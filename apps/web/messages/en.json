@@ -1,0 +1,983 @@
+{
+  "Common": {
+    "signIn": "Sign in",
+    "signUp": "Sign up",
+    "brandName": "AI Music Editor",
+    "back": "Back",
+    "cancel": "Cancel",
+    "continue": "Continue",
+    "retry": "Try again",
+    "upload": "Upload",
+    "credits": "Credits",
+    "loading": "Loading...",
+    "delete": "Delete",
+    "stop": "Stop",
+    "or": "or",
+    "download": "Download",
+    "edit": "Edit",
+    "emptyValue": "—",
+    "close": "Close",
+    "save": "Save",
+    "confirm": "Confirm",
+    "apply": "Apply",
+    "reset": "Reset",
+    "downloading": "Downloading...",
+    "progress": "Progress",
+    "goHome": "Go home",
+    "statusLabel": "Status: {status}"
+  },
+  "Navigation": {
+    "musicCreate": "Music Create",
+    "history": "History",
+    "profile": "Profile",
+    "pricing": "Pricing",
+    "openMenu": "Open menu",
+    "closeMenu": "Close menu"
+  },
+  "Footer": {
+    "support": "Support",
+    "supportEmailAriaLabel": "Support email",
+    "legalNavLabel": "Legal",
+    "termsLink": "Terms of Service",
+    "privacyLink": "Privacy Policy",
+    "refundLink": "Refund Policy",
+    "legalInfoLink": "Legal Information"
+  },
+  "LanguageSwitcher": {
+    "label": "Language",
+    "en": "EN",
+    "ru": "RU",
+    "ka": "GE"
+  },
+  "Theme": {
+    "groupLabel": "Theme",
+    "light": "Light",
+    "dark": "Dark",
+    "system": "System"
+  },
+  "Landing": {
+    "eyebrow": "AI Music Create",
+    "hero": {
+      "title": "Create any<br></br><highlight>song</highlight><br></br>you can imagine",
+      "subtitle": "Create a track with a standard AI vocal, or add a Personal AI Voice when you are ready."
+    },
+    "demoCredits": {
+      "packages": "{credits} free starter credits for new users · no card required"
+    },
+    "cta": {
+      "subtitle": "Professional music without watermarks — fast and affordable.",
+      "creditPackages": "Credit packages",
+      "pricing": "Pricing"
+    },
+    "voiceGate": {
+      "title": "Sign in to continue",
+      "hint": "Sign up for free — then create a track with a standard AI vocal, or add a Personal AI Voice."
+    },
+    "continueWithoutVoice": {
+      "or": "or",
+      "lead": "Not ready to record your voice?",
+      "hint": "Create music with standard AI vocals instead.",
+      "label": "Create a track with AI vocals"
+    }
+  },
+  "Metadata": {
+    "home": {
+      "title": "AI Music — Create songs with an AI vocal",
+      "description": "Create a track with a standard AI vocal, or add a Personal AI Voice when you are ready."
+    },
+    "musicCreate": {
+      "title": "Create a song — AI Music",
+      "description": "Write or generate lyrics, pick a style, and create a track with a standard AI vocal or your Personal AI Voice."
+    },
+    "profile": {
+      "title": "Profile — AI Music",
+      "description": "View your account, plan, and credit balance."
+    },
+    "history": {
+      "title": "Generation history — AI Music",
+      "description": "Browse your generated tracks and open them in the editor."
+    },
+    "pricing": {
+      "title": "Credit packages — AI Music",
+      "description": "Buy prepaid credits for AI music generation. One-time purchase, no subscription."
+    },
+    "paymentReturn": {
+      "title": "Payment status — AI Music",
+      "description": "Confirm your prepaid credit purchase."
+    },
+    "editor": {
+      "title": "Music editor — AI Music",
+      "titleWithTrack": "{title} — Music editor — AI Music",
+      "description": "Edit vocals and instrumental on a timeline, then render a new version."
+    },
+    "terms": {
+      "title": "Terms of Service — AI Music",
+      "description": "Terms for prepaid usage credits and one-time purchases on AI Music (Voice-to-Song)."
+    },
+    "refund": {
+      "title": "Refund Policy — AI Music",
+      "description": "Refund rules for prepaid credit package purchases on AI Music (Voice-to-Song)."
+    },
+    "consent": {
+      "title": "Voice verification — AI Music",
+      "description": "Verify your voice sample for AI music generation."
+    },
+    "privacy": {
+      "title": "Privacy Policy — AI Music",
+      "description": "How Voice to Song collects and uses account, voice, generation, and payment-related data."
+    },
+    "businessInformation": {
+      "title": "Legal Information — AI Music",
+      "description": "Registered trader details for Voice to Song (AI Music): name, legal form, identification number, address, and support email."
+    }
+  },
+  "Validation": {
+    "consentRequired": "Confirm consent before continuing",
+    "consentRequiredBeforeRecord": "Confirm consent before recording your voice",
+    "consentRequiredBeforeUpload": "Confirm consent before uploading a file",
+    "consentRequiredForVoice": "Confirm consent to use your voice",
+    "genderRequired": "Select a gender",
+    "genderRequiredBeforeRecord": "Select a gender before recording your voice.",
+    "genderRequiredBeforeUpload": "Select a gender before uploading a file.",
+    "audioOrFileRequired": "Record your voice or choose an audio file",
+    "emptyRecording": "Recording is empty — try again",
+    "minDuration": "Minimum duration is {seconds} sec",
+    "maxDuration": "Maximum duration is {seconds} sec",
+    "minDurationHint": "Minimum {seconds} sec — record or upload a longer sample.",
+    "maxDurationHint": "Maximum {seconds} sec — record or upload a shorter sample.",
+    "lyricsBriefRequired": "Enter a lyrics description",
+    "lyricsTooLong": "Lyrics are too long for ~{seconds} sec — maximum {max} characters.",
+    "verifyPhraseRequired": "Record the verification phrase first",
+    "verifyRecordingTooShort": "Recording is too short — minimum {seconds} sec. Say the full phrase.",
+    "voiceSampleMissing": "Voice sample is missing"
+  },
+  "Errors": {
+    "generic": "Something went wrong. Please try again.",
+    "insufficientCredits": "Not enough credits. Top up your balance on the pricing page.",
+    "featureNotAvailable": "This feature is not available on your plan. Go to the pricing page.",
+    "durationLimitExceeded": "Track duration limit exceeded for your plan.",
+    "editorOperationNotAllowed": "This editor operation requires a higher plan.",
+    "contentModeration": "The content did not pass moderation. Change the text and try again.",
+    "providerCapacity": "The music service is temporarily overloaded. Please try again shortly.",
+    "uploadFailed": "Could not upload the voice sample",
+    "saveGenderFailed": "Could not save gender",
+    "generateLyricsFailed": "Could not generate lyrics",
+    "lyricsGenerationFailed": "Lyrics generation failed",
+    "lyricsEmpty": "AI did not return song lyrics",
+    "generateTrackFailed": "Could not generate the track",
+    "generationTimeout": "Generation took more than 5 minutes. Check history or try again.",
+    "loadVoiceSampleFailed": "Could not load the voice sample",
+    "voiceSetupFailed": "Could not set up the AI Music voice",
+    "voiceCreateFailed": "Could not create the AI Music voice",
+    "microphoneUnavailable": "Voice recording is not available in this browser",
+    "microphoneAccessDenied": "Could not access the microphone",
+    "recordingFailed": "Voice recording error",
+    "verifySubmitFailed": "Could not submit the recording. Try recording the phrase again.",
+    "verifyCloneNotStarted": "Recording was sent, but AI Music did not start creating the voice. Refresh the page or tap Retry.",
+    "coverGenerateFailed": "Could not generate a cover",
+    "coverSelectFailed": "Could not select a cover",
+    "recordingScriptFailed": "Could not generate recording text",
+    "recordingScriptEmpty": "AI did not return text for recording",
+    "audioDurationReadFailed": "Could not read the audio duration. Try another file.",
+    "apiUnreachable": "Could not reach the API ({status}). Start <code>pnpm dev:api</code> and check NEXT_PUBLIC_API_URL.",
+    "musicNotConfigured": "Music generation is not configured. Add an API key to the root .env and restart the API.",
+    "profileLoadFailed": "Could not load profile",
+    "historyLoadFailed": "Could not load history",
+    "historyDeleteFailed": "Could not delete history items",
+    "trackDeleteFailed": "Could not delete the track",
+    "openEditorFailed": "Could not open the editor",
+    "remixStatusFailed": "Could not check remix status",
+    "remixCreateFailed": "Could not create a remix",
+    "profileDevHint": "Make sure the API is running (`pnpm dev:api`) and Docker Postgres is up (`pnpm docker:up`).",
+    "checkoutOpenFailed": "We could not start the payment. Please try again.",
+    "editorLoadFailed": "Could not load the editor.",
+    "editorOperationFailed": "Could not apply the edit.",
+    "editorUndoFailed": "Could not undo the last change.",
+    "editorRedoFailed": "Could not redo the change.",
+    "editorRenderFailed": "Could not render the track.",
+    "editorWavExportFailed": "Could not export WAV.",
+    "editorStemRetryFailed": "Could not retry stem separation.",
+    "editorAudioLoadFailed": "Could not load audio.",
+    "editorRefreshFailed": "Could not refresh editor state.",
+    "karaokeLoadFailed": "Could not load karaoke sync.",
+    "voicePresetDemoFailed": "Could not play the demo.",
+    "generationLoadFailed": "Could not load generation status",
+    "downloadFailed": "Download failed",
+    "coverDownloadFailed": "Could not download the cover"
+  },
+  "MusicCreate": {
+    "authTitle": "Sign in to create music",
+    "authHint": "Sign up for free to create tracks with a standard AI vocal or your Personal AI Voice.",
+    "pageTitle": "Music Create",
+    "voiceNotReady": "Your AI Music voice is not ready yet.",
+    "voiceNotReadyLink": "Create and verify your voice on the home page",
+    "voiceNotReadySuffix": "— otherwise the song will use a different AI vocal.",
+    "personalVoiceNotReady": "Your personal AI voice is not ready yet.",
+    "personalVoiceNotReadyLink": "Create a personal voice on the home page",
+    "standardVocalHint": "Generation will use the standard AI vocal.",
+    "addPersonalVoiceHint": "Add a personal voice to use your own vocal.",
+    "addPersonalVoiceLink": "Add on the home page",
+    "personalVoiceOffReadyHint": "Personal voice is off. Generation will use the standard AI vocal.",
+    "personalVoiceReadyHint": "Personal voice is on.",
+    "personalVoiceLoadErrorHint": "Could not load your personal AI voice. You can still create a track with the standard AI vocal.",
+    "sessionLoading": "Loading session...",
+    "stepOf": "Step {current} of {total}",
+    "lyricsStep": {
+      "title": "Lyrics generation",
+      "description": "Choose one option: describe an idea for AI or enter finished song lyrics.",
+      "manualLabel": "Enter song lyrics for the AI to sing",
+      "manualPlaceholder": "Write your own lyrics, or verses (8 lines) for better results",
+      "clearBriefFirst": "Clear the description above or tap “Generate lyrics” — the finished text will appear here.",
+      "clearLyricsFirst": "Clear the song lyrics below to describe an idea for AI.",
+      "limitFree": "On Free — up to {max} characters ({durationHint}). On paid plans the limit grows with track duration.",
+      "limitPaid": "Lyrics limit: {max} characters ({durationHint}).",
+      "continueToMusic": "Next: create music"
+    },
+    "lyricsLanguage": {
+      "label": "Lyrics language",
+      "options": {
+        "auto": "Auto — the song is generated in the same language as the text",
+        "en": "English",
+        "ka": "Georgian",
+        "es": "Spanish",
+        "fr": "French",
+        "de": "German",
+        "it": "Italian",
+        "pt": "Portuguese",
+        "pl": "Polish",
+        "tr": "Turkish",
+        "uk": "Ukrainian",
+        "ru": "Russian",
+        "ja": "Japanese",
+        "ko": "Korean",
+        "zh": "Chinese"
+      }
+    },
+    "lyricsFromPrompt": {
+      "genderLocked": "Voice gender: {gender} — fixed when the sample was recorded and verified.",
+      "genderMissing": "Voice gender is not set — choose it when recording a sample on the home page so AI can match verb forms.",
+      "placeholder": "For example: a sad breakup ballad, first person",
+      "hint": "Describe the lyrics roughly and AI will create song lyrics from your prompt",
+      "costBalance": "Lyrics cost: {cost} credits. Balance: {balance}.",
+      "topUp": "Top up on the pricing page",
+      "submit": "Generate lyrics",
+      "starting": "Starting...",
+      "generating": "Generating...",
+      "aiWriting": "AI is writing song lyrics...",
+      "chooseVariant": "Choose a variant:",
+      "variantFallback": "Variant {index}"
+    },
+    "musicStep": {
+      "title": "Create music",
+      "description": "Choose a style, title, and duration",
+      "descriptionWithGender": "Choose a style, title, and duration — vocals will use your AI Music Voice ({gender}).",
+      "lyricsLabel": "Song lyrics",
+      "titleLabel": "Title",
+      "titlePlaceholder": "Enter a title",
+      "styleLabel": "Music style",
+      "stylePlaceholder": "pop, hyperpop, upbeat, 120 BPM",
+      "durationLabel": "Duration (AI does not always match the selected length exactly)",
+      "paidPlanHint": "Pro+",
+      "durationLockedHint": "Other durations are available on paid plans.",
+      "freeDurationOnly": "On Free only 30 sec is available. Other durations are on paid plans.",
+      "personalVoiceLabel": "My voice",
+      "personalVoiceHint": "Use your ready personal AI voice for vocals.",
+      "personalVoiceDisabledHint": "Personal voice is off. Generation will use the standard AI vocal.",
+      "personalVoiceEnabledHint": "Personal voice is on.",
+      "pricingLink": "Pricing",
+      "costBalance": "New generation cost: {cost} credits. Balance: {balance}.",
+      "topUp": "Top up on the pricing page",
+      "backToLyrics": "Back to lyrics",
+      "starting": "Starting...",
+      "submit": "Create music"
+    },
+    "styles": {
+      "customTagsHint": "Custom style tags are available in full generation mode",
+      "selected": "Style: {style}",
+      "sectionLabel": "Music style",
+      "freeComboOnly": "On Free you can pick a combo style only. Custom tags unlock on paid plans.",
+      "recommendedHint": "Pick {min}–{max} tags — AI Music understands short comma-separated styles better than long descriptions. Selected: {selected}/{max}.",
+      "comboTrigger": "combo style",
+      "comboMismatchTooltip": "This combo may not match your voice timbre well. Try another style if the result sounds off."
+    },
+    "comboStyles": {
+      "dreamyLofi": "Dreamy lo-fi chill",
+      "energeticHyperpop": "Energetic hyperpop anthem",
+      "gloomyBedroom": "Gloomy bedroom pop",
+      "emotionalIndie": "Emotional indie rock",
+      "darkTrap": "Dark trap beat",
+      "chargedPopPunk": "Charged pop-punk",
+      "danceElectropop": "Dance electropop",
+      "nostalgic2000s": "Nostalgic 2000s pop",
+      "aggressiveRage": "Aggressive rage rap",
+      "melodicEmo": "Melodic emo rap"
+    },
+    "gender": {
+      "m": "Male",
+      "f": "Female",
+      "mShort": "Male",
+      "fShort": "Female"
+    },
+    "duration": {
+      "sec": "~{seconds} sec",
+      "min1": "~1 min",
+      "min2": "~2 min",
+      "min3": "~3 min",
+      "min2to3": "~2–3 min",
+      "auto1": "Auto (~1 min)",
+      "auto2": "Auto (~2 min)",
+      "auto2to3": "Auto (~2–3 min)",
+      "fallbackSec": "{seconds} sec"
+    },
+    "lyricsDurationHint": {
+      "free": "On the Free plan AI creates short lyrics only for {duration}. On paid plans length depends on the selected track duration.",
+      "selected": "AI will write lyrics for {duration} — the duration you choose on the next step."
+    },
+    "results": {
+      "trackFallback": "Track",
+      "download": "Download",
+      "deleteTrack": "Delete track",
+      "openingEditor": "Opening editor...",
+      "openEditor": "Open Editor",
+      "preparingSecond": "Preparing the second version…",
+      "secondFailed": "Could not create the second version."
+    },
+    "cover": {
+      "selectedAria": "Selected cover",
+      "selectAria": "Select cover",
+      "generating": "Generating new cover variants…",
+      "newVariants": "New cover variants — free",
+      "creatingVariants": "Generating new cover variants…",
+      "waitingForReady": "New cover variants become available when music generation fully completes.",
+      "variantsUnavailable": "This track was made with your Personal AI Voice — extra cover variants aren't supported for these tracks yet.",
+      "needPlan": "Cover variant generation is available on plans that include this feature.",
+      "creditPackages": "Plans and packages"
+    }
+  },
+  "VoiceUpload": {
+    "authTitle": "Sign in to record your voice",
+    "authHint": "Recording and uploading a voice sample require an account.",
+    "authHintVerify": "Voice verification is available after you sign in.",
+    "authTitleVerify": "Sign in to verify your voice",
+    "pageAuthHint": "Recording and verification are available after you sign in.",
+    "creationTitle": "Create your own voice",
+    "creationOptionalLabel": "OPTIONAL",
+    "creationHint": "Record a sample if you want to use your own voice in future tracks.",
+    "readyHint": "Voice is ready. You can continue to lyrics and music generation.",
+    "createTrack": "Create a track",
+    "addNewSample": "Add a new sample",
+    "personalVoice": {
+      "title": "Personal AI voice",
+      "description": "Create a personal voice for music generation. Cost: {cost} credits.",
+      "create": "Create my AI voice",
+      "retry": "Retry creation",
+      "starting": "Starting...",
+      "creating": "Creating your personal AI voice. This may take a few minutes.",
+      "ready": "Your personal AI voice is ready.",
+      "failed": "Personal AI voice creation failed.",
+      "failedRefunded": "Personal AI voice creation failed. The charge was refunded.",
+      "unavailable": "Could not load your personal AI voice state. Refresh the page or try again later.",
+      "staleWhileCreating": "Your personal AI voice is still being created. Status refresh failed — retrying.",
+      "stale": "Could not refresh your personal AI voice status. Showing the last received data.",
+      "blockedLoading": "Loading your personal AI voice state...",
+      "blockedProcessing": "The voice sample is still processing. Please wait until it is ready.",
+      "blockedConsent": "Confirm consent to use your voice.",
+      "blockedDuration": "Sample duration must be between {min} and {max} seconds."
+    },
+    "pageTitle": "Voice recording",
+    "consentTitle": "Consent to personal data processing.",
+    "consentRequiredNote": "Without consent, voice recording and file upload are unavailable.",
+    "voiceLanguage": {
+      "label": "Sample language",
+      "helper": "Used for the consent text and the verification phrase you will sing next.",
+      "options": {
+        "en": "English",
+        "ru": "Russian",
+        "zh": "Chinese",
+        "es": "Spanish",
+        "fr": "French",
+        "pt": "Portuguese",
+        "de": "German",
+        "ja": "Japanese",
+        "ko": "Korean",
+        "hi": "Hindi"
+      }
+    },
+    "inputModeAria": "Voice input method",
+    "microphone": "Microphone",
+    "file": "File",
+    "switchConfirmRecordToFile": "The recording will be deleted. Switch to file upload?",
+    "switchConfirmFileToRecord": "The uploaded file will be deleted. Switch to microphone recording?",
+    "switch": "Switch",
+    "recordLabel": "Microphone recording",
+    "record": "Record",
+    "recordingProgress": "Recording {time}",
+    "recordingTarget": " · target {duration}",
+    "recordingEnough": " · duration is enough",
+    "uploadLabel": "File upload",
+    "chooseFileAria": "Choose a voice audio file",
+    "previewLabel": "Preview · {source}",
+    "previewRecord": "Microphone recording",
+    "previewFile": "Uploaded file",
+    "browserOnlyHint": "The file is only in the browser for now. After “Upload sample” it will be saved on the server.",
+    "uploading": "Uploading...",
+    "uploadSample": "Upload sample",
+    "durationRecommendation": "Recommended: {duration} of humming. Shorter samples may fail.",
+    "genderLabel": "Gender:",
+    "genderAria": "Gender for voice recording",
+    "tipsTitle": "How to record your voice correctly",
+    "tipsAria": "How to record your voice correctly",
+    "verifyTipsTitle": "How to record the verification phrase",
+    "verifyTipsAria": "How to record the verification phrase",
+    "tips": {
+      "sampleDuration": "Record a hummed sample lasting {duration} — this is the base for your future AI voice.",
+      "sameVoiceNext": "On the next step you will repeat a short phrase with the same voice and intonation.",
+      "quietRoom": "Record in a quiet room without echo or background noise.",
+      "micDistance": "Keep the mic 5–8 cm away; for loud phrases move back to 10–15 cm.",
+      "moderateVolume": "Speak or sing moderately — quieter is better than too loud.",
+      "headphones": "Remove headset mics or lower volume so headphone bleed is not captured.",
+      "avoidReadingOnly": "Avoid plain reading without melody — verification needs the same timbre on both steps."
+    },
+    "verifyTips": {
+      "sameManner": "Speak or hum the full phrase with the same voice you used on the home page.",
+      "matchStyle": "If you read text on the home page — read here too. If you sang or hummed — do the same here.",
+      "dontCutShort": "Do not stop the recording before the phrase ends."
+    },
+    "script": {
+      "title": "Text for recording",
+      "humTitle": "Text to hum",
+      "generating": "AI is preparing text for recording...",
+      "selectGenderHint": "Select a gender and open the panel again..."
+    },
+    "scriptHint": "Humming hint (~20 seconds). For a high-quality clone, 30 seconds is better.",
+    "sample": {
+      "titleFromDate": "Sample from {date}",
+      "status": {
+        "pending": "Uploaded",
+        "preparing": "AI Music analysis",
+        "awaitingVerification": "Verification needed",
+        "cloning": "Creating voice",
+        "ready": "Ready",
+        "failed": "Error",
+        "readyForGeneration": "Ready for generation",
+        "needsReverification": "Re-verification needed"
+      }
+    },
+    "waiting": {
+      "defaultHint": "Usually about 1 minute — do not close the page.",
+      "slowHint": "AI Music is taking longer than usual. You can tap Stop or Retry verification.",
+      "elapsedMeta": "{hint} Elapsed: {elapsed}."
+    }
+  },
+  "Generation": {
+    "progress": {
+      "starting": "Starting generation...",
+      "queued": "In our queue",
+      "queuedWithEta": "In our queue · ~{eta}",
+      "queuedAtProvider": "In the AI queue",
+      "generating": "Creating music…",
+      "finalizing": "Finalizing track",
+      "persisting": "Preparing your result…",
+      "ready": "Ready",
+      "fallback": "Creating music…",
+      "etaMinutes": "{minutes, plural, one {# min} other {# min}}"
+    },
+    "loader": {
+      "usualTime": "Usually 2–3 minutes · do not close the page",
+      "taskId": "ID: {id}…",
+      "elapsedPrefix": "Elapsed "
+    },
+    "verify": {
+      "pageTitle": "Create your voice",
+      "inlineTitle": "Voice verification",
+      "loading": "Loading...",
+      "preparing": "Preparing...",
+      "idleHint": "Tap “Start verification” so AI Music can prepare a phrase for recording.",
+      "preparingHint": "Analyzing your voice and preparing a verification phrase...",
+      "awaitingRecordingHint": "Record the phrase below with the same voice and manner as your sample",
+      "cloningHint": "Creating your voice in AI Music...",
+      "readyHint": "Voice is ready",
+      "failedMismatch": "AI Music could not confirm the voice for music generation. Tap “Retry verification” — your home-page sample is kept.",
+      "failedGeneric": "Could not confirm the voice. Retry verification or record a new sample.",
+      "fallbackHint": "Preparing voice...",
+      "pollTimeoutCloning": "AI Music did not finish creating the voice within 6 minutes. Tap “Retry verification” or refresh the page.",
+      "pollTimeoutPrepare": "AI Music did not return a phrase within 6 minutes. Tap “Retry verification” or upload a new sample.",
+      "phraseExpiredBanner": "Time to record the phrase has expired. Retry verification — AI Music will issue a new phrase.",
+      "phraseLabel": "Phrase to record",
+      "startRecording": "Start recording the phrase",
+      "stopAndSubmit": "Stop and submit ({seconds} s)",
+      "submitting": "Submitting...",
+      "verifiedReady": "Voice verified and ready for music generation.",
+      "goToCreate": "Go to track creation",
+      "startVerification": "Start verification",
+      "starting": "Starting...",
+      "retryVerification": "Retry verification",
+      "recordNewSample": "Record a new sample",
+      "stopping": "Stopping...",
+      "preparingAiVoice": "Preparing AI Voice...",
+      "sendingVerify": "Sending the verification recording to AI Music...",
+      "creatingVoice": "Creating your voice in AI Music...",
+      "countdownExpired": "Verification phrase expired — tap “Retry verification”",
+      "countdownLabel": "Verification phrase expires in:",
+      "voiceMismatchHint": "If you read text for the home-page sample but sang or hummed here (or the other way around), AI Music will reject the recording. Record a new hummed sample and retry verification with the same voice.",
+      "failedEmptyPhrase": "AI Music did not return a verification phrase. Tap “Retry verification”. If it happens again, record a new sample on the home page."
+    },
+    "pageTitle": "Generation",
+    "authTitle": "Sign in to follow generation",
+    "authHint": "Sign in or sign up to follow generation status.",
+    "jobId": "Job ID: {id}",
+    "pollingMeta": "Updating every 3 sec...",
+    "openTrack": "Open track",
+    "backToProfile": "Back to profile",
+    "status": {
+      "pending": "Queued",
+      "preprocessing_voice": "Preparing voice",
+      "generating_lyrics": "Generating lyrics",
+      "generating_song": "Generating music",
+      "converting_voice": "Processing voice",
+      "uploading_result": "Saving result",
+      "completed": "Done",
+      "failed": "Failed"
+    }
+  },
+  "Profile": {
+    "authTitle": "Sign in to open your profile",
+    "authHint": "Sign in or create an account to view your profile and credit balance.",
+    "title": "Profile",
+    "loading": "Loading profile...",
+    "labels": {
+      "email": "Email",
+      "name": "Name",
+      "plan": "Plan",
+      "credits": "Credits",
+      "creditBalance": "Credit balance",
+      "devUser": "Dev user"
+    },
+    "billingNote": "Credits do not renew automatically.",
+    "historyNote": "Credit purchase history will appear here after online payments are activated.",
+    "actions": {
+      "createTrack": "Create a track",
+      "buyCredits": "Buy more credits",
+      "pricing": "Pricing"
+    },
+    "accountDeletion": {
+      "title": "Delete account",
+      "description": "Account deletion is irreversible. Your personal AI voice will be disabled, source recordings removed from our storage, and a deletion request will be sent to the AI provider.",
+      "delete": "Delete account",
+      "deleting": "Submitting request...",
+      "confirmTitle": "Delete account?",
+      "confirmLead": "This action cannot be undone.",
+      "confirmBody": "Your account will be disabled for further use. Original personal voice recordings will be deleted from our storage, and a request to delete related voice data will be sent to the AI provider.",
+      "confirmTiming": "Final deletion may take some time.",
+      "cancel": "Cancel",
+      "confirmDelete": "Delete account",
+      "pending": "Account deletion is in progress. Some external data may not be removed immediately.",
+      "pendingHint": "While deletion is pending, generation, voice upload, and purchases are unavailable."
+    }
+  },
+  "History": {
+    "authTitle": "Sign in to view history",
+    "authHint": "Sign in or create an account to see your generation history.",
+    "pageTitle": "Generation history",
+    "createLink": "Music Create",
+    "loading": "Loading history...",
+    "empty": {
+      "title": "No tracks yet",
+      "description": "Create a track on Music Create — results will appear here.",
+      "action": "Create a song"
+    },
+    "limitNotice": "Showing the latest {count} projects.",
+    "limitNoticeLink": "Buy a larger credit package ",
+    "limitNoticeSuffix": "to see more in history.",
+    "selectAll": "Select all",
+    "selectedCount": "Selected: {count}",
+    "deleteSelected": "Delete selected",
+    "status": {
+      "pending": "Queued",
+      "processing": "Generating",
+      "completed": "Ready",
+      "failed": "Failed",
+      "unknown": "Unknown status"
+    },
+    "type": {
+      "song": "Track",
+      "lyrics": "Lyrics for a track"
+    },
+    "remixBadge": "Remix",
+    "deleteRecord": "Delete record",
+    "deleteTrack": "Delete track",
+    "download": "Download",
+    "openEditor": "Open Editor",
+    "openingEditor": "Opening editor...",
+    "audioUnavailable": "Audio unavailable"
+  },
+  "TrackCard": {
+    "coverAlt": "Cover for {title}"
+  },
+  "Pagination": {
+    "loadMore": "Load more",
+    "endOfList": "End of list"
+  },
+  "PaymentReturn": {
+    "title": "Payment status",
+    "description": "We are confirming your purchase. Credits are added only after the payment is verified by the server.",
+    "pending": "Confirming payment…",
+    "success": "Payment successful. {credits, plural, one {# credit was} other {# credits were}} added to your balance.",
+    "failed": "Payment was not completed. No credits were added. You can try again from the pricing page.",
+    "missingPurchase": "We could not match this return to a purchase. Open pricing to continue.",
+    "statusFailed": "Could not load payment status. Please sign in and open pricing.",
+    "backToPricing": "Back to pricing",
+    "goToProfile": "Go to profile",
+    "authTitle": "Sign in to see payment status",
+    "authHint": "Sign in to confirm whether your credits were added."
+  },
+  "Pricing": {
+    "packages": {
+      "title": "Credit Packs",
+      "headline": "Buy prepaid credits for AI music generation and audio processing. One-time purchase. No subscription or automatic renewal.",
+      "explanation": "Credits are used for paid AI operations such as music generation, creating a Personal AI Voice, stem separation, and other AI tools. Manual Music Editor actions, reuse of an existing Personal AI Voice, and MP3/WAV export do not consume credits.",
+      "gelPaymentNote": "Payment is processed in GEL. The GEL equivalent is calculated from the current official USD/GEL exchange rate of the National Bank of Georgia. The exact GEL amount is fixed when you proceed to checkout and is shown before you confirm payment.",
+      "approxGel": "≈ {amount} GEL",
+      "examplesDisclaimer": "Generation estimates are examples, not guarantees. Actual credit usage depends on the AI operations you choose.",
+      "faqTitle": "FAQ",
+      "termsLink": "Terms of use",
+      "refundLink": "Refund policy",
+      "privacyLink": "Privacy policy",
+      "legalInfoLink": "Legal Information",
+      "paymentsPending": "Online payments are being activated.",
+      "checkoutStarting": "Starting checkout…",
+      "checkoutFailed": "Could not start checkout. Please try again.",
+      "checkoutRedirectInvalid": "Payment page is unavailable. Please try again.",
+      "creditsCount": "{count, plural, one {# credit} other {# credits}}",
+      "saveVsStarter": "≈{percent}% cheaper per credit than Starter",
+      "sharedFeatures": {
+        "allTools": "All core tools",
+        "standardVocal": "Standard AI vocals",
+        "musicEditor": "Music Editor",
+        "exportsIncluded": "MP3/WAV export included",
+        "personalVoiceAvailable": "Personal AI Voice available from {count} credits"
+      },
+      "purchasingPower": {
+        "enoughForPersonalVoice": "Enough credits to create a Personal AI Voice"
+      },
+      "examples": {
+        "standardGenerations": "≈{generations} AI generations · up to {variants} variants",
+        "withVoice": "1 Personal AI Voice + ≈{generations} AI generations · up to ≈{variants} variants",
+        "withoutVoice": "≈{generations} standard AI generations if a new Personal AI Voice is not created"
+      },
+      "free": {
+        "name": "Free",
+        "shortDescription": "Try the core AI generation flow",
+        "cta": "Start for free"
+      },
+      "starter": {
+        "name": "Starter Pack",
+        "shortDescription": "For first projects",
+        "cta": "Buy {count} credits"
+      },
+      "creator": {
+        "name": "Creator Pack",
+        "badge": "Good pack for a Personal AI Voice",
+        "cta": "Buy {count, number} credits"
+      },
+      "studio": {
+        "name": "Studio Pack",
+        "badge": "Best value",
+        "cta": "Buy {count, number} credits"
+      },
+      "faq": {
+        "differQ": "How do packages differ?",
+        "differA": "All core AI tools are available to everyone. Packages differ by credit balance and price per credit.",
+        "subscriptionQ": "Is this a subscription?",
+        "subscriptionA": "No. Purchases are one-time. There is no automatic renewal and no subscription.",
+        "creditsQ": "What are credits used for?",
+        "creditsA": "Credits are spent on paid AI operations such as music generation, creating a Personal AI Voice, stem separation, and other AI tools. Manual Music Editor actions, reuse of an existing Personal AI Voice, and MP3/WAV export do not consume credits.",
+        "moneyQ": "Are credits money?",
+        "moneyA": "No. Credits are not money, cannot be transferred between users, and cannot be withdrawn. They are used only inside the product."
+      }
+    }
+  },
+  "Billing": {
+    "header": {
+      "availableCredits": "Buy credits",
+      "creditsLabel": "{balance} credits",
+      "planCreditsLabel": "{plan} {balance} credits",
+      "lowBalanceHint": ", not enough to generate a track",
+      "ariaAvailable": "{balance} available credits{hint}",
+      "ariaPlan": "{plan}, {balance} credits{hint}",
+      "titleAvailable": "{balance} available credits{hint}",
+      "titlePlan": "{plan} · {balance} credits{hint}",
+      "devOverride": "{plan} (dev override)"
+    }
+  },
+  "Karaoke": {
+    "lyricsLabel": "Song lyrics",
+    "toggleOn": "Karaoke: on",
+    "toggleOff": "Karaoke: off",
+    "syncing": "Syncing lyrics...",
+    "unavailable": "Timed lyrics are not available yet.",
+    "unavailableForProvider": "Timed lyrics sync is not available for this track yet.",
+    "cacheMissHint": "Karaoke Sync is not ready for this track yet.",
+    "syncAction": "Sync lyrics (1 credit)",
+    "upgradeTitle": "Karaoke Sync is temporarily unavailable",
+    "upgradeHint": "Timed karaoke lyrics are available on paid credit packages.",
+    "packagesLink": "Credit packages"
+  },
+  "Editor": {
+    "titleFallback": "Audio Editor",
+    "trackFilenameFallback": "track",
+    "hintsToggle": "Hints",
+    "karaokePanelTitle": "Karaoke Sync",
+    "auth": {
+      "title": "Sign in to open the editor",
+      "hint": "Sign in or sign up to edit tracks."
+    },
+    "preparation": {
+      "separating": "Separating the track into vocals and music...",
+      "preparing": "Preparing the editor...",
+      "mayTakeMinute": "Preparation may take up to a minute.",
+      "elapsed": "Elapsed {elapsed}. Usually up to {estimate}.",
+      "elapsedOvertime": "Elapsed {elapsed}. Usually up to {estimate}, but AI Music can take longer.",
+      "progressAria": "Preparation",
+      "loadingTimeline": "Loading timeline..."
+    },
+    "tracks": {
+      "panelTitle": "Tracks (edits for the whole track)",
+      "vocal": "Vocal",
+      "instrumental": "Instrumental",
+      "vocalTooltip": "Vocal track. Mute applies to the whole track; volume applies to the selected region.",
+      "instrumentalTooltip": "Instrumental track. Mute applies to the whole track; volume applies to the selected region.",
+      "muteTooltip": "Mute the whole track",
+      "muteUnavailableTooltip": "Mute is unavailable: vocal/instrumental separation is not supported yet for tracks with a Personal AI Voice",
+      "muteUnavailableHint": "For tracks with a Personal AI Voice, Mute on Vocal and Instrumental does not work — stem separation is not available yet.",
+      "volumeTooltip": "Volume of the selected region on this track",
+      "seekAria": "Seek this track to the current playback position",
+      "muteShort": "M"
+    },
+    "timeline": {
+      "title": "Timeline",
+      "linked": "Linked tracks",
+      "independent": "Independent tracks",
+      "loadingWaveform": "Loading waveform...",
+      "preparingTimeline": "Preparing timeline...",
+      "linkedHint": "Linked mode: drag and trim apply to Vocal and Instrumental together.",
+      "independentHint": "Independent mode: drag and trim apply only to the track you edit.",
+      "actionsHint": "Click the timeline to select the region under the playhead. Select a range on the waveform and press Delete to cut it. Split cuts at the playhead."
+    },
+    "playback": {
+      "play": "Play",
+      "pause": "Pause",
+      "stop": "Stop",
+      "loopSelected": "Loop selected",
+      "zoomOut": "Zoom -",
+      "zoomIn": "Zoom +",
+      "playPauseTooltip": "Play or pause the track (Space)",
+      "stopTooltip": "Stop and return to the start",
+      "loopTooltip": "Loop the selected region",
+      "zoomOutTooltip": "Zoom out on the timeline",
+      "zoomInTooltip": "Zoom in on the timeline"
+    },
+    "region": {
+      "panelTitle": "Clip edit (Vocal + Instrumental)",
+      "selectFirst": "Select a clip on the timeline first",
+      "advancedLocked": "Your plan does not allow this editor operation",
+      "split": "Split",
+      "delete": "Delete",
+      "duplicate": "Duplicate",
+      "fadeIn": "Fade in",
+      "fadeOut": "Fade out",
+      "moveLeft": "Move left",
+      "moveRight": "Move right",
+      "splitTooltip": "Split the selected clip at the playhead on the timeline",
+      "deleteTooltip": "Delete the selected range on the timeline, or the whole region if nothing is selected",
+      "duplicateTooltip": "Create a copy of the selected clip",
+      "fadeInTooltip": "Gradually increase volume at the start of the clip",
+      "fadeOutTooltip": "Gradually decrease volume at the end of the clip",
+      "moveLeftTooltip": "Move the selected clip left",
+      "moveRightTooltip": "Move the selected clip right"
+    },
+    "context": {
+      "editing": "Editing:",
+      "track": "Track: {label}",
+      "region": "Region: {label}",
+      "time": "Time: {range}",
+      "selection": "Selection: {range}",
+      "linkedTracks": "Vocal + Instrumental",
+      "tooltip": "Shows which clip and track the next action will apply to",
+      "emptyHint": "Click the timeline to select a region. Select a range on the waveform and press Delete to cut it. Split cuts at the playhead."
+    },
+    "history": {
+      "title": "Edit history",
+      "operationsCount": "Operations: {count} / {limit}",
+      "empty": "Operations will appear here after your first edit",
+      "jumpTooltip": "Click to jump to the clip that was changed",
+      "undo": "Undo",
+      "redo": "Redo",
+      "undoTooltip": "Undo the last change",
+      "redoTooltip": "Redo the undone change",
+      "wholeTrack": "whole track",
+      "volume": "{trackId} volume {gainDb} dB — {region}",
+      "mute": "{trackId} mute — {scope}",
+      "unmute": "{trackId} unmute — {scope}",
+      "solo": "{trackId} solo — {region}",
+      "unsolo": "{trackId} unsolo — {region}",
+      "fade": "Fade {fadeType} — {region}",
+      "split": "Split — {region}",
+      "duplicate": "Duplicate — {region}",
+      "move": "Move — {region}",
+      "moveTrack": "Move {trackId} — {region}",
+      "delete": "Delete — {region}",
+      "deleteRange": "Delete range — {region}",
+      "resize": "Resize — {region}",
+      "resizeTrack": "Resize {trackId} — {region}",
+      "voicePresetOriginal": "Voice preset: original",
+      "voicePreset": "Voice preset: {label}",
+      "operation": "Operation — {region}"
+    },
+    "export": {
+      "title": "Render version",
+      "hint": "Create a new audio version with all edits. The original will not be overwritten.",
+      "renderTooltip": "Create a new version without changing the original",
+      "render": "Render version",
+      "rendering": "Rendering...",
+      "buildingMp3": "Building MP3 on the server, please wait...",
+      "noVersions": "No finished versions yet. After a successful render, the player and Download MP3 will appear here.",
+      "lastFailed": "The last render (v{version}) failed. Try again or contact support if it keeps failing.",
+      "versionReady": "Version {version} ready",
+      "downloadMp3Tooltip": "Download MP3 — the main export format after render",
+      "downloadMp3": "Download MP3",
+      "wavTooltip": "Save the same render version as WAV for DAW and video editing",
+      "exportingWav": "Exporting WAV...",
+      "exportWav": "Export to WAV ({cost} credits)",
+      "formatsHint": "MP3 and WAV export after render do not consume credits. Re-downloading a cached version is free.",
+      "downloadWavTooltip": "Download the WAV file for this version",
+      "downloadWav": "Download WAV",
+      "wavStudioOnly": "WAV export is available after render. <pricing>Credit packs</pricing>",
+      "exportWavFree": "Export to WAV"
+    },
+    "stems": {
+      "planRestrictedTitle": "Stem separation is not available on Free",
+      "failedTitle": "The service did not separate the stems",
+      "planRestrictedMessage": "You can edit the track with the full mix on both tracks.",
+      "failedMessage": "The editor opened with the full mix on both tracks. You can retry separation — sometimes a track is rejected on the first attempt.",
+      "viewPricing": "View pricing",
+      "retry": "Retry separation",
+      "retrying": "Retrying separation...",
+      "absentHint": "Vocals and instrumental are not separated yet. The timeline currently uses the original track.",
+      "separateCta": "Separate vocals and instrumental — {cost} credits",
+      "separating": "Separating stems...",
+      "unavailableForProvider": "Vocal and instrumental separation is not yet available for tracks generated with a Personal AI Voice.",
+      "masterMissingTitle": "Source audio is missing",
+      "masterMissingMessage": "This is not about missing stems: the original track audio file is unavailable."
+    },
+    "help": {
+      "toggle": "How to use the editor?",
+      "step1": "Click the timeline to select the region under the playhead",
+      "step2": "Split and other region actions apply to the selected region",
+      "step3": "Select the Vocal or Instrumental track",
+      "step4": "Apply an action: volume, fade, split, duplicate",
+      "step5": "Press Render version"
+    },
+    "voicePresets": {
+      "title": "Voice presets",
+      "hint": "EQ for your vocals: audible on the Vocal track immediately; applied to the final mix after Render version.",
+      "groupAria": "Voice presets",
+      "original": "Original",
+      "presets": {
+        "warm": {
+          "label": "Warm",
+          "description": "Softer lows and muted highs"
+        },
+        "deep": {
+          "label": "Deep",
+          "description": "More bass, denser timbre"
+        },
+        "bright": {
+          "label": "Bright",
+          "description": "Clearer highs and presence"
+        },
+        "energetic": {
+          "label": "Energetic",
+          "description": "More drive and brightness"
+        },
+        "soft": {
+          "label": "Soft",
+          "description": "Muted highs, calm delivery"
+        }
+      },
+      "demoTitle": "Voice presets — demo",
+      "demoHint": "Press “Listen to demo”, then switch presets — playback restarts so you can hear the difference. This is a sample track; apply presets to your vocals in the Voice presets block nearby.",
+      "demoGroupAria": "Voice preset demos",
+      "listenDemo": "Listen to demo",
+      "playing": "Playing..."
+    },
+    "remix": {
+      "title": "AI Remix",
+      "description": "Create a new version of this track in another musical style. The original stays unchanged.",
+      "styleAria": "Remix style",
+      "create": "Create remix · {cost} credits",
+      "creating": "Creating remix...",
+      "unavailableAudio": "Remix unavailable: source audio is not ready.",
+      "success": "Remix is ready",
+      "openRemix": "Open remix",
+      "openingRemix": "Opening remix...",
+      "goToHistory": "Go to history"
+    },
+    "validation": {
+      "selectRegion": "Select a region on the timeline",
+      "selectRegionForDuplicate": "Select a region to duplicate",
+      "selectRegionForFade": "Select a region for fade",
+      "selectRegionForMove": "Select a region to move",
+      "selectRegionForDelete": "Select a region to delete",
+      "selectTrackForFade": "Select a track for fade",
+      "playheadInsideOrSelect": "Place the playhead inside a region or select a clip on the timeline",
+      "splitRegionUnknown": "Could not resolve a region for split",
+      "playheadInsideSelected": "Place the playhead inside the selected region on the timeline",
+      "playheadTooClose": "Playhead is too close to the region edge for split",
+      "regionTooShort": "Region is too short for split",
+      "splitFailed": "Could not split at the playhead",
+      "fadeSelectInside": "Select a range inside the region on the timeline",
+      "fadeRangeUnknown": "Could not resolve a range for fade",
+      "deleteSelectInside": "Select a range inside the selected region on the timeline",
+      "deleteTooShort": "The selected range is too short to delete",
+      "deleteTooCloseToEdge": "Selection is too close to the region edge — the whole block will be deleted, or use Split",
+      "deleteRangeUnknown": "Could not resolve a range to delete"
+    }
+  },
+  "SystemPages": {
+    "notFound": {
+      "title": "Page not found",
+      "description": "This page does not exist or has been moved.",
+      "home": "Go home",
+      "create": "Create music"
+    },
+    "error": {
+      "title": "Something went wrong",
+      "description": "An unexpected error occurred. Please try again.",
+      "retry": "Try again",
+      "home": "Go home"
+    },
+    "share": {
+      "title": "Public link",
+      "description": "Public track page: {slug}.",
+      "home": "Go home"
+    },
+    "track": {
+      "title": "Track result",
+      "description": "Player and share for track {id}.",
+      "share": "Share"
+    },
+    "consentLoading": "Loading...",
+    "devAuthBadgeTitle": "Dev auth token is sent to the API"
+  },
+  "Media": {
+    "lyricsLabel": "Song lyrics",
+    "hideLyrics": "Hide lyrics",
+    "showLyrics": "Show lyrics",
+    "noCover": "No cover",
+    "openCover": "Open cover: {title}",
+    "coverAlt": "Cover: {title}",
+    "coverViewer": "Cover viewer",
+    "downloadCover": "Download"
+  }
+}

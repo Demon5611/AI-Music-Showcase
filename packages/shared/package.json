@@ -1,0 +1,41 @@
+{
+  "name": "@ai-music/shared",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "files": ["dist"],
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./types": {
+      "types": "./dist/types/index.d.ts",
+      "import": "./dist/types/index.js"
+    },
+    "./schemas": {
+      "types": "./dist/schemas/index.d.ts",
+      "import": "./dist/schemas/index.js"
+    },
+    "./constants": {
+      "types": "./dist/constants/index.d.ts",
+      "import": "./dist/constants/index.js"
+    }
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json",
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint .",
+    "test": "tsx src/constants/plans.test.ts && tsx src/constants/payment-provider.test.ts && tsx src/constants/credit-packages.test.ts && tsx src/constants/credit-pack-refund.unit.test.ts && tsx src/constants/cash-refund.unit.test.ts && tsx src/fx/usd-gel-fx.test.ts && tsx src/fx/nbg-usd-gel-fx.test.ts && tsx src/constants/pricing-examples.test.ts && tsx src/constants/mureka-credits.test.ts && tsx src/constants/mureka-economics.test.ts && tsx src/constants/music-generate-cost.test.ts && tsx src/constants/mureka-provider-job-id.test.ts && tsx src/constants/provider-data-deletion-queue.test.ts && tsx src/constants/mureka-base-url.test.ts && tsx src/constants/voice-deletion.test.ts && tsx src/transactional-email/mureka-vocal-deletion-message.test.ts && tsx src/transactional-email/send-mureka-vocal-deletion-email.test.ts && tsx src/transactional-email/inbound-forward.test.ts && tsx src/transactional-email/forward-received-email.test.ts && tsx src/constants/voice-profile-recovery.test.ts && tsx src/entitlements/entitlements.test.ts && tsx src/schemas/mute-track-operation-schema.test.ts && tsx src/schemas/voice-profile.test.ts && tsx src/voice-verify-phrase-ttl.test.ts && tsx src/suno-callback-token.test.ts && tsx src/content-moderation/check-content.test.ts && tsx src/lyrics-language/resolve-lyrics-language.test.ts && tsx src/voice-language/voice-language.test.ts && tsx src/schemas/upload-voice-sample-fields.test.ts && tsx src/music-brief/music-brief.test.ts && tsx src/utils/album-cover-cost.test.ts && tsx src/music-provider-affinity/provider-affinity.test.ts && tsx src/utils/timed-lyrics-capability.test.ts && tsx src/utils/timed-lyrics-ui-policy.test.ts && tsx src/utils/static-audio-middleware.policy.test.ts && tsx src/utils/music-track-playback.test.ts && tsx src/utils/stem-separation-capability.test.ts && tsx src/utils/stem-separation-ux-contract.test.ts && tsx src/utils/remix-eligibility.test.ts && tsx src/utils/payment-return.test.ts && tsx ../../apps/web/src/features/billing/payment-return.ui.test.ts"
+  },
+  "dependencies": {
+    "zod": "^3.25.76"
+  },
+  "devDependencies": {
+    "@ai-music/config": "workspace:*",
+    "@types/node": "^20.17.57",
+    "eslint": "^9.28.0",
+    "tsx": "^4.19.4",
+    "typescript": "^5.8.3"
+  }
+}

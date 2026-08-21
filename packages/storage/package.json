@@ -1,0 +1,28 @@
+{
+  "name": "@ai-music/storage",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "files": ["dist"],
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json",
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint ."
+  },
+  "dependencies": {
+    "@aws-sdk/client-s3": "^3.888.0",
+    "@aws-sdk/s3-request-presigner": "^3.888.0"
+  },
+  "devDependencies": {
+    "@ai-music/config": "workspace:*",
+    "@types/node": "^20.17.57",
+    "eslint": "^9.28.0",
+    "typescript": "^5.8.3"
+  }
+}

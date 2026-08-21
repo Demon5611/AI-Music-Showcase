@@ -1,0 +1,12 @@
+{
+  "expo": {
+    "name": "AI Music",
+    "slug": "ai-music",
+    "version": "0.0.1",
+    "scheme": "ai-music",
+    "platforms": ["ios", "android"],
+    "extra": {
+      "apiUrl": "http://localhost:3001"
+    }
+  }
+}

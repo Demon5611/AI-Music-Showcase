@@ -1,0 +1,84 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+
+    env:
+      NEXT_PUBLIC_APP_ENV: production
+      NEXT_PUBLIC_API_URL: ${{ vars.NEXT_PUBLIC_API_URL }}
+      NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: ${{ vars.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY }}
+      NEXT_PUBLIC_FORCE_CLERK: "true"
+      NEXT_PUBLIC_DEV_AUTH_USER_ID: ""
+      NEXT_PUBLIC_SENTRY_DSN: ${{ vars.NEXT_PUBLIC_SENTRY_DSN }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v6
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: 20
+          cache: pnpm
+          cache-dependency-path: pnpm-lock.yaml
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Generate Prisma client
+        run: pnpm db:generate
+
+      - name: Typecheck
+        run: pnpm typecheck
+
+      - name: Lint
+        run: pnpm lint
+
+      - name: Validate build environment
+        shell: bash
+        run: |
+          test -n "$NEXT_PUBLIC_API_URL" || {
+            echo "NEXT_PUBLIC_API_URL GitHub repository variable is missing"
+            exit 1
+          }
+
+          test -n "$NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY" || {
+            echo "NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY GitHub repository variable is missing"
+            exit 1
+          }
+
+          case "$NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY" in
+            pk_test_*|pk_live_*)
+              echo "Clerk publishable key format is valid"
+              ;;
+            *)
+              echo "NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY has an invalid format"
+              echo "Expected prefix: pk_test_ or pk_live_"
+              exit 1
+              ;;
+          esac
+
+          case "$NEXT_PUBLIC_API_URL" in
+            https://*)
+              echo "NEXT_PUBLIC_API_URL format is valid"
+              ;;
+            *)
+              echo "NEXT_PUBLIC_API_URL must start with https://"
+              exit 1
+              ;;
+          esac
+
+      - name: Build
+        run: pnpm build

@@ -1,0 +1,107 @@
+groups:
+  - name: music-generation
+    rules:
+      - alert: GenerationFailureRateHigh
+        expr: |
+          (
+            sum(rate(music_generation_failed_total[5m]))
+            /
+            clamp_min(sum(rate(music_generation_started_total[5m])), 0.001)
+          ) > 0.1
+          and sum(rate(music_generation_started_total[5m])) > 0.05
+        for: 10m
+        labels:
+          severity: warning
+        annotations:
+          summary: High music generation failure rate
+          description: >
+            Failed/started ratio exceeded 10% with meaningful traffic
+            (started rate > 0.05/s). See docs/runbooks/generation-failure-rate.md
+          runbook_url: docs/runbooks/generation-failure-rate.md
+
+      - alert: GenerationQueueBacklog
+        expr: music_generation_queue_depth > 50
+        for: 10m
+        labels:
+          severity: warning
+        annotations:
+          summary: Provider job queue backlog high
+          description: waiting+delayed provider-jobs > 50 for 10m. See docs/runbooks/generation-queue-backlog.md
+          runbook_url: docs/runbooks/generation-queue-backlog.md
+
+      - alert: PersistenceQueueBacklog
+        expr: music_persistence_queue_depth > 50
+        for: 10m
+        labels:
+          severity: warning
+        annotations:
+          summary: Track persistence queue backlog high
+          description: waiting+delayed music-track-persistence > 50 for 10m. See docs/runbooks/persistence-backlog.md
+          runbook_url: docs/runbooks/persistence-backlog.md
+
+      - alert: CallbackLatencyHigh
+        expr: |
+          histogram_quantile(
+            0.95,
+            sum(rate(music_callback_duration_seconds_bucket[5m])) by (le)
+          ) > 5
+          and sum(rate(music_callback_duration_seconds_count[5m])) > 0.02
+        for: 10m
+        labels:
+          severity: warning
+        annotations:
+          summary: Music callback p95 latency high
+          description: Callback handler p95 > 5s with traffic. See docs/runbooks/callback-latency.md
+          runbook_url: docs/runbooks/callback-latency.md
+
+      - alert: PersistenceFailureRateHigh
+        expr: |
+          (
+            sum(rate(music_persist_failed_total[5m]))
+            /
+            clamp_min(
+              sum(rate(music_persist_success_total[5m])) + sum(rate(music_persist_failed_total[5m])),
+              0.001
+            )
+          ) > 0.05
+          and (sum(rate(music_persist_success_total[5m])) + sum(rate(music_persist_failed_total[5m]))) > 0.02
+        for: 15m
+        labels:
+          severity: warning
+        annotations:
+          summary: Track persistence failure rate high
+          description: Persist fail ratio > 5% with traffic. See docs/runbooks/persistence-backlog.md
+          runbook_url: docs/runbooks/persistence-backlog.md
+
+      - alert: AudioNotReadySpike
+        expr: |
+          sum(rate(music_audio_not_ready_total[5m])) > 0.2
+        for: 15m
+        labels:
+          severity: info
+        annotations:
+          summary: Audio-not-ready responses elevated
+          description: Sustained AUDIO_NOT_READY rate. May be backlog or storage issues. See docs/runbooks/audio-not-ready.md
+          runbook_url: docs/runbooks/audio-not-ready.md
+
+      - alert: SubmitUnknownDetected
+        expr: |
+          sum(rate(music_provider_submit_attempts_total{result="submit_unknown"}[5m])) > 0.02
+          and sum(rate(music_provider_submit_attempts_total[5m])) > 0.05
+        for: 10m
+        labels:
+          severity: warning
+        annotations:
+          summary: Provider submit_unknown attempts elevated
+          description: >
+            Ambiguous submits elevated with meaningful submit traffic.
+            Do NOT manually re-POST. See docs/runbooks/submit-unknown.md
+          runbook_url: docs/runbooks/submit-unknown.md
+
+# Templates for future Prometheus scrape (raw /metrics does not evaluate alerts):
+#   - ApiMetricsDown / WorkerMetricsDown require `up{job=...}` from a Prometheus scrape config.
+# GenerationStuck is deferred until a reliable stuck-generation gauge/exporter exists.
+#
+# Validation:
+#   promtool check rules deploy/observability/alerts/music-generation.rules.yml
+# If promtool is unavailable: YAML structure lint only; ratio alerts include traffic guards.

@@ -1,0 +1,58 @@
+# dependencies
+node_modules
+.pnpm-store
+
+# build
+.next
+out
+dist
+build
+.turbo
+coverage
+
+# env / secrets
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.p12
+*.p8
+credentials.json
+service-account*.json
+
+# debug / logs
+npm-debug.log*
+pnpm-debug.log*
+*.log
+
+# misc
+.DS_Store
+/storage/
+apps/api/storage/
+apps/worker/storage/
+
+# typescript
+*.tsbuildinfo
+next-env.d.ts
+
+# prisma
+packages/db/prisma/migrations/**/migration_lock.toml
+
+# load-test / automation artifacts
+artifacts/
+.playwright-mcp/
+.chrome-devtools-mcp/
+**/chrome-profile*/
+**/user-data-dir*/
+test-results/
+playwright-report/
+blob-report/
+playwright/.cache/
+*.webm
+
+# IDE / local tooling
+.idea/
+.vscode/
+.cursor/
+*.swp

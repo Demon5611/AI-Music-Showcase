@@ -1,0 +1,44 @@
+{
+  "name": "@ai-music/db",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "files": [
+    "dist"
+  ],
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "scripts": {
+    "build": "pnpm run db:generate && tsc -p tsconfig.build.json",
+    "db:generate": "prisma generate",
+    "db:validate": "dotenv -e ../../.env -- prisma validate",
+    "db:format": "prisma format",
+    "db:studio": "dotenv -e ../../.env -- prisma studio",
+    "db:push": "dotenv -e ../../.env -- prisma db push",
+    "db:migrate:dev": "dotenv -e ../../.env -- prisma migrate dev",
+    "db:migrate:deploy": "dotenv -e ../../.env -- prisma migrate deploy",
+    "db:reset": "dotenv -e ../../.env -- prisma migrate reset",
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint .",
+    "test": "tsx --test src/credits-ledger.refund-original.test.ts src/credit-grant-lots.unit.test.ts src/spend-credit-compensation.unit.test.ts"
+  },
+  "dependencies": {
+    "@ai-music/shared": "workspace:*",
+    "@prisma/client": "^6.9.0"
+  },
+  "devDependencies": {
+    "@ai-music/config": "workspace:*",
+    "@types/node": "^25.9.1",
+    "dotenv-cli": "^11.0.0",
+    "eslint": "^9.28.0",
+    "prisma": "^6.9.0",
+    "typescript": "^5.8.3"
+  },
+  "prisma": {
+    "schema": "prisma/schema.prisma"
+  }
+}

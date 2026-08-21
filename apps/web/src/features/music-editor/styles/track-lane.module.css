@@ -1,0 +1,4 @@
+.trackProgressFill {
+  width: var(--track-progress, 0%);
+  background: linear-gradient(90deg, #7c3aed 0%, #a78bfa 100%);
+}

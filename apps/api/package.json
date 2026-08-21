@@ -1,0 +1,50 @@
+{
+  "name": "@ai-music/api",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "tsx watch src/main.ts",
+    "build": "tsc",
+    "start": "node dist/main.js",
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint .",
+    "test": "tsx src/modules/music/commit-music-generation-retry.test.ts && tsx src/modules/music/handle-music-error.test.ts && tsx src/modules/music/music-generate-idempotency.test.ts && tsx src/modules/music/music-generate-body.test.ts && tsx src/modules/music/music-generate-mureka.test.ts && tsx src/modules/music/album-cover-strategy.test.ts && tsx src/modules/music/album-cover-contract.test.ts && tsx src/modules/music/album-cover-cost.contract.test.ts && tsx src/modules/music/music-provider-routing.contract.test.ts && tsx src/modules/music/music-generate-routing-fixes.contract.test.ts && tsx src/modules/music/remix.contract.test.ts && tsx src/modules/billing/credit-pack-tbc.stage1.test.ts && tsx src/modules/billing/tbc-checkout-feature-off.test.ts && tsx src/modules/billing/flitt-checkout.contract.test.ts && tsx src/modules/billing/credit-pack-refund-policy.contract.test.ts && tsx src/modules/billing/cash-refund-policy.contract.test.ts && tsx src/modules/billing/refund-enqueue.contract.test.ts && tsx src/modules/billing/refund-recovery.contract.test.ts && tsx src/modules/billing/refund-balance-contract.test.ts && tsx src/modules/queue/enqueue-refund-job.unit.test.ts && tsx src/modules/billing/payment-provider-selection.contract.test.ts && tsx src/modules/billing/stripe-retired.contract.test.ts && tsx src/modules/billing/authorization-refund.contract.test.ts && tsx src/modules/billing/refund-amount.contract.test.ts && tsx src/modules/billing/tbc-refund-idempotency.contract.test.ts && tsx src/modules/billing/staging-ops-refund.contract.test.ts && tsx src/modules/billing/refund-fixture-guard.contract.test.ts && tsx src/common/authorization.contract.test.ts && tsx src/modules/account-deletion/account-deletion.contract.test.ts && tsx src/modules/auth/clerk-auth.unit.test.ts && tsx src/modules/resend-inbound/resend-inbound.contract.test.ts && tsx ../../packages/tbc-checkout/src/mock-tbc-payment-provider.unit.test.ts && tsx ../../packages/tbc-checkout/src/process-tbc-refund.unit.test.ts && tsx ../../packages/flitt-checkout/src/flitt-signature.unit.test.ts && tsx ../../packages/flitt-checkout/src/flitt-amount.unit.test.ts && tsx ../../packages/flitt-checkout/src/flitt-status.unit.test.ts && tsx ../../packages/flitt-checkout/src/flitt-checkout-url.unit.test.ts && tsx ../../packages/flitt-checkout/src/flitt-verify.unit.test.ts && tsx ../../packages/flitt-checkout/src/flitt-config.unit.test.ts && tsx ../../packages/flitt-checkout/src/process-flitt-refund.unit.test.ts",
+    "test:voice-deletion": "tsx src/modules/voice-profiles/deletion.integration.test.ts",
+    "test:integration": "tsx src/modules/music/commit-music-generation.integration.test.ts",
+    "test:callback": "tsx ../../packages/shared/src/suno-callback-token.test.ts && tsx src/modules/music/suno-callback.service.imports.test.ts && tsx ../../packages/ai-providers/src/music/providers/suno-api/suno-callback.normalizer.test.ts && tsx src/modules/music/suno-callback.integration.test.ts",
+    "test:track-persist": "tsx src/modules/music/music-track-metadata.unit.test.ts && tsx src/modules/music/music-track-persistence.integration.test.ts",
+    "test:pr83": "tsx src/modules/music/music-generate-idempotency.test.ts && tsx src/modules/music/music-generate-body.test.ts && tsx src/modules/music/music-generate-mureka.test.ts && tsx ../web/src/features/music-create/music-generation-progress.imports.test.ts && tsx ../web/src/features/music-create/utils/build-music-generate-body.test.ts",
+    "postinstall": "node scripts/ensure-ffmpeg.mjs",
+    "grant-dev-credits": "tsx scripts/grant-dev-credits.ts",
+    "refund:create-fixture": "tsx scripts/refund-create-fixture.ts",
+    "set-dev-plan": "tsx scripts/set-dev-plan.ts"
+  },
+  "dependencies": {
+    "@ai-music/ai-providers": "workspace:*",
+    "@ai-music/db": "workspace:*",
+    "@ai-music/observability": "workspace:*",
+    "@ai-music/shared": "workspace:*",
+    "@ai-music/storage": "workspace:*",
+    "@ai-music/tbc-checkout": "workspace:*",
+    "@ai-music/flitt-checkout": "workspace:*",
+    "@clerk/backend": "^3.4.13",
+    "@fastify/cors": "^11.0.1",
+    "@fastify/multipart": "^9.0.3",
+    "@fastify/rate-limit": "^11.0.0",
+    "bullmq": "^5.77.2",
+    "dotenv": "^16.5.0",
+    "fastify": "^5.3.3",
+    "ffmpeg-static": "^5.3.0",
+    "ioredis": "^5.10.1",
+    "svix": "^1.66.0",
+    "zod": "^3.25.76"
+  },
+  "devDependencies": {
+    "@ai-music/config": "workspace:*",
+    "@types/node": "^20.17.57",
+    "eslint": "^9.28.0",
+    "tsx": "^4.19.4",
+    "typescript": "^5.8.3"
+  }
+}

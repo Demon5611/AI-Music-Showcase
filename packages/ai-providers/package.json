@@ -1,0 +1,34 @@
+{
+  "name": "@ai-music/ai-providers",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "files": ["dist"],
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json",
+    "typecheck": "tsc --noEmit",
+    "test:callback-normalizer": "tsx src/music/providers/suno-api/suno-callback.normalizer.test.ts",
+    "test:suno-submit-contract": "tsx src/music/providers/suno-api/suno-submit-once.contract.test.ts",
+    "test:music-base-url": "tsx src/music/music-config.base-url.test.ts",
+    "test:mureka": "tsx src/music/providers/mureka/mureka-status-mapper.test.ts && tsx src/music/providers/mureka/mureka-music-generation.provider.test.ts && tsx src/music/resolve-music-provider.test.ts && tsx src/voice/providers/mureka/mureka-voice-provider.test.ts",
+    "lint": "eslint ."
+  },
+  "dependencies": {
+    "@ai-music/shared": "workspace:*",
+    "ioredis": "^5.6.1",
+    "zod": "^3.25.76"
+  },
+  "devDependencies": {
+    "@ai-music/config": "workspace:*",
+    "@types/node": "^20.17.57",
+    "eslint": "^9.28.0",
+    "tsx": "^4.19.4",
+    "typescript": "^5.8.3"
+  }
+}

@@ -1,0 +1,20 @@
+{
+  "name": "@ai-music/mobile",
+  "version": "0.0.0",
+  "private": true,
+  "main": "src/app/index.tsx",
+  "scripts": {
+    "dev": "echo 'Expo app — run expo start after Stage 3 setup'",
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint ."
+  },
+  "dependencies": {
+    "@ai-music/api-client": "workspace:*",
+    "@ai-music/shared": "workspace:*"
+  },
+  "devDependencies": {
+    "@ai-music/config": "workspace:*",
+    "eslint": "^9.28.0",
+    "typescript": "^5.8.3"
+  }
+}

@@ -1,0 +1,351 @@
+{
+  "common": {
+    "effectiveDate": "Effective date: {date}",
+    "lastUpdated": "Last updated: {date}"
+  },
+  "operator": {
+    "title": "Trader details",
+    "name": "Registered name",
+    "legalForm": "Legal form",
+    "legalFormValue": "Individual Entrepreneur",
+    "country": "Country",
+    "countryValue": "Georgia",
+    "identificationNumber": "Identification / registration number",
+    "registrationDate": "Registration date",
+    "registeringAuthority": "Registering authority",
+    "address": "Registered / legal address",
+    "serviceName": "Service / trade name",
+    "email": "Support email"
+  },
+  "businessInformation": {
+    "title": "Legal Information",
+    "lead": "Registered trader details for Voice to Song (AI Music). This page is the canonical public source for legally required business identification. The service / trade name is not the registered legal entity name."
+  },
+  "purchaseNotice": {
+    "text": "By purchasing credits, you agree to the <terms>Terms of Service</terms> and acknowledge the <refund>Refund Policy</refund>, <privacy>Privacy Policy</privacy>, and <legalInfo>Legal Information</legalInfo>."
+  },
+  "voiceUse": {
+    "rights": "You confirm that you have the right to use the voice and audio you upload.",
+    "thirdParty": "Do not use another person’s voice without their permission.",
+    "processors": "Audio may be transmitted to external processors solely to perform the requested operation.",
+    "ownership": "Consent to processing does not transfer ownership of your voice to the service.",
+    "deletion": "You may contact support about deletion of voice-related data.",
+    "privacyLink": "See the <privacy>Privacy Policy</privacy> for more detail."
+  },
+  "terms": {
+    "title": "Terms of Service",
+    "lead": "These Terms govern access to and use of Voice to Song (also referred to as AI Music), including accounts, voice upload, music generation, the editor, and prepaid credit packages.",
+    "intro": {
+      "title": "1. Agreement",
+      "p1": "By creating an account or using the service, you agree to these Terms and to the related Refund Policy and Privacy Policy published on the website.",
+      "p2": "If you do not agree, do not use the service."
+    },
+    "operator": {
+      "title": "2. Trader / Service Provider",
+      "p1": "The service is operated by an individual entrepreneur registered in Georgia.",
+      "p2": "Full registered trader details are published on the <legalInfo>Legal Information</legalInfo> page. For support and legal notices, contact <email></email>."
+    },
+    "service": {
+      "title": "3. The service",
+      "p1": "Voice to Song provides tools to upload or record voice audio, generate music and lyrics with the assistance of external AI providers, edit projects in an online editor, and purchase prepaid usage credits when online payments are enabled.",
+      "p2": "Features may change during the MVP and beta stages. Availability can depend on account status, credit balance, and third-party provider capacity."
+    },
+    "credits": {
+      "title": "4. Credit packages",
+      "p1": "Credits are an internal unit used to measure consumption of paid operations inside the service. Credits are not money, a bank deposit, a stored-value account, or electronic money.",
+      "p2": "Credits cannot be freely redeemed or withdrawn as cash, transferred to another user, or exchanged outside the service. Eligible monetary refunds of purchases or specific operations are governed separately by the Refund Policy.",
+      "p3": "Prices and the number of credits in a package are shown before purchase. Purchases of credit packages are one-time payments. There is no automatic renewal and no subscription in the default credit-package billing model.",
+      "p4": "Credits do not currently expire by an automatic product rule. The operator may change future package offers; changes do not silently cancel unused credits already on your balance except where required by law or clearly communicated for a specific offer.",
+      "items": [
+        "Credits are spent when you start a paid operation according to the prices shown in the product.",
+        "Free starter credits, if offered, follow the then-current product offer and may be limited.",
+        "The service may refuse or reverse abusive or fraudulent credit use."
+      ]
+    },
+    "payment": {
+      "title": "5. Payment processing",
+      "p1": "When online payments are enabled, payments are processed by Flitt. The final amount and currency charged are displayed at checkout before the customer confirms payment.",
+      "p2": "We do not intentionally store full card numbers, CVV/CVC codes, or internet-banking passwords.",
+      "p3": "A purchase is considered completed after payment confirmation and crediting of the purchased package to your account balance. If confirmation is delayed, do not repeat the payment before checking your balance and contacting support."
+    },
+    "aiOutput": {
+      "title": "6. AI-generated results",
+      "p1": "AI-generated music, lyrics, and related outputs can be unpredictable. Similarity to your prompt, uniqueness, commercial fitness, and legal clearance for a particular use are not guaranteed.",
+      "p2": "You are responsible for reviewing outputs before publication or commercial use. The service does not provide a legal opinion on copyright, neighbouring rights, or trademark clearance.",
+      "p3": "Your rights in outputs depend on applicable law and on the terms of external AI providers used to produce the result. The service does not claim exclusive ownership of your uploaded voice recording solely because you used the service."
+    },
+    "voice": {
+      "title": "7. Voice and uploaded content",
+      "p1": "You represent that you have the right to upload and process the content you provide, including voice recordings, prompts, lyrics, and titles.",
+      "items": [
+        "You have the necessary rights and consents to use the voice and audio.",
+        "You will not use the service for deception, unauthorized impersonation, or infringement of third-party rights.",
+        "You will not upload unlawful, harmful, or abusive content."
+      ],
+      "p2": "Content may be transmitted to external processors solely to perform the requested function and operate the service, as described in the Privacy Policy.",
+      "p3": "Turning off a personal AI voice only stops using it for new generations and is not a deletion request. Turning it back on reuses the same ready personal AI voice without a new cloning charge.",
+      "p4": "Account deletion is initiated from profile settings. After confirmation, the account is immediately unavailable for generation, voice upload, and purchases. Original personal voice recordings are deleted from our storage, and a request to delete related voice data is sent to the AI provider. Provider-side deletion may take time and is tracked separately. We may retain a minimal audit trail for consent evidence, billing, fraud prevention, dispute handling, and legal compliance.",
+      "p5": "Final account deletion completes after related provider deletion requests are processed. We do not promise immediate deletion at the provider or from all backups."
+    },
+    "failedOps": {
+      "title": "8. Failed operations and refunds",
+      "p1": "Rules for restoration of credits and for monetary refunds of purchases are set out in the Refund Policy. In case of conflict on refund topics, the Refund Policy controls for that topic.",
+      "seeRefund": "Read the full <refund>Refund Policy</refund>."
+    },
+    "availability": {
+      "title": "9. Availability",
+      "p1": "The service is offered as an MVP / beta product. Temporary unavailability, degraded performance, queue delays, and provider outages may occur.",
+      "p2": "External authentication, hosting, storage, and AI providers affect speed and availability. Continuous uninterrupted operation is not guaranteed."
+    },
+    "children": {
+      "title": "10. Eligibility",
+      "p1": "The service is not intended for children who cannot lawfully consent to the processing of their data or enter into the applicable agreement without permission from a parent or guardian."
+    },
+    "changes": {
+      "title": "11. Changes",
+      "p1": "We may update these Terms. Material changes will be reflected on the website or communicated through another reasonable channel. Continued use after the effective date of updated Terms constitutes acceptance where permitted by law."
+    },
+    "contact": {
+      "title": "12. Contact",
+      "p1": "Questions about these Terms may be sent to <email></email>."
+    },
+    "seeAlso": "See also <privacy>Privacy Policy</privacy> and <refund>Refund Policy</refund>."
+  },
+  "refund": {
+    "title": "Refund Policy",
+    "lead": "This Refund Policy explains how Voice to Song handles credit restoration for failed paid operations and monetary refunds for prepaid credit package purchases and, where approved, for specific operations. Purchases are one-time payments. This policy does not describe a subscription or automatic renewal product.",
+    "definitions": {
+      "title": "1. Definitions",
+      "p1": "Credit restoration means returning internal usage credits to your account balance after a paid operation does not produce a usable result, or after a verified billing or technical error.",
+      "p2": "Payment refund (monetary refund) means returning money through Flitt against the original payment transaction for a credit package purchase or, where approved, for paid credits attributable to a specific operation.",
+      "p3": "These processes are different. Restoring credits is not the same as a monetary refund, and a monetary refund request is reviewed separately from automatic credit restoration."
+    },
+    "model": {
+      "title": "2. Purchase model",
+      "p1": "Credit packages are digital prepaid usage units for AI generation and related features. They are not subscriptions and do not renew automatically.",
+      "p2": "Because results of AI generation are creative and subjective, dissatisfaction with style, timbre, pronunciation, lyrics, or artistic quality alone does not automatically entitle you to a monetary refund or to credit restoration when the operation completed technically and produced a usable result."
+    },
+    "failedOps": {
+      "title": "3. Failed operations and credit restoration",
+      "p1": "When a paid operation fails before a usable result is produced, the service may automatically restore the credits charged for that operation. Where the failure is verified as a terminal failure in our systems, charged credits for that operation are restored automatically and idempotently.",
+      "p2": "Examples of situations where credits are typically restored automatically after a verified failure include music generation marked failed after provider confirmation, lyrics generation failure, stem separation failure, and WAV export failure after credits were charged.",
+      "p3": "If the external provider outcome cannot yet be determined, the operation may remain under verification. Once the outcome is confirmed as failed, applicable charged credits may be restored. If a usable result was later confirmed, credits are not restored.",
+      "p4": "User cancellation of a music generation is not currently offered as a self-service refund path. Render of an MP3 mix in the editor does not charge credits in the current product configuration.",
+      "p5": "If credits were not restored and you believe a paid operation failed without a usable result, contact support with the account email, approximate time, and any job or project identifier shown in the product."
+    },
+    "unsatisfactory": {
+      "title": "4. Unsatisfactory AI results",
+      "p1": "Subjective dissatisfaction with an AI result — including differences from expectations about musical style, voice timbre, pronunciation, lyrics, arrangement, or creative quality — does not automatically guarantee a refund when the operation completed and a usable output was delivered.",
+      "p2": "However, the user may submit a monetary refund request, which may be reviewed individually according to this Refund Policy and applicable law."
+    },
+    "purchaseRemainder": {
+      "title": "5. Unused paid credits from a purchase",
+      "p1": "A user may request a monetary refund for the unused paid remainder of a specific credit-package purchase.",
+      "p2": "For a partially used credit package, any approved refund is limited to the monetary value attributable to the unused paid credits from that specific purchase. The calculation is based on the original payment transaction, not a later exchange rate.",
+      "p3": "Free or promotional credits have no monetary refund value.",
+      "p4": "Previous refunds associated with the same purchase are taken into account when calculating any later refundable amount, so that the total monetary refund cannot exceed the original payment.",
+      "p5": "Requests are reviewed by support. Monetary refunds are not automated in the product."
+    },
+    "operationRefund": {
+      "title": "6. Monetary refund for a completed operation",
+      "p1": "If an operation completed successfully and the user later submits a monetary refund request, support or an authorized reviewer may review the request under this Policy and applicable law.",
+      "p2": "If an approved refund relates to a specific completed operation, the refundable amount is limited to the portion of paid credits attributable to that operation. Free or promotional credits have no monetary refund value."
+    },
+    "remediesXor": {
+      "title": "7. Credit restoration and monetary reimbursement",
+      "p1": "Credit restoration and monetary reimbursement are alternative remedies for the same compensated usage and are not applied cumulatively.",
+      "p2": "If a monetary refund for an operation has been completed, the spent credits for that compensated usage are not returned to the account. If the same usage already received system credit restoration after a confirmed technical failure, it is not also eligible for duplicate monetary compensation."
+    },
+    "duplicate": {
+      "title": "8. Duplicate or incorrect charge",
+      "p1": "Contact support if you see a duplicate charge, an incorrect amount, a successful payment without package credits, or a payment marked successful while the balance was not updated.",
+      "p2": "After verification, we may credit the package, restore credits, or initiate a monetary refund through Flitt, depending on the case. Immediate completion is not guaranteed."
+    },
+    "unauthorized": {
+      "title": "9. Unauthorized payment",
+      "p1": "If you believe a payment was unauthorized, contact your bank or card issuer immediately and also notify support.",
+      "p2": "We may request information needed to investigate. Do not send full card numbers, CVV/CVC codes, SMS/OTP codes, or internet-banking passwords to the service."
+    },
+    "howTo": {
+      "title": "10. How to request a monetary refund",
+      "p1": "For refund requests, contact <email></email> and include:",
+      "items": [
+        "Account email",
+        "Payment or order identifier, if available",
+        "Purchase date",
+        "Amount and currency, if known",
+        "A short description of the reason",
+        "Operation or project identifier, when the refund concerns a specific operation"
+      ],
+      "p2": "Do not include full card numbers, CVV/CVC, banking passwords, or one-time codes."
+    },
+    "timing": {
+      "title": "11. Review timing",
+      "p1": "We aim to review complete monetary refund requests within 10 business days. Approved monetary refunds are initiated through Flitt against the original payment transaction. The time for funds to appear depends on Flitt, the card/payment network, and the customer’s issuing bank.",
+      "p2": "The 10-business-day period is a target for reviewing the request, not a guarantee of payment settlement timing."
+    },
+    "chargebacks": {
+      "title": "12. Chargebacks",
+      "p1": "Before opening a chargeback, we recommend contacting support so we can attempt to resolve the issue.",
+      "p2": "A chargeback does not stop fraud or abuse investigation. An account may be temporarily limited while a disputed purchase is linked to issued or used credits. We do not impose an automatic permanent ban solely because a chargeback was filed."
+    },
+    "mandatory": {
+      "title": "13. Mandatory consumer rights",
+      "p1": "Refund requests may also be subject to mandatory withdrawal or consumer rights under applicable law. Nothing in this Policy limits rights that cannot legally be excluded."
+    },
+    "contact": {
+      "title": "14. Contact",
+      "p1": "For refund requests, contact <email></email>.",
+      "p2": "Trader details: <legalInfo>Legal Information</legalInfo>."
+    },
+    "seeAlso": "See also <terms>Terms of Service</terms>, <privacy>Privacy Policy</privacy>, and <pricing>Pricing</pricing>."
+  },
+  "privacy": {
+    "title": "Privacy Policy",
+    "lead": "This Privacy Policy explains how Voice to Song (AI Music) collects and uses personal data when you use the website, create an account, upload audio, generate or edit music, purchase credits, or contact support.",
+    "whoWeAre": {
+      "title": "1. Who we are",
+      "p1": "Voice to Song is an online service for voice-assisted AI music creation and editing.",
+      "p2": "The data controller is an individual entrepreneur registered in Georgia. Full registration details are published on the <legalInfo>Legal Information</legalInfo> page.",
+      "p3": "For privacy requests, contact <email></email> and include enough detail for us to identify your account without sending unnecessary sensitive credentials."
+    },
+    "scope": {
+      "title": "2. Scope",
+      "p1": "This Policy applies to processing connected with:",
+      "items": [
+        "the website and related pages",
+        "user accounts and authentication",
+        "voice and audio upload",
+        "music and lyrics generation",
+        "the music editor and exports",
+        "purchase and use of prepaid credits",
+        "customer support communications"
+      ]
+    },
+    "dataWeCollect": {
+      "title": "3. Data we collect",
+      "accountTitle": "Account data",
+      "accountIntro": "Depending on how you sign in, we may process:",
+      "accountItems": [
+        "user identifier",
+        "email address",
+        "display name, if provided",
+        "authentication-related identifiers supplied by our authentication provider (Clerk)"
+      ],
+      "accountNote": "We do not receive or store your account password from the authentication provider in ordinary email/password flows handled by that provider.",
+      "contentTitle": "User-provided content",
+      "contentItems": [
+        "prompts and generation settings",
+        "lyrics and song titles",
+        "voice recordings and uploaded audio",
+        "generated tracks and project files needed for the editor",
+        "editing instructions and export requests",
+        "support messages you send us"
+      ],
+      "technicalTitle": "Service and technical data",
+      "technicalItems": [
+        "request and job identifiers",
+        "generation and processing status",
+        "credit transaction records",
+        "timestamps related to account and job activity",
+        "diagnostic and security logs needed to operate and protect the service"
+      ],
+      "technicalNote": "We do not intentionally collect advertising identifiers, precise geolocation, or device fingerprinting for ads. Platform hosting logs may include IP addresses or similar connection metadata as part of ordinary infrastructure operation.",
+      "paymentTitle": "Payment data",
+      "paymentP1": "When online payments are enabled, payments are processed by Flitt. We may receive payment or order identifiers, amount, currency, status, timestamps, and other information needed for reconciliation and refunds.",
+      "paymentP2": "We do not receive or intentionally store full card numbers, CVV/CVC codes, banking passwords, or OTP codes.",
+      "paymentP3": "Payment-related data is used to complete purchases, reconcile payments, and process eligible refunds. While online payments are not enabled in a given environment, payment transactions may be absent."
+    },
+    "purposes": {
+      "title": "4. Why we process data",
+      "p1": "We process personal data to:",
+      "items": [
+        "create and maintain your account",
+        "provide generation, voice processing, and editor features",
+        "store projects and deliver downloads or renders you request",
+        "process credits and purchases",
+        "prevent abuse, fraud, and security incidents",
+        "diagnose errors and improve reliability",
+        "respond to support requests",
+        "comply with applicable legal obligations"
+      ],
+      "p2": "We do not use your content for direct advertising campaigns in the current product.",
+      "p3": "We may correlate technical logs with job identifiers to investigate generation failures, credit accounting errors, and security incidents. This is done to support the service, not to build advertising profiles."
+    },
+    "grounds": {
+      "title": "5. Legal grounds",
+      "p1": "Depending on your location and the activity involved, processing may be based on performance of the service agreement, consent where required (for example certain voice processing confirmations), legitimate interests in operating and securing the service, and compliance with applicable legal obligations.",
+      "p2": "This Policy describes our practices in plain language. It is not a claim of certification under every privacy regime worldwide, and applicable law may differ by user and place of service.",
+      "p3": "If applicable law grants additional rights or imposes stricter requirements, those requirements prevail over this Policy to the extent they cannot be limited by contract."
+    },
+    "aiVoice": {
+      "title": "6. AI and voice processing",
+      "p1": "Voice and other audio may be transmitted to external service providers to perform the processing you request. Prompts, lyrics, and audio may be processed by external AI providers to generate or transform content.",
+      "p2": "Data is shared for performing the requested function and operating the service. You must not upload another person’s voice without permission.",
+      "p3": "External providers process data under their own contractual and privacy terms. Their retention and model-training practices may differ. We aim to configure providers in a privacy-conscious manner where available.",
+      "p4": "Consent to a specific processing step does not transfer ownership of your voice to the service.",
+      "p5": "Voice verification and related consent confirmations may be required before certain generation features become available. Those confirmations document permission to process the submitted voice for the requested music workflow.",
+      "p6": "Voice samples may be sent to a third-party voice-processing provider to create an AI voice profile. The provider may create derived voice representations, embeddings, or model data from the sample.",
+      "p7": "Turning off a personal AI voice in the music creation flow only stops using that voice for new generations. It is not a deletion request: the voice profile, provider Vocal ID, and source sample remain. With the voice off, you can keep generating with the standard AI vocal. Turning it back on reuses the same ready personal AI voice without a new cloning charge.",
+      "p8": "Account deletion is initiated from profile settings. After confirmation, local use stops immediately: generation, voice upload, and purchases are blocked. The original voice sample is purged from our storage, and a request to delete related voice data is registered with the external AI provider. Provider-side deletion may be processed asynchronously. We do not promise immediate physical erasure from the provider or from operational backups, or from records we must retain by law.",
+      "p9": "Final account deletion completes after related provider deletion requests are confirmed (or if no provider ticket was required). Turning off a personal voice never starts account deletion."
+    },
+    "providers": {
+      "title": "7. Service providers and transfers",
+      "p1": "We use categories of service providers such as:",
+      "items": [
+        "authentication provider",
+        "cloud hosting and worker infrastructure",
+        "database provider",
+        "object storage provider",
+        "AI generation and voice-processing providers",
+        "payment provider (when online payments are enabled)"
+      ],
+      "p2": "Some providers may be located outside Georgia and outside your country of residence. We do not promise a specific international-transfer mechanism beyond what is available under our provider contracts and applicable law.",
+      "p3": "We do not publish a fixed list of every sub-processor name in this MVP Policy because generation and voice-processing vendors may change through our provider abstraction. Categories above reflect the roles that process data in production architecture.",
+      "p4": "Optional application monitoring configuration may be enabled in some deployments. If enabled, diagnostic event data needed to detect errors can be processed by the configured monitoring vendor under that vendor’s terms."
+    },
+    "retention": {
+      "title": "8. Data retention",
+      "p1": "Account data is retained while your account remains active and as needed to provide the service.",
+      "p2": "Projects and audio remain available while they are accessible to you in the product or otherwise needed to deliver the service.",
+      "p3": "Payment and accounting records may be retained longer where required by law.",
+      "p4": "Logs and backups may persist for a limited operational period. A deletion request does not necessarily erase data immediately from backups or from records we must keep by law.",
+      "p5": "Exact retention schedules will be refined after MVP validation. Until then, we retain data only as long as reasonably needed for the purposes described in this Policy or required by law.",
+      "p6": "When a track or project is deleted from the product interface, associated files may remain briefly in operational backups before they age out."
+    },
+    "security": {
+      "title": "9. Security",
+      "p1": "We apply reasonable technical and organisational measures, including authenticated access controls, transport security where supported by the relevant systems, monitoring, and backups.",
+      "p2": "No method of transmission or storage is completely secure. Absolute security cannot be guaranteed.",
+      "p3": "Access to production systems is limited to personnel and automated services that need it to operate the product. Users access their own projects through authenticated sessions provided by the authentication provider."
+    },
+    "rights": {
+      "title": "10. User rights",
+      "p1": "Subject to applicable law, you may request information about processing, access, correction, deletion, restriction or objection where applicable, and withdrawal of consent where processing is based on consent. You may also contact a competent authority if you believe your rights were violated.",
+      "p2": "Requests should be sent to the support email listed below. We may need to verify your identity. We do not promise to complete every request immediately where verification, technical limits, or legal exceptions apply."
+    },
+    "deletion": {
+      "title": "11. Account and content deletion",
+      "p1": "Account deletion is initiated from profile settings via the Delete account button and requires confirmation.",
+      "p2": "Some data may be retained as needed for accounting, fraud prevention, dispute resolution, legal compliance, or limited backup recovery windows.",
+      "p3": "Disabling a personal AI voice only stops using it for new generations and is not itself a data deletion request.",
+      "p4": "When you delete your account, we immediately block further use, purge local source audio according to our deletion flow, and register a provider deletion request. Provider-side deletion is processed separately, may take additional time, and is tracked as a separate status. We do not claim that provider-side voice data is deleted instantly or from all backup systems.",
+      "p5": "Final account deletion completes after related provider deletion requests are processed. Turning off a personal voice never starts account deletion."
+    },
+    "children": {
+      "title": "12. Children",
+      "p1": "The service is not intended for children who cannot lawfully consent to the processing of their data or enter into the applicable agreement without permission from a parent or guardian."
+    },
+    "changes": {
+      "title": "13. Changes",
+      "p1": "We may update this Privacy Policy. Material changes will be shown on the website or communicated through another reasonable channel. We do not promise email notice for every update."
+    },
+    "contact": {
+      "title": "14. Contact",
+      "p1": "For privacy requests, personal data requests, and account deletion questions, contact <email></email>.",
+      "p2": "Full trader / controller registration details: <legalInfo>Legal Information</legalInfo>."
+    },
+    "seeAlso": "See also <terms>Terms of Service</terms> and <refund>Refund Policy</refund>."
+  }
+}

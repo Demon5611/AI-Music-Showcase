@@ -1,0 +1,30 @@
+.shell {
+  display: flex;
+  width: 100%;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.25rem;
+}
+
+.label {
+  margin: 0;
+  max-width: 36rem;
+  text-align: center;
+  font-size: 0.95rem;
+  font-weight: 500;
+  line-height: 1.4;
+  color: var(--app-text);
+}
+
+.progressBlock {
+  width: min(100%, 22rem);
+}
+
+.meta {
+  margin: 0;
+  max-width: 36rem;
+  text-align: center;
+  font-size: 0.75rem;
+  line-height: 1.4;
+  color: var(--app-text-muted);
+}

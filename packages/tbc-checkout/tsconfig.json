@@ -1,0 +1,9 @@
+{
+  "extends": "@ai-music/config/typescript/base.json",
+  "compilerOptions": {
+    "types": ["node"],
+    "forceConsistentCasingInFileNames": true
+  },
+  "include": ["src/**/*.ts"],
+  "exclude": ["node_modules", "dist"]
+}

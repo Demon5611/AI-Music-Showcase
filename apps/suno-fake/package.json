@@ -1,0 +1,16 @@
+{
+  "name": "@ai-music/suno-fake",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "tsx watch src/main.ts",
+    "start": "tsx src/main.ts",
+    "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "@types/node": "^20.17.57",
+    "tsx": "^4.19.4",
+    "typescript": "^5.8.3"
+  }
+}

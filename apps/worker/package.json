@@ -1,0 +1,40 @@
+{
+  "name": "@ai-music/worker",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "tsx watch src/index.ts",
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint .",
+    "storage:probe": "tsx src/scripts/storage-probe.ts",
+    "mureka:probe": "tsx src/scripts/mureka-connectivity-probe.ts",
+    "mureka:recover-generation": "tsx src/scripts/recover-mureka-music-generation.ts",
+    "test": "tsx src/common/db-availability.test.ts && tsx src/common/secure-audio-download.test.ts && tsx src/config/flitt-env.contract.test.ts && tsx src/mureka-provider-job.test.ts && tsx src/processors/mureka-music-generate-action.test.ts && tsx src/scripts/recover-mureka-music-generation.plan.test.ts && tsx ../../packages/storage/src/map-r2-error.test.ts && tsx ../../packages/shared/src/constants/mureka-base-url.test.ts && tsx ../../packages/shared/src/constants/mureka-provider-job-id.test.ts",
+    "test:integration": "tsx src/provider-job-reconciler.integration.test.ts",
+    "test:submit-guard": "tsx src/music-generate-submit-guard.integration.test.ts",
+    "test:track-persist": "tsx src/common/secure-audio-download.test.ts && tsx src/music-track-persist.integration.test.ts"
+  },
+  "dependencies": {
+    "@ai-music/ai-providers": "workspace:*",
+    "@ai-music/db": "workspace:*",
+    "@ai-music/observability": "workspace:*",
+    "@ai-music/shared": "workspace:*",
+    "@ai-music/storage": "workspace:*",
+    "@ai-music/tbc-checkout": "workspace:*",
+    "@ai-music/flitt-checkout": "workspace:*",
+    "bullmq": "^5.53.2",
+    "dotenv": "^16.6.1",
+    "ioredis": "^5.6.1",
+    "zod": "^3.25.76"
+  },
+  "devDependencies": {
+    "@ai-music/config": "workspace:*",
+    "@types/node": "^20.17.57",
+    "eslint": "^9.28.0",
+    "tsx": "^4.19.4",
+    "typescript": "^5.8.3"
+  }
+}

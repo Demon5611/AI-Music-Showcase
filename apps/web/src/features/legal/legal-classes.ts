@@ -1,0 +1,23 @@
+export const legal = {
+  page: "mx-auto max-w-3xl px-4 py-8 sm:px-6 sm:py-12",
+  title: "mb-3 text-3xl font-semibold text-[var(--app-text)]",
+  lead: "mb-4 text-base text-[var(--app-text-muted)]",
+  meta: "mb-8 text-sm text-[var(--app-text-muted)]",
+  section: "mb-8",
+  sectionTitle: "mb-3 text-xl font-semibold text-[var(--app-text)]",
+  subsectionTitle: "mb-2 mt-4 text-base font-semibold text-[var(--app-text)]",
+  paragraph: "mb-3 text-sm leading-relaxed text-[var(--app-text)] sm:text-base",
+  list: "mb-4 list-disc space-y-2 pl-5 text-sm text-[var(--app-text)] sm:text-base",
+  note: "mb-4 text-sm text-[var(--app-text-muted)]",
+  links: "text-sm text-[var(--app-text-muted)]",
+  link: "underline underline-offset-2 hover:text-[var(--app-text)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--app-text)]",
+  entityBlock:
+    "mt-10 rounded-xl border border-[var(--app-border-subtle)] bg-[var(--app-bg-surface)] p-4 text-sm text-[var(--app-text)]",
+  entityTitle: "mb-3 text-base font-semibold text-[var(--app-text)]",
+  entityList: "m-0 list-none space-y-2 p-0",
+  entityRow: "grid gap-1 sm:grid-cols-[minmax(10rem,14rem)_1fr] sm:gap-3",
+  entityLabel: "text-[var(--app-text-muted)]",
+  entityValue: "break-words text-[var(--app-text)]",
+  purchaseNotice: "mt-6 text-center text-sm leading-relaxed text-[var(--app-text-muted)]",
+  voiceNotes: "mt-3 space-y-1 text-xs leading-snug text-[var(--app-text-muted)]",
+} as const;

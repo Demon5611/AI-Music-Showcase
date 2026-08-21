@@ -1,0 +1,31 @@
+{
+  "name": "@ai-music/flitt-checkout",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./config": {
+      "types": "./dist/flitt-config.d.ts",
+      "import": "./dist/flitt-config.js"
+    }
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test": "tsx src/flitt-signature.unit.test.ts && tsx src/flitt-amount.unit.test.ts && tsx src/flitt-status.unit.test.ts && tsx src/flitt-checkout-url.unit.test.ts && tsx src/flitt-verify.unit.test.ts && tsx src/flitt-config.unit.test.ts && tsx src/process-flitt-refund.unit.test.ts"
+  },
+  "dependencies": {
+    "@ai-music/db": "workspace:*",
+    "@ai-music/shared": "workspace:*"
+  },
+  "devDependencies": {
+    "@ai-music/config": "workspace:*",
+    "@types/node": "^25.9.1",
+    "tsx": "^4.19.4",
+    "typescript": "^5.8.3"
+  }
+}

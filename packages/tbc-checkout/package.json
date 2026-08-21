@@ -1,0 +1,27 @@
+{
+  "name": "@ai-music/tbc-checkout",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test": "tsx src/mock-tbc-payment-provider.unit.test.ts && tsx src/process-tbc-refund.unit.test.ts"
+  },
+  "dependencies": {
+    "@ai-music/db": "workspace:*",
+    "@ai-music/shared": "workspace:*"
+  },
+  "devDependencies": {
+    "@ai-music/config": "workspace:*",
+    "@types/node": "^25.9.1",
+    "tsx": "^4.19.4",
+    "typescript": "^5.8.3"
+  }
+}

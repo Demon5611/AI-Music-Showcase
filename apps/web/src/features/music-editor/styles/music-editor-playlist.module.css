@@ -1,0 +1,40 @@
+/* Waveform playlist :global overrides — third-party DOM only. */
+
+/* Timescale corner above stem labels — match Vocal column style */
+.shell :global([data-playlist-state] > div:first-child > div:first-child) {
+  background-color: var(--editor-stem-vocal-bg);
+}
+
+/* Keep stem label backgrounds when a track row is selected */
+.shell :global([data-playlist-state] > div:first-child > div:has([data-stem-id="vocal"])) {
+  background-color: var(--editor-stem-vocal-bg);
+}
+
+.shell :global([data-playlist-state] > div:first-child > div:has([data-stem-id="instrumental"])) {
+  background-color: var(--editor-stem-instrumental-bg);
+}
+
+.shell :global([data-clip-id] span) {
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.shell :global([data-clip-container]:focus),
+.shell :global([data-clip-container]:focus-visible),
+.shell :global([data-clip-container]:focus-within),
+.shell :global([data-clip-id]:focus),
+.shell :global([data-clip-id]:focus-visible) {
+  outline: none;
+  box-shadow: none;
+}
+
+.shell :global([data-clip-container][data-editor-region-selected="true"]) {
+  outline: 2px solid #7c3aed;
+  outline-offset: -1px;
+  box-shadow: inset 0 0 0 1px rgb(124 58 237 / 0.25);
+  z-index: 1;
+}
+
+.shell :global([data-clip-container][data-editor-region-selected="true"] [data-clip-id]) {
+  font-weight: 600;
+}

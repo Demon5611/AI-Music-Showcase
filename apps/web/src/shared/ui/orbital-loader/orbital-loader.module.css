@@ -1,0 +1,92 @@
+.visual {
+  display: flex;
+  width: 100%;
+  max-width: 100%;
+  align-items: center;
+  justify-content: center;
+  /* 3D rings paint past the stage box — reserve clearance so they never touch status text. */
+  padding-top: max(0.75rem, calc(var(--loader-size) * 0.06));
+  padding-bottom: max(1.5rem, calc(var(--loader-size) * 0.14));
+  overflow: hidden;
+  isolation: isolate;
+}
+
+.visualLarge {
+  --loader-size: clamp(180px, min(52vw, 42vh), 420px);
+}
+
+.visualCompact {
+  --loader-size: clamp(112px, min(36vw, 28vh), 160px);
+  padding-top: max(0.5rem, calc(var(--loader-size) * 0.05));
+  padding-bottom: max(1rem, calc(var(--loader-size) * 0.12));
+}
+
+.stage {
+  position: relative;
+  width: var(--loader-size);
+  height: var(--loader-size);
+  max-width: 100%;
+  flex-shrink: 0;
+  background: transparent;
+  transform: perspective(1000px) rotateX(45deg) rotateY(45deg);
+  transform-style: preserve-3d;
+  will-change: transform;
+}
+
+.circle {
+  position: absolute;
+  top: var(--circle-offset);
+  left: var(--circle-offset);
+  box-sizing: border-box;
+  width: var(--circle-size);
+  height: var(--circle-size);
+  border-radius: 50%;
+  border-width: clamp(1px, 0.25vw, 2px);
+  border-style: solid;
+  border-color: rgba(255, 255, 255, 0.95);
+  background: transparent;
+  transform-style: preserve-3d;
+  animation-name: orbitalSpin;
+  animation-duration: var(--circle-duration);
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+  animation-direction: var(--circle-direction);
+  will-change: transform;
+}
+
+.circleDashed {
+  border-style: dashed;
+  border-color: rgba(255, 255, 255, 0.45);
+}
+
+@keyframes orbitalSpin {
+  from {
+    transform: rotateX(0deg) rotateY(0deg);
+  }
+
+  to {
+    transform: rotateX(360deg) rotateY(360deg);
+  }
+}
+
+@media (max-width: 640px) {
+  .visualLarge {
+    --loader-size: clamp(160px, min(72vw, 38vh), 280px);
+  }
+
+  .visualCompact {
+    --loader-size: clamp(96px, min(42vw, 24vh), 132px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .stage {
+    will-change: auto;
+  }
+
+  .circle {
+    animation: none;
+    will-change: auto;
+    transform: rotateX(24deg) rotateY(36deg);
+  }
+}

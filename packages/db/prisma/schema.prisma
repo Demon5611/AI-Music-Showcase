@@ -1,0 +1,612 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_DATABASE_URL")
+}
+
+model User {
+  id          String   @id @default(cuid())
+  email       String   @unique
+  name        String?
+  vocalGender String?  @map("vocal_gender")
+  /**
+   * Account deletion lifecycle (not VoiceProfile disable):
+   * active | deletion_requested | provider_deletion_pending |
+   * ready_for_finalization | deleted
+   */
+  accountDeletionStatus      String    @default("active") @map("account_deletion_status")
+  accountDeletionRequestedAt DateTime? @map("account_deletion_requested_at")
+  accountDeletionFinalizedAt DateTime? @map("account_deletion_finalized_at")
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  voiceSamples                 VoiceSample[]
+  voiceProfiles                VoiceProfile[]
+  providerDataDeletionRequests ProviderDataDeletionRequest[]
+  tracks                       Track[]
+  generationJobs               GenerationJob[]
+  musicGenerations             MusicGeneration[]
+  creditTransactions           CreditTransaction[]
+  creditGrantLots              CreditGrantLot[]
+  songs                        Song[]
+  subscription                 Subscription?
+  storageObjects               StorageObject[]
+  creditPackPurchases          CreditPackPurchase[]
+  refundRequests               RefundRequest[]
+  accountDeletionRequest       AccountDeletionRequest?
+
+  @@index([accountDeletionStatus, updatedAt])
+  @@map("users")
+}
+
+model VoiceSample {
+  id                     String    @id @default(cuid())
+  userId                 String    @map("user_id")
+  r2Key                  String    @map("r2_key")
+  durationSec            Int       @map("duration_sec")
+  status                 String    @default("pending")
+  consentConfirmed       Boolean   @default(false) @map("consent_confirmed")
+  /** Suno /voice/validate language (en, ru, zh, es, fr, pt, de, ja, ko, hi). */
+  voiceLanguage          String    @default("ru") @map("voice_language")
+  sunoVoiceId            String?   @map("suno_voice_id")
+  sunoVoiceTaskId        String?   @map("suno_voice_task_id")
+  sunoValidatePhrase     String?   @map("suno_validate_phrase")
+  voiceCloneStatus       String    @default("pending") @map("voice_clone_status")
+  voiceCloneError        String?   @map("voice_clone_error")
+  voiceCloneStartedAt    DateTime? @map("voice_clone_started_at")
+  sunoValidateRegenCount Int       @default(0) @map("suno_validate_regen_count")
+  createdAt              DateTime  @default(now()) @map("created_at")
+
+  user           User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  generationJobs GenerationJob[]
+
+  @@index([userId, status, createdAt])
+  @@map("voice_samples")
+}
+
+/**
+ * Provider-neutral personal voice profile (e.g. Mureka vocal_id).
+ * Suno persona IDs remain on VoiceSample — do not reuse those fields for Mureka.
+ */
+model VoiceProfile {
+  id                  String    @id @default(cuid())
+  userId              String    @map("user_id")
+  provider            String
+  externalId          String    @map("external_id")
+  status              String
+  description         String?
+  sourceVoiceSampleId String    @map("source_voice_sample_id")
+  consentId           String?   @map("consent_id")
+  metadata            Json?
+  createdAt           DateTime  @default(now()) @map("created_at")
+  updatedAt           DateTime  @updatedAt @map("updated_at")
+  deletedAt           DateTime? @map("deleted_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, provider, externalId])
+  @@index([userId, provider, status, deletedAt])
+  @@map("voice_profiles")
+}
+
+/**
+ * Provider-side data deletion ledger (no public Mureka delete API).
+ * Email submit is automated via BullMQ; physical deletion confirmed by ops later.
+ * Status machine: pending → submitting → submitted_to_provider → confirmed
+ *   | submit_failed (email exhausted) | failed | cancelled
+ */
+model ProviderDataDeletionRequest {
+  id                 String    @id @default(cuid())
+  userId             String    @map("user_id")
+  provider           String
+  resourceType       String    @map("resource_type")
+  resourceId         String    @map("resource_id")
+  providerExternalId String    @map("provider_external_id")
+  status             String
+  requestedAt        DateTime  @default(now()) @map("requested_at")
+  submittedAt        DateTime? @map("submitted_at")
+  confirmedAt        DateTime? @map("confirmed_at")
+  attemptCount       Int       @default(0) @map("attempt_count")
+  lastAttemptAt      DateTime? @map("last_attempt_at")
+  lastError          String?   @map("last_error")
+  /** Email-provider message id after successful submit (e.g. Resend). */
+  providerReference  String?   @map("provider_reference")
+  metadata           Json?
+  createdAt          DateTime  @default(now()) @map("created_at")
+  updatedAt          DateTime  @updatedAt @map("updated_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([provider, status, requestedAt])
+  @@index([userId, status])
+  @@map("provider_data_deletion_requests")
+}
+
+/**
+ * Self-service account deletion request.
+ * Holds notificationEmail until completion email is sent, then cleared.
+ * Voice disable ("My voice" off) must never create this row.
+ */
+model AccountDeletionRequest {
+  id                String    @id @default(cuid())
+  userId            String    @unique @map("user_id")
+  status            String
+  notificationEmail String?   @map("notification_email")
+  emailSentAt       DateTime? @map("email_sent_at")
+  requestedAt       DateTime  @default(now()) @map("requested_at")
+  finalizedAt       DateTime? @map("finalized_at")
+  metadata          Json?
+  createdAt         DateTime  @default(now()) @map("created_at")
+  updatedAt         DateTime  @updatedAt @map("updated_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([status, updatedAt])
+  @@map("account_deletion_requests")
+}
+
+model Track {
+  id          String   @id @default(cuid())
+  userId      String   @map("user_id")
+  title       String
+  prompt      String
+  style       String
+  durationSec Int      @map("duration_sec")
+  audioR2Key  String   @map("audio_r2_key")
+  coverR2Key  String?  @map("cover_r2_key")
+  shareSlug   String   @unique @map("share_slug")
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  user           User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  generationJobs GenerationJob[]
+
+  @@index([userId, createdAt(sort: Desc)])
+  @@map("tracks")
+}
+
+model GenerationJob {
+  id               String   @id @default(cuid())
+  userId           String   @map("user_id")
+  voiceSampleId    String   @map("voice_sample_id")
+  trackId          String?  @map("track_id")
+  prompt           String
+  style            String
+  durationSec      Int      @map("duration_sec")
+  status           String   @default("pending")
+  errorMessage     String?  @map("error_message")
+  providerJobId    String?  @map("provider_job_id")
+  creditsCostUnits Int      @map("credits_cost_units")
+  createdAt        DateTime @default(now()) @map("created_at")
+  updatedAt        DateTime @updatedAt @map("updated_at")
+
+  user        User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  voiceSample VoiceSample @relation(fields: [voiceSampleId], references: [id])
+  track       Track?      @relation(fields: [trackId], references: [id])
+
+  @@index([userId, status, createdAt])
+  @@map("generation_jobs")
+}
+
+enum MusicSubmissionState {
+  queued
+  dispatching
+  submitted
+  submit_unknown
+  failed
+}
+
+model MusicGeneration {
+  id                    String                @id @default(cuid())
+  userId                String                @map("user_id")
+  type                  String
+  /** Persisted provider id — worker/status must use this, not current env. */
+  provider              String                @default("sunoapi")
+  providerTaskId        String                @unique @map("provider_task_id")
+  clientRequestId       String?               @map("client_request_id")
+  clientRequestHash     String?               @map("client_request_hash")
+  providerRequestJson   Json?                 @map("provider_request_json")
+  prompt                String
+  style                 String?
+  title                 String?
+  customMode            Boolean               @default(false) @map("custom_mode")
+  instrumental          Boolean               @default(false)
+  /** Optional Mureka (or other) voice profile used for this generation. */
+  voiceProfileId        String?               @map("voice_profile_id")
+  status                String                @default("pending")
+  submissionState       MusicSubmissionState  @default(queued) @map("submission_state")
+  submitAttemptId       String?               @map("submit_attempt_id")
+  submitAttemptedAt     DateTime?             @map("submit_attempted_at")
+  submitCompletedAt     DateTime?             @map("submit_completed_at")
+  submitErrorCode       String?               @map("submit_error_code")
+  submitErrorMessage    String?               @map("submit_error_message")
+  rawStatus             String?               @map("raw_status")
+  errorMessage          String?               @map("error_message")
+  lyricsResult          Json?                 @map("lyrics_result")
+  albumCoverImagesJson  Json?                 @map("album_cover_images_json")
+  albumCoverTaskId      String?               @map("album_cover_task_id")
+  selectedAlbumCoverUrl String?               @map("selected_album_cover_url")
+  createdAt             DateTime              @default(now()) @map("created_at")
+  updatedAt             DateTime              @updatedAt @map("updated_at")
+
+  user   User                   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  tracks MusicGenerationTrack[]
+
+  @@unique([userId, clientRequestId])
+  @@index([userId, createdAt(sort: Desc)])
+  @@index([userId, status, createdAt])
+  @@index([status, updatedAt])
+  @@index([provider, status, updatedAt])
+  @@index([submissionState, submitAttemptedAt])
+  @@map("music_generations")
+}
+
+enum MusicTrackPersistenceState {
+  pending
+  processing
+  stored
+  failed
+}
+
+model MusicGenerationTrack {
+  id                       String                      @id @default(cuid())
+  musicGenerationId        String                      @map("music_generation_id")
+  providerTrackId          String                      @map("provider_track_id")
+  title                    String
+  durationSec              Int?                        @map("duration_sec")
+  audioStorageKey          String?                     @map("audio_storage_key")
+  audioSourceUrl           String?                     @map("audio_source_url")
+  imageSourceUrl           String?                     @map("image_source_url")
+  lyricsText               String?                     @map("lyrics_text")
+  timedLyricsJson          Json?                       @map("timed_lyrics_json")
+  persistenceState         MusicTrackPersistenceState  @default(pending) @map("persistence_state")
+  persistenceAttemptedAt   DateTime?                   @map("persistence_attempted_at")
+  persistenceCompletedAt   DateTime?                   @map("persistence_completed_at")
+  persistenceHeartbeatAt   DateTime?                   @map("persistence_heartbeat_at")
+  persistenceErrorCode     String?                     @map("persistence_error_code")
+  persistenceErrorMessage  String?                     @map("persistence_error_message")
+  persistenceAttempts      Int                         @default(0) @map("persistence_attempts")
+  createdAt                DateTime                    @default(now()) @map("created_at")
+
+  musicGeneration MusicGeneration @relation(fields: [musicGenerationId], references: [id], onDelete: Cascade)
+  song            Song?
+
+  @@unique([musicGenerationId, providerTrackId])
+  @@index([musicGenerationId])
+  @@index([persistenceState, persistenceHeartbeatAt])
+  @@map("music_generation_tracks")
+}
+
+model Song {
+  id                   String   @id @default(cuid())
+  userId               String   @map("user_id")
+  sourceTrackId        String   @unique @map("source_track_id")
+  provider             String   @default("sunoapi")
+  providerTaskId       String   @map("provider_task_id")
+  providerTrackId      String   @map("provider_track_id")
+  prompt               String
+  title                String
+  status               String   @default("pending_stems")
+  audioStorageKey      String?  @map("audio_storage_key")
+  durationMs           Int?     @map("duration_ms")
+  stemSeparationTaskId String?  @map("stem_separation_task_id")
+  stemSeparationNotice String?  @map("stem_separation_notice")
+  pendingAction        String?  @map("pending_action")
+  pendingTaskId        String?  @map("pending_task_id")
+  pendingRegionId      String?  @map("pending_region_id")
+  pendingPrompt        String?  @map("pending_prompt")
+  createdAt            DateTime @default(now()) @map("created_at")
+  updatedAt            DateTime @updatedAt @map("updated_at")
+
+  user        User                 @relation(fields: [userId], references: [id], onDelete: Cascade)
+  sourceTrack MusicGenerationTrack @relation(fields: [sourceTrackId], references: [id], onDelete: Cascade)
+  stems       SongStem[]
+  regions     SongRegion[]
+  versions    SongVersion[]
+  renderJobs  RenderJob[]
+
+  @@index([userId, createdAt(sort: Desc)])
+  @@map("songs")
+}
+
+model SongStem {
+  id              String   @id @default(cuid())
+  songId          String   @map("song_id")
+  type            String
+  audioStorageKey String   @map("audio_storage_key")
+  durationMs      Int?     @map("duration_ms")
+  createdAt       DateTime @default(now()) @map("created_at")
+
+  song Song @relation(fields: [songId], references: [id], onDelete: Cascade)
+
+  @@unique([songId, type])
+  @@map("song_stems")
+}
+
+model SongRegion {
+  id                  String   @id @default(cuid())
+  songId              String   @map("song_id")
+  label               String
+  startMs             Int      @map("start_ms")
+  endMs               Int      @map("end_ms")
+  orderIndex          Int      @map("order_index")
+  replacementAudioKey String?  @map("replacement_audio_key")
+  createdAt           DateTime @default(now()) @map("created_at")
+
+  song Song @relation(fields: [songId], references: [id], onDelete: Cascade)
+
+  @@index([songId, orderIndex])
+  @@map("song_regions")
+}
+
+model SongVersion {
+  id               String   @id @default(cuid())
+  songId           String   @map("song_id")
+  versionNumber    Int      @map("version_number")
+  renderedAudioKey String?  @map("rendered_audio_key")
+  status           String   @default("draft")
+  createdAt        DateTime @default(now()) @map("created_at")
+
+  song       Song            @relation(fields: [songId], references: [id], onDelete: Cascade)
+  operations EditOperation[]
+  renderJobs RenderJob[]
+
+  @@unique([songId, versionNumber])
+  @@map("song_versions")
+}
+
+model EditOperation {
+  id            String    @id @default(cuid())
+  songVersionId String    @map("song_version_id")
+  operationType String    @map("operation_type")
+  payloadJson   Json      @map("payload_json")
+  createdAt     DateTime  @default(now()) @map("created_at")
+  undoneAt      DateTime? @map("undone_at")
+
+  songVersion SongVersion @relation(fields: [songVersionId], references: [id], onDelete: Cascade)
+
+  @@index([songVersionId, createdAt])
+  @@index([songVersionId, undoneAt])
+  @@map("edit_operations")
+}
+
+model RenderJob {
+  id            String   @id @default(cuid())
+  songId        String   @map("song_id")
+  songVersionId String   @map("song_version_id")
+  status        String   @default("pending")
+  errorMessage  String?  @map("error_message")
+  createdAt     DateTime @default(now()) @map("created_at")
+  updatedAt     DateTime @updatedAt @map("updated_at")
+
+  song        Song        @relation(fields: [songId], references: [id], onDelete: Cascade)
+  songVersion SongVersion @relation(fields: [songVersionId], references: [id], onDelete: Cascade)
+
+  @@index([songId, createdAt(sort: Desc)])
+  @@index([status, createdAt])
+  @@map("render_jobs")
+}
+
+model CreditTransaction {
+  id                String   @id @default(cuid())
+  userId            String   @map("user_id")
+  type              String
+  amountUnits       Int      @map("amount_units")
+  reason            String
+  idempotencyKey    String?  @unique @map("idempotency_key")
+  relatedEntityType String?  @map("related_entity_type")
+  relatedEntityId   String?  @map("related_entity_id")
+  createdAt         DateTime @default(now()) @map("created_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, createdAt])
+  @@index([relatedEntityType, relatedEntityId])
+  @@map("credit_transactions")
+}
+
+/**
+ * FIFO grant lot for refund eligibility. remaining includes reserved units.
+ * Spendable = remaining - reserved. Legacy grants without a lot are unlotted.
+ */
+model CreditGrantLot {
+  id                   String   @id @default(cuid())
+  userId               String   @map("user_id")
+  sourcePurchaseId     String?  @map("source_purchase_id")
+  sourceLedgerEntryId  String   @unique @map("source_ledger_entry_id")
+  grantAmountUnits     Int      @map("grant_amount_units")
+  remainingAmountUnits Int      @map("remaining_amount_units")
+  reservedAmountUnits  Int      @default(0) @map("reserved_amount_units")
+  reservedRefundRequestId String? @unique @map("reserved_refund_request_id")
+  /** open | reserved | clawed */
+  status               String   @default("open")
+  createdAt            DateTime @default(now()) @map("created_at")
+  updatedAt            DateTime @updatedAt @map("updated_at")
+
+  user     User                @relation(fields: [userId], references: [id], onDelete: Cascade)
+  purchase CreditPackPurchase? @relation(fields: [sourcePurchaseId], references: [id], onDelete: SetNull)
+  allocations CreditGrantLotAllocation[]
+
+  @@index([userId, createdAt])
+  @@index([sourcePurchaseId])
+  @@map("credit_grant_lots")
+}
+
+model CreditGrantLotAllocation {
+  id                  String    @id @default(cuid())
+  lotId               String    @map("lot_id")
+  spendLedgerEntryId  String    @map("spend_ledger_entry_id")
+  amountUnits         Int       @map("amount_units")
+  restoredAt          DateTime? @map("restored_at")
+  /** Set when these spent units were included in a successful user cash refund. */
+  cashRefundRequestId String?   @map("cash_refund_request_id")
+  createdAt           DateTime  @default(now()) @map("created_at")
+
+  lot CreditGrantLot @relation(fields: [lotId], references: [id], onDelete: Cascade)
+
+  @@unique([spendLedgerEntryId, lotId])
+  @@index([spendLedgerEntryId])
+  @@index([cashRefundRequestId])
+  @@map("credit_grant_lot_allocations")
+}
+
+model WebhookEvent {
+  id           String   @id @default(cuid())
+  provider     String
+  eventId      String   @map("event_id")
+  type         String
+  payloadHash  String?  @map("payload_hash")
+  status       String   @default("processing")
+  errorMessage String?  @map("error_message")
+  processedAt  DateTime @default(now()) @map("processed_at")
+  createdAt    DateTime @default(now()) @map("created_at")
+
+  @@unique([provider, eventId])
+  @@index([provider, type, createdAt])
+  @@map("webhook_events")
+}
+
+model StorageObject {
+  id         String    @id @default(cuid())
+  userId     String?   @map("user_id")
+  bucket     String
+  key        String
+  kind       String
+  mimeType   String?   @map("mime_type")
+  sizeBytes  Int?      @map("size_bytes")
+  checksum   String?
+  visibility String    @default("private")
+  entityType String?   @map("entity_type")
+  entityId   String?   @map("entity_id")
+  createdAt  DateTime  @default(now()) @map("created_at")
+  deletedAt  DateTime? @map("deleted_at")
+
+  user User? @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@unique([bucket, key])
+  @@index([userId, kind, createdAt])
+  @@index([entityType, entityId])
+  @@index([deletedAt])
+  @@map("storage_objects")
+}
+
+/** Entitlements plan store (free/pro/studio labels). Not a payment subscription. */
+model Subscription {
+  id        String   @id @default(cuid())
+  userId    String   @unique @map("user_id")
+  planId    String   @default("free") @map("plan_id")
+  status    String   @default("active")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("subscriptions")
+}
+
+/**
+ * One-time prepaid credit pack purchase (TBC Checkout Stage 1).
+ * Snapshots packageId/price/currency/credits at create time — never re-read SoT on grant.
+ * Prepaid credit packs via TBC. Not an entitlement plan row.
+ */
+model CreditPackPurchase {
+  id                String    @id @default(cuid())
+  userId            String    @map("user_id")
+  provider          String    @default("tbc")
+  packageId         String    @map("package_id")
+  /**
+   * Charged major units at checkout (Flitt: GEL after USD→GEL snapshot).
+   * Never re-quoted; refunds/verify use this row, not live FX.
+   */
+  priceAmount       Decimal   @map("price_amount") @db.Decimal(12, 2)
+  currency          String
+  /** Commercial SoT amount (USD) captured at checkout. Null on legacy TBC rows. */
+  basePriceAmount   Decimal?  @map("base_price_amount") @db.Decimal(12, 2)
+  baseCurrency      String?   @map("base_currency")
+  /** USD→GEL rate used to compute priceAmount. Null on legacy rows. */
+  fxRate            Decimal?  @map("fx_rate") @db.Decimal(18, 8)
+  fxQuotedAt        DateTime? @map("fx_quoted_at")
+  fxSource          String?   @map("fx_source")
+  creditsAmount     Int       @map("credits_amount")
+  merchantPaymentId String    @unique @map("merchant_payment_id")
+  providerPaymentId String?   @map("provider_payment_id")
+  /**
+   * Domain lifecycle: created | provider_created | pending | paid | credited |
+   * failed | expired | cancelled | refunded | partial_refunded | verification_failed
+   */
+  status            String    @default("created")
+  /** Raw provider status string when known (TBC or Flitt). */
+  providerStatus    String?   @map("provider_status")
+  approvalUrl       String?   @map("approval_url") @db.Text
+  /** Client checkout idempotency key (repeat purchase allowed with a new key). */
+  clientRequestId   String?   @map("client_request_id")
+  paidAt            DateTime? @map("paid_at")
+  creditedAt        DateTime? @map("credited_at")
+  failureCode       String?   @map("failure_code")
+  failureMessage    String?   @map("failure_message")
+  metadata          Json?
+  createdAt         DateTime  @default(now()) @map("created_at")
+  updatedAt         DateTime  @updatedAt @map("updated_at")
+
+  user            User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  refundRequests  RefundRequest[]
+  creditGrantLots CreditGrantLot[]
+
+  @@unique([userId, clientRequestId])
+  @@unique([provider, providerPaymentId])
+  @@index([userId, createdAt(sort: Desc)])
+  @@index([status, updatedAt])
+  @@map("credit_pack_purchases")
+}
+
+/**
+ * Monetary refund request for a CreditPackPurchase (Flitt/TBC).
+ * Separate from ledger credit refunds (AI failure / timeout).
+ * amount is set by admin on approve from credit-provenance entitlement.
+ */
+model RefundRequest {
+  id                       String    @id @default(cuid())
+  userId                   String    @map("user_id")
+  /** Internal CreditPackPurchase.id — never a raw provider payId. */
+  paymentId                String    @map("payment_id")
+  /** Set on admin approve; null while status=requested. */
+  amount                   Decimal?  @db.Decimal(12, 2)
+  currency                 String
+  reason                   String    @db.Text
+  /**
+   * requested | approved | processing | refunded | rejected | failed | needs_review
+   */
+  status                   String    @default("requested")
+  /**
+   * purchase_remainder | operation
+   * User cash refund scope — not system credit compensation.
+   */
+  scope                    String    @default("purchase_remainder")
+  /** Paid credit units (ledger units) covered by this monetary refund. */
+  cashRefundCreditUnits    Int?      @map("cash_refund_credit_units")
+  /** Exact spend ledger entry for scope=operation. */
+  sourceSpendLedgerEntryId String?   @map("source_spend_ledger_entry_id")
+  requestedAt              DateTime  @default(now()) @map("requested_at")
+  reviewedAt               DateTime? @map("reviewed_at")
+  reviewedBy               String?   @map("reviewed_by")
+  rejectReason             String?   @map("reject_reason") @db.Text
+  provider                 String    @default("tbc")
+  providerRefundId         String?   @map("provider_refund_id")
+  providerReference        String?   @map("provider_reference")
+  /** Sanitized provider error / result code — never tokens or secrets. */
+  providerError            String?   @map("provider_error") @db.Text
+  createdAt                DateTime  @default(now()) @map("created_at")
+  updatedAt                DateTime  @updatedAt @map("updated_at")
+
+  user    User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+  payment CreditPackPurchase @relation(fields: [paymentId], references: [id], onDelete: Restrict)
+
+  @@index([userId, createdAt(sort: Desc)])
+  @@index([paymentId, status])
+  @@index([status, updatedAt])
+  @@index([sourceSpendLedgerEntryId])
+  @@map("refund_requests")
+}
