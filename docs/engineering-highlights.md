@@ -2,68 +2,82 @@
 
 ## Provider abstraction
 
-Music, voice, video, and payment operations go through provider interfaces. Application services depend on contracts, not vendor HTTP clients.
+Music, voice, video, and payment operations are modeled behind stable interfaces. Application services depend on contracts instead of vendor HTTP clients.
 
-The video layer follows the same pattern: submit, poll, download, optional cancel, and reuse of an existing provider task are expressed through a stable provider contract.
+The public repository keeps these boundaries visible while production adapter implementations remain private.
 
 ## Queue-based processing
 
-Long-running AI work runs in BullMQ workers outside the HTTP request path. API commits durable state, then enqueues; workers submit, poll, persist, compose, validate, and reconcile.
+Long-running AI work runs in BullMQ workers outside the HTTP request path. The API persists durable state before enqueueing; workers continue processing asynchronously.
 
-For Share Video / AI Story, scene generation is separated from final media composition so paid/generated scene assets can survive render retries.
+For video workloads, external generation state is kept separate from final media composition so completed external work can survive local render retries.
 
 ## Idempotency
 
-Client retries must not create duplicate spend or duplicate provider submissions. Idempotency keys, persisted provider task IDs, and unique ledger constraints protect monetary side effects.
+Retries must not duplicate monetary state changes or blindly duplicate external submissions. The architecture uses durable identifiers and idempotent state transitions around those side effects.
 
-Video retry paths can reuse an already-known provider task instead of issuing a second paid submit.
+The showcase documents this reliability requirement without exposing provider-specific retry recipes.
 
 ## Concurrency control
 
-Provider throughput can be limited independently from API traffic using worker concurrency and shared rate-limit buckets.
+External-provider throughput can be bounded independently from normal API traffic through worker-level concurrency and shared rate-limiting concepts.
 
-Music and video providers can have different concurrency limits because their latency, quotas, and failure modes differ.
+Exact production limits and vendor-specific operational thresholds remain private.
 
 ## Durable job lifecycle
 
-Generation and persistence state survives API/worker restarts. Reconcilers recover committed-but-not-enqueued, submitted-but-unconfirmed, or stalled work.
+Generation state survives API / worker restarts. Recovery processes can reconcile durable state after crashes or uncertain external responses.
 
-The Share Video flow persists scene-level state so provider polling, final rendering, and recovery do not depend on one long-lived process.
+For Share Video, generated media and task identity are persisted separately from the final render state.
 
 ## Media composition and validation
 
-Generated short clips are not the final product artifact. The worker composes scenes with trims, timing decisions, overlays/transitions, and the source track using FFmpeg.
+Generated media is not automatically treated as the final product artifact. Application-owned media processing composes the final output and validates it before publication.
 
-The final MP4 is probed before publication so a job is not marked ready solely because FFmpeg returned successfully.
-
-## Anti-loop / source usage planning
-
-Multi-scene AI Story flows track which ranges of generated clips are used during the final edit. This reduces obvious repeated loops when short provider clips must fill a longer social-video timeline.
+FFmpeg and ffprobe are retained in the public architecture because they demonstrate media-pipeline engineering; production creative presets and composition heuristics are not published.
 
 ## Server-controlled templates
 
-Share Video templates are resolved on the server. Availability and advanced controls are fail-closed so the client cannot enable an unverified or disabled generation path by modifying request fields.
+Share Video templates are resolved and authorized server-side. The browser cannot enable a disabled or unsupported generation path simply by modifying request data.
+
+Private template-to-provider mappings and generation directives are intentionally excluded.
 
 ## Storage persistence
 
-Temporary provider media URLs are not treated as long-term storage. Workers download and store music, scene clips, and final media under application-owned object keys.
+Temporary external media URLs are not treated as durable application storage. Generated assets are persisted under application-controlled storage keys.
 
 ## Credit ledger
 
-Balances are derived from an append-only credit transaction ledger. Spend and refund are explicit records with stable idempotency keys.
+Balances are derived from an append-only credit transaction ledger. Spend and refund are explicit state transitions with stable identities.
 
-Commercial pricing and exact provider cost models are intentionally not included in this public showcase.
+Commercial pricing, provider cost models, margins, and package economics are intentionally not part of this public showcase.
 
 ## Authorization
 
-Authenticated identity comes from server-side auth. Resource access is scoped by ownership; client-supplied user IDs are not trusted.
+Authenticated identity is established server-side. Domain-resource access is scoped by ownership; client-supplied ownership claims are not trusted.
 
 ## Payment / refund safety
 
-Checkout verification, credit grant, and refund processing use explicit lifecycle states and idempotent callbacks / jobs.
+Checkout, credit grant, and refund processing use explicit lifecycle state and idempotent processing concepts.
 
-AI generation failures and render failures are handled separately so already-consumed external work is not accidentally treated as if no provider work occurred.
+The public repository demonstrates the state-machine approach rather than publishing current merchant configuration or private payment operations.
 
 ## Observability
 
-Independent API and Worker processes expose health/readiness and metrics hooks suitable for multi-service deployment. Provider-specific operational balances, quotas, and production admin data are intentionally excluded from the public showcase.
+Independent API and Worker processes expose health/readiness and metrics concepts suitable for a multi-service deployment.
+
+Provider balances, quotas, treasury data, private alerts, and production operational thresholds are intentionally excluded.
+
+## What is deliberately not demonstrated in source
+
+The public showcase does not attempt to teach a reader how to reproduce the production provider behavior. In particular it excludes:
+
+- provider-specific HTTP implementations;
+- proprietary prompt construction;
+- detailed creative-planning algorithms;
+- exact model/version parameters;
+- routing, ranking, and fallback policy;
+- vendor-specific recovery workarounds;
+- commercial and operational decision rules.
+
+Those details are maintained in the private production repository.
