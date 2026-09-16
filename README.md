@@ -1,60 +1,86 @@
 # AI Music
 
-Production-oriented AI music and short-form video SaaS architecture for turning an idea or lyrics into a complete song, optionally using a personal AI voice, then creating a shareable vertical video from the generated track.
+Production-oriented AI music and short-form video SaaS architecture for turning an idea or lyrics into a complete song, optionally using a personal AI voice, then creating a shareable vertical video.
 
-This repository is a **public showcase / portfolio** version of a private production project. Commercial credentials, vendor configuration, private infrastructure identifiers, operational runbooks, and proprietary economics have intentionally been removed.
+This repository is a **public portfolio / architecture showcase** derived from a separately maintained private production project. It is intentionally not a publishable copy of the production system.
 
-## What it does
+Production provider implementations, proprietary prompts, routing heuristics, exact model configuration, commercial economics, private infrastructure identifiers, operational runbooks, and user data are intentionally excluded.
 
-AI Music is an AI-powered creation platform. Users can:
+> **Runnable locally — no production cloud accounts required.**
+> The public showcase is designed around local PostgreSQL + Redis, local filesystem storage, development authentication, and deterministic demo providers. Access to production Railway, Neon, object storage, AI-provider, or payment accounts is not required.
 
-- start from a prompt or custom lyrics;
-- generate a song through asynchronous AI processing;
-- optionally use a personal cloned voice;
-- review generation history;
-- edit audio in a timeline editor;
-- generate a short-form share video / AI Story from a track;
-- export audio and video results.
+## What it demonstrates
 
-The product orchestrates authentication, credits, durable job lifecycle, media persistence, provider routing, payments, and recovery around external generative-model and payment providers.
+AI Music is an AI-powered creation platform. The production product supports:
 
-## Core product flow
+- prompt or custom-lyrics song creation;
+- asynchronous AI generation;
+- optional personal-voice workflows;
+- generation history and durable job state;
+- timeline-based audio editing;
+- short-form Share Video / AI Story creation;
+- audio and video export;
+- credits, payments, authorization, storage, retries, and recovery around external providers.
 
-```text
-Idea / custom lyrics
-        ↓
-Song generation request
-        ↓
-Async AI processing (+ optional personal voice)
-        ↓
-Object storage persistence
-        ↓
-Music editor
-        ↓
-Track result ───────────────→ Audio export
-        ↓
-Share Video / AI Story
-        ↓
-Scene planning → video generation → FFmpeg composition
-        ↓
-Validated vertical MP4
+The public repository focuses on the engineering architecture behind those workflows rather than publishing reconstruction-ready production integrations.
+
+## Quick start
+
+Requirements:
+
+- Node.js 20+
+- pnpm 10+
+- Docker / Docker Compose
+
+```bash
+git clone https://github.com/Demon5611/AI-Music-Showcase.git
+cd AI-Music-Showcase
+
+corepack enable
+pnpm install
+cp .env.example .env
+
+pnpm docker:up
+pnpm db:generate
+pnpm db:push
+pnpm dev
 ```
 
-## Key capabilities
+Default local endpoints:
 
-- Personal-voice onboarding architecture
-- Prompt or custom-lyrics generation workflow
-- Durable asynchronous music and video generation
-- Multi-provider AI orchestration behind stable interfaces
-- Credit ledger for billable AI operations
-- Hosted payment checkout / refund lifecycle architecture
-- Ownership-scoped authorization and signed media access
-- Feature-oriented Next.js UI with i18n
-- Waveform / timeline editor architecture (Web Audio / Tone.js stack)
-- Short-form video generation with scene planning, provider affinity, reconciliation, and final media validation
-- Curated AI Story template catalog for product-controlled video styles
+```text
+Web: http://localhost:3000
+API: http://localhost:3001
+```
 
-## Architecture
+The showcase environment defaults to:
+
+```env
+SHOWCASE_MODE=true
+AUTH_DEV_MODE=true
+STORAGE_DRIVER=local
+MUSIC_DEFAULT_PROVIDER=mock
+```
+
+No production credentials should be added to this repository.
+
+## Production vs public showcase
+
+| Concern | Private production | Public showcase |
+| --- | --- | --- |
+| Web / API / Worker | Managed deployment | Local Node processes |
+| PostgreSQL | Managed production database | Docker PostgreSQL |
+| Redis / queues | Managed Redis | Docker Redis |
+| Object storage | Private cloud object storage | Local filesystem |
+| Authentication | Production identity provider | Development auth mode |
+| Music / voice AI | Private provider adapters | Mock / demo boundary |
+| Video AI | Private provider adapters | `VideoProvider` contract + mock |
+| Payments | Real hosted payment integration | Disabled / mock behavior |
+| Provider routing | Production policy | Intentionally excluded |
+| Prompts / model tuning | Private | Intentionally excluded |
+| Economics / treasury | Private | Intentionally excluded |
+
+## Core architecture
 
 ```mermaid
 flowchart LR
@@ -66,12 +92,12 @@ flowchart LR
     Queue[BullMQ]
     Worker[Background Worker]
 
-    Music[Music / Voice Provider Adapters]
-    Video[Video Provider Adapters]
+    Music[Music / Voice Provider Boundary]
+    Video[Video Provider Boundary]
     Composer[FFmpeg / ffprobe Media Pipeline]
-    Storage[(Object Storage)]
+    Storage[(Object Storage Abstraction)]
     Auth[Authentication]
-    Payment[Payment Gateway Adapter]
+    Payment[Payment Boundary]
 
     Client --> API
     Client --> Storage
@@ -93,25 +119,47 @@ flowchart LR
 
 More detail: [docs/architecture.md](docs/architecture.md).
 
+## Core product flow
+
+```text
+Idea / custom lyrics
+        ↓
+Song generation request
+        ↓
+Async processing (+ optional personal voice)
+        ↓
+Durable storage
+        ↓
+Music editor
+        ↓
+Track result ───────────────→ Audio export
+        ↓
+Share Video / AI Story
+        ↓
+Application scene lifecycle → video provider boundary → composition
+        ↓
+Validated vertical MP4
+```
+
 ## Monorepo structure
 
 ```text
 apps/
-  web/          Next.js client (App Router)
+  web/          Next.js client
   api/          Fastify HTTP API
   worker/       BullMQ background jobs and media composition
-  suno-fake/    Local fake provider for load/dev experiments
+  suno-fake/    Local fake-provider / load-development utility
 
 packages/
-  ai-providers/ Music / voice / video provider abstractions + adapters
-  api-client/   Typed HTTP client for web
-  db/           Prisma schema + credits ledger + durable generation state
-  shared/       Zod schemas, constants, storage keys, cross-service contracts
-  storage/      Object storage abstraction
-  observability/ Health/metrics helpers
-  flitt-checkout/ Hosted payment gateway adapter
-  tbc-checkout/ Legacy payment adapter + mocks
-  config/       Shared tooling config
+  ai-providers/ Public provider contracts + safe/demo implementations
+  api-client/   Typed HTTP client
+  db/           Prisma schema + durable generation / credit state
+  shared/       Zod schemas and cross-service contracts
+  storage/      Storage abstraction
+  observability/ Health / metrics helpers
+  flitt-checkout/ Reduced payment-boundary code retained from showcase snapshot
+  tbc-checkout/ Legacy payment adapter / mocks retained from showcase snapshot
+  config/       Shared tooling configuration
 ```
 
 ## Technology stack
@@ -124,90 +172,105 @@ packages/
 - Tailwind CSS
 - TanStack Query
 - Zustand
-- Clerk authentication integration
-- next-intl internationalization
+- Clerk-compatible authentication architecture
+- next-intl
 - Tone.js / Web Audio oriented editor architecture
-- waveform playlist / drag-and-drop editor building blocks
 
 ### Backend
 
 - Fastify
 - TypeScript
-- Zod validation
+- Zod
 - Prisma + PostgreSQL
 - BullMQ + Redis
-- FFmpeg + ffprobe for media composition and output validation
-- Provider adapters for music / voice / video / payments
-
-### AI / media provider layer
-
-Production code currently includes provider boundaries for:
-
-- music generation and personal-voice workflows;
-- CometAPI-backed video generation paths;
-- Wan-family image-to-video scenes;
-- Sora-based hero-scene experiments behind feature gates;
-- BytePlus / Seedance video generation as an explicitly gated provider path;
-- deterministic mock providers for local/showcase execution.
-
-Provider credentials, model-account configuration, quotas, exact vendor pricing, and commercial routing rules are intentionally not published here.
+- FFmpeg + ffprobe
+- provider-adapter architecture for external AI / media / payment systems
 
 ### Platform
 
 - pnpm workspaces
 - Turborepo
-- Object-storage architecture (local or R2-compatible)
-- Independently deployable Web / API / Worker processes
+- independently deployable Web / API / Worker processes
+- local or object-storage-backed media abstraction
 
 ## Engineering highlights
 
-- **Provider abstraction** — business logic depends on interfaces, not vendor SDKs
-- **Queue-based AI workloads** — long music/video jobs leave the request lifecycle
-- **Idempotent spend / enqueue / submit** — retries must not double-charge or double-submit vendor work
-- **Provider affinity** — existing jobs and assets keep their persisted provider/task identity
-- **Append-only credit ledger** — balance is derived from transactions
-- **Signed private media** — short-lived URLs for voice/tracks/renders
-- **Payment state machines** — verified callbacks, credit grant, refund jobs
-- **Reconcilers** — recover committed work after process crashes or transient provider failures
-- **Scene durability** — completed video scenes can be reused during render/recovery instead of regenerating paid media
-- **Media validation** — final share videos are probed before being marked ready
-- **Template gating** — server-resolved template availability is authoritative, not client-controlled
+- **Provider abstraction** — product logic depends on interfaces instead of vendor SDKs
+- **Queue-based long-running workloads** — expensive/slow AI jobs leave the HTTP lifecycle
+- **Idempotent side effects** — retries are designed not to duplicate billing or external submissions
+- **Provider affinity** — persisted jobs retain their external task identity
+- **Append-only credit ledger** — balance derives from transactions
+- **Private media ownership** — authorization and signed-access concepts remain separated from UI state
+- **Payment state machines** — payment/refund lifecycle is modeled explicitly
+- **Reconcilers** — committed external work can recover after crashes or uncertain responses
+- **Scene durability** — generated video assets can survive render retries
+- **Media validation** — final video output is probed before being marked ready
+- **Server-authoritative template gates** — the browser cannot enable disabled generation paths by editing JSON
 
 See [docs/engineering-highlights.md](docs/engineering-highlights.md), [docs/share-video.md](docs/share-video.md), and [docs/security-design.md](docs/security-design.md).
 
-## Reliability and scalability
+## What works in showcase mode
 
-- Horizontal worker scaling with per-provider concurrency controls
-- Shared Redis rate-limit buckets for provider submit pressure
-- Durable generation records before external side effects
-- Retry / backoff for transient provider and storage failures
-- Poll/reconcile recovery after uncertain provider responses
-- Re-render paths that reuse durable generated scenes
-- ffprobe validation before publishing final video outputs
-- Health and metrics endpoints for multi-service operations
+The public repository is intended to demonstrate the application shape without paid provider access. Depending on the selected local flow, it can exercise:
 
-## Security and privacy
+- Next.js UI and API interaction;
+- local development authentication;
+- PostgreSQL persistence;
+- Redis / BullMQ queues;
+- API ↔ Worker separation;
+- deterministic provider behavior where a mock is supplied;
+- durable job lifecycle concepts;
+- local media-storage paths;
+- FFmpeg / ffprobe media-pipeline concepts;
+- retry / recovery architecture.
 
-- Server-side auth identity; no trusted client `userId`
-- Ownership checks on domain resources
-- Secrets only in environment variables
-- Private object storage by default
-- Commercial providers are called server-side only
-- Showcase repository strips real credentials, infrastructure IDs, vendor quotas, private operational configuration, and exact unit economics
+The showcase should be treated as an engineering demonstration, not as a substitute deployment for the private production service.
 
-## Local development
+## Intentionally excluded from the public repository
 
-Requirements: Node.js 20+, pnpm, Docker (Postgres/Redis optional via compose).
+The following are private even when the production product uses them:
 
-```bash
-pnpm install
-cp .env.example .env
-pnpm docker:up   # if using local Postgres/Redis
-pnpm db:generate
-pnpm dev
+- production music / voice / video provider implementations;
+- provider-specific payload mappings and undocumented workarounds;
+- exact production model selection and tuning;
+- proprietary prompts and prompt templates;
+- detailed scene-planning / anti-repetition heuristics;
+- production provider routing and fallback rules;
+- real payment credentials and merchant configuration;
+- production infrastructure identifiers and deployment configuration;
+- provider account balances, quotas, treasury and admin internals;
+- exact COGS, margins, package economics, and commercial decision rules;
+- private runbooks, incidents, vendor correspondence, and user data.
+
+The repository may name technologies used in the broader system for portfolio context, but it intentionally does not publish enough provider-specific detail to reproduce the production implementation directly.
+
+## Public/private boundary
+
+The public architecture follows this principle:
+
+```text
+PRIVATE PRODUCTION
+    real adapters
+    proprietary orchestration
+    prompts / tuning
+    routing / economics
+    production operations
+          │
+          │ sanitized architecture boundary
+          ▼
+PUBLIC SHOWCASE
+    interfaces
+    domain lifecycle
+    mocks
+    reduced worker patterns
+    frontend / API architecture
+    local infrastructure
+    safe documentation
 ```
 
-Useful scripts:
+See [docs/public-showcase-boundary.md](docs/public-showcase-boundary.md).
+
+## Validation commands
 
 ```bash
 pnpm typecheck
@@ -216,41 +279,34 @@ pnpm test
 pnpm build
 ```
 
-## Showcase mode
+These commands should be run before merging a sanitized refresh from the private project into the public default branch.
 
-```env
-SHOWCASE_MODE=true
-```
+## Security and privacy
 
-When enabled:
-
-- music / voice / video / payment adapters prefer deterministic demo implementations where available;
-- no commercial AI provider calls are required;
-- no real payment gateway credentials are required;
-- API / worker architecture remains intact for local demonstration.
+- server-side identity is authoritative;
+- domain resources require ownership checks;
+- secrets belong only in environment variables;
+- private media is private by default;
+- production external providers are called server-side only;
+- public code must use obvious local/demo placeholders;
+- production secrets and commercial implementation details must never be copied into this repository.
 
 ## Screenshots
 
-Safe product screenshots for this public repository live under [docs/assets/](docs/assets/).
-Do not add captures that contain emails, payment details, internal IDs, provider balances, or private admin data.
+Safe product screenshots for this repository live under [docs/assets/](docs/assets/).
+
+Do not add captures containing emails, payment details, internal IDs, provider balances, private admin data, or reconstructable provider configuration.
 
 ## Project status
 
-This showcase mirrors the architecture of a privately deployed production SaaS and is periodically refreshed from a separately maintained private repository after sanitization.
+This repository is periodically refreshed from a separately maintained private project through an explicit sanitization step.
 
-Current showcase scope includes both the original AI music pipeline and the later Share Video / AI Story architecture.
+The showcase currently represents the AI music architecture plus the later Share Video / AI Story domain and media-pipeline architecture.
 
-## Disclaimer
+## License / usage
 
-Public showcase version of a private production project.
+Copyright © 2026 Dmitrii Sedov. All rights reserved.
 
-Commercial credentials, merchant configuration, private infrastructure identifiers, provider-account configuration, exact vendor economics, and production/user data have intentionally been removed or replaced with obvious placeholders.
+This source is published for portfolio review, technical evaluation, educational inspection, and demonstration purposes. No permission is granted for commercial reuse, redistribution, sublicensing, or derivative commercial products without prior written permission.
 
-Third-party foundation models, payment rails, and cloud services are not owned by this repository.
-
-## License / IP
-
-Copyright © 2026. All rights reserved.
-
-This repository is published for portfolio and demonstration purposes.
-No license is granted for commercial reuse, redistribution, or derivative commercial products without prior written permission.
+See [NOTICE](NOTICE).
