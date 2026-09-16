@@ -1,8 +1,18 @@
-Copyright © 2026. All rights reserved.
+Copyright © 2026 Dmitrii Sedov. All rights reserved.
 
-This repository is published for portfolio and demonstration purposes.
-No license is granted for commercial reuse, redistribution, or derivative
-commercial products without prior written permission.
+This repository is published solely for portfolio review, technical evaluation,
+educational inspection, and demonstration purposes.
 
-Third-party dependencies remain under their respective licenses.
-Third-party AI models and payment providers are not owned by this repository.
+No permission is granted to use, reproduce, modify, redistribute, sublicense,
+sell, commercialize, or create derivative commercial products from the source
+code or project-specific implementation without prior written permission from
+the copyright owner.
+
+The public repository intentionally contains a reduced demonstration layer.
+Production provider implementations, proprietary orchestration logic,
+commercial configuration, operational data, and other non-public know-how are
+maintained separately and are not licensed by publication of this showcase.
+
+Third-party dependencies remain subject to their respective licenses.
+Third-party AI models, payment providers, cloud services, and their trademarks
+are owned by their respective owners.

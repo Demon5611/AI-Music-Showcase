@@ -13,12 +13,18 @@ jobs:
     runs-on: ubuntu-latest
 
     env:
-      NEXT_PUBLIC_APP_ENV: production
-      NEXT_PUBLIC_API_URL: ${{ vars.NEXT_PUBLIC_API_URL }}
-      NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: ${{ vars.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY }}
-      NEXT_PUBLIC_FORCE_CLERK: "true"
-      NEXT_PUBLIC_DEV_AUTH_USER_ID: ""
-      NEXT_PUBLIC_SENTRY_DSN: ${{ vars.NEXT_PUBLIC_SENTRY_DSN }}
+      SHOWCASE_MODE: "true"
+      NEXT_PUBLIC_SHOWCASE_MODE: "true"
+      NEXT_PUBLIC_APP_ENV: development
+      NEXT_PUBLIC_API_URL: http://localhost:3001
+      NEXT_PUBLIC_FORCE_CLERK: "false"
+      NEXT_PUBLIC_DEV_AUTH_USER_ID: showcase-ci-user
+      AUTH_DEV_MODE: "true"
+      DATABASE_URL: postgresql://postgres:postgres@localhost:5432/ai_music
+      DIRECT_DATABASE_URL: postgresql://postgres:postgres@localhost:5432/ai_music
+      REDIS_URL: redis://localhost:6379
+      STORAGE_DRIVER: local
+      STORAGE_LOCAL_PATH: ./storage
 
     steps:
       - name: Checkout repository
@@ -46,39 +52,8 @@ jobs:
       - name: Lint
         run: pnpm lint
 
-      - name: Validate build environment
-        shell: bash
-        run: |
-          test -n "$NEXT_PUBLIC_API_URL" || {
-            echo "NEXT_PUBLIC_API_URL GitHub repository variable is missing"
-            exit 1
-          }
-
-          test -n "$NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY" || {
-            echo "NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY GitHub repository variable is missing"
-            exit 1
-          }
-
-          case "$NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY" in
-            pk_test_*|pk_live_*)
-              echo "Clerk publishable key format is valid"
-              ;;
-            *)
-              echo "NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY has an invalid format"
-              echo "Expected prefix: pk_test_ or pk_live_"
-              exit 1
-              ;;
-          esac
-
-          case "$NEXT_PUBLIC_API_URL" in
-            https://*)
-              echo "NEXT_PUBLIC_API_URL format is valid"
-              ;;
-            *)
-              echo "NEXT_PUBLIC_API_URL must start with https://"
-              exit 1
-              ;;
-          esac
+      - name: Test
+        run: pnpm test
 
       - name: Build
         run: pnpm build

@@ -45,6 +45,7 @@ export type {
 } from "./kits/types.js";
 export * from "./types.js";
 export * from "./music/index.js";
+export * from "./video/index.js";
 export type {
   VoiceDeletionRequestResult,
   RequestVoiceProfileDeletionInput,
