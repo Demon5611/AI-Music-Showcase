@@ -1,143 +1,144 @@
 # Share Video / AI Story
 
-This document describes the public, sanitized architecture of the short-form video feature added after the original showcase snapshot.
+This document describes the public, intentionally reduced architecture of the short-form video subsystem.
 
-Commercial credentials, exact provider pricing, quotas, production endpoints, account-specific limitations, and private operational notes are intentionally omitted.
+The showcase demonstrates engineering patterns without publishing production provider implementations, proprietary prompts, routing heuristics, commercial configuration, or operational know-how.
 
-## Product modes
+## Product scope
 
-The Share Video area supports multiple presentation levels:
+The product supports several classes of share-video experiences:
 
 - non-AI motion / photo-based presentation;
 - single-image AI animation;
 - multi-scene AI Story generation;
-- curated templates that control visual direction and server-approved generation paths.
+- curated templates resolved and authorized by the server.
+
+Exact production template logic and provider-specific creative behavior are private.
 
 ## Provider boundary
 
-Video generation is isolated behind a provider contract. Business code is responsible for lifecycle and product rules; provider adapters are responsible for vendor-specific submit/poll/download behavior.
+Video generation is isolated behind a stable `VideoProvider` contract. Product code owns lifecycle and authorization; provider adapters own vendor-specific transport.
 
-The production architecture currently includes:
+The public repository exposes only the architectural boundary and deterministic mock behavior required to understand and demonstrate the design.
 
-| Provider boundary | Public description |
-| --- | --- |
-| CometAPI adapter | Video-generation transport used for Wan/Sora-family workloads |
-| Wan-family path | Image-to-video scene generation used by AI Story flows |
-| Sora path | Feature-gated hero-scene / experiment path |
-| BytePlus / Seedance | Explicitly gated alternative/reserve video provider path |
-| Mock provider | Deterministic no-network implementation for development/showcase mode |
+```text
+Product / Worker
+      ↓
+VideoProvider interface
+      ↓
+MockVideoProvider      ← public showcase
+      ↓
+Production adapters    ← private repository
+```
 
-The public repository intentionally does not expose provider account configuration, real endpoints where unnecessary, vendor credentials, quotas, or exact routing economics.
+Production has used multiple external image/video generation systems behind this boundary, but provider-specific payload mapping, model selection, endpoints, routing rules, policy workarounds, and fallback logic are intentionally excluded here.
 
 ## Durable scene pipeline
 
 ```text
-Track + source image + selected template
+Track + source media + selected template
         ↓
-Validate ownership / feature gates / billing
+Validate ownership / feature gate / billing state
         ↓
-Persist Share Video job
+Persist video job
         ↓
-Plan scenes and visual continuity
+Create application-level scene plan
         ↓
-Submit scene generation through VideoProvider
+Submit through VideoProvider
         ↓
-Persist provider task identity
+Persist external task identity
         ↓
-Poll / reconcile until scene completion
+Poll / reconcile until completion
         ↓
-Persist generated scene clip to application storage
+Persist generated scene asset
         ↓
-Repeat for required scenes
+Build application-level edit plan
         ↓
-Build edit plan
-        ↓
-FFmpeg final composition
+FFmpeg composition
         ↓
 ffprobe output validation
         ↓
 Persist final MP4 and mark ready
 ```
 
+The diagram intentionally stops at application-level responsibilities. Production prompt construction, scene heuristics, provider selection, model parameters, and creative planning algorithms are not part of the public source.
+
 ## Why scene state is persisted
 
-Video generation has a different cost and latency profile from ordinary HTTP work. A worker crash after a provider accepted a job must not cause an automatic second provider POST.
+External video generation is slow, asynchronous, and potentially billable. A worker crash after an external provider accepted a task must not automatically create a duplicate submission.
 
-The architecture therefore stores provider task identity and scene state separately from final rendering. Retries can poll/reconcile existing tasks and final rendering can be repeated from durable scene assets.
+The architecture therefore persists provider task identity and scene state separately from final rendering. Retries can reconcile already submitted work, and rendering can be repeated from durable scene assets.
 
-This separates two failure domains:
+This separates two important failure domains:
 
-1. **generation failure** — external scene generation did not complete;
-2. **render failure** — generated scenes exist, but local composition/validation failed.
+1. **generation failure** — external generation did not complete;
+2. **render failure** — generated media exists, but local composition or validation failed.
 
-A render retry should reuse completed scenes rather than regenerate them.
+A render retry should reuse completed assets instead of requesting them again.
 
-## Multi-provider AI Story
+## Multi-provider architecture
 
-The production project evolved from a single-provider prototype toward provider-composed stories. A story can route different scene roles through different explicitly enabled provider paths while keeping one durable application-level scene model.
+The application-level scene model is independent of any particular external model vendor. This lets production evolve provider choices without spreading vendor-specific logic through product code.
 
-Examples include a higher-fidelity hero scene combined with supporting image-to-video scenes. Exact production routing remains private because it changes with provider quality, policy constraints, availability, and commercial terms.
+The public showcase intentionally does not disclose which production provider is assigned to which creative role, how providers are ranked, how fallback works, or which model parameters are selected.
 
-## Visual continuity and anti-loop editing
+## Edit planning
 
-Longer social videos may be assembled from several short generated clips. The pipeline tracks source ranges and playback decisions during edit planning so the final result does not simply repeat the same few seconds in an obvious loop.
-
-The planning layer may define:
+Generated clips and song audio are composed by an application-owned media pipeline. The public architecture demonstrates that an edit plan can contain concepts such as:
 
 - scene ordering;
 - source trim ranges;
-- playback rate;
-- transition timing;
-- overlay/branding metadata;
-- preservation rules for visible source text/branding.
+- playback timing;
+- transition metadata;
+- overlay metadata.
+
+Production anti-repetition heuristics, prompt strategy, visual-continuity rules, and other product-specific planning logic are private.
 
 ## Templates
 
-The UI uses a curated template catalog rather than giving every low-level model field directly to the browser.
+The browser selects from a curated catalog rather than directly controlling low-level provider settings.
 
-Template availability is enforced server-side. This prevents a client from enabling disabled/unverified provider paths by editing request JSON.
+Template availability is enforced server-side. A modified client request must not be able to activate a disabled or unsupported generation path.
 
-A template can control high-level creative direction while the backend resolves implementation details.
+The public repository documents this security boundary but intentionally omits production template-to-provider mappings and private generation directives.
 
 ## Media composition
 
-Final video assembly uses FFmpeg-compatible composition rather than relying on the generation provider to produce the finished social artifact.
+Final video assembly is application-owned rather than delegated entirely to a generation provider.
 
-The application can therefore combine:
+The media pipeline combines durable generated assets with the track and validates the resulting output before changing the job state to `ready`.
 
-- generated scene clips;
-- the original/generated song audio;
-- transitions;
-- timing changes;
-- overlays / subtitles / branding elements where applicable.
-
-The output is validated with ffprobe before the job becomes `ready`.
+The showcase retains FFmpeg / ffprobe integration concepts because they demonstrate media-pipeline engineering, while production composition presets and creative rules remain private.
 
 ## Reliability patterns demonstrated
 
-- BullMQ jobs outside the HTTP lifecycle;
-- per-provider concurrency control;
-- persisted provider affinity;
-- idempotent provider submit behavior;
-- polling and reconciliation after uncertain network responses;
-- durable scene storage;
-- render-only retry after composition failures;
-- final media validation before publish;
-- explicit feature gates for experimental provider routes;
-- mock provider support for no-network local development.
+- background jobs outside the HTTP lifecycle;
+- bounded provider concurrency;
+- persisted provider/task affinity;
+- idempotent external submission semantics;
+- polling and reconciliation after uncertain responses;
+- durable scene assets;
+- render-only recovery;
+- final media validation;
+- server-authoritative feature/template gates;
+- deterministic no-network mock providers.
 
-## Public-showcase safety boundary
+## Public-showcase boundary
 
 Not included in this repository:
 
-- API keys or tokens;
-- production/staging endpoints tied to private accounts;
-- provider wallet balances or quotas;
-- exact cost-per-second / token economics;
-- margin calculations or package economics;
-- private vendor support correspondence;
-- real provider task IDs;
-- user-generated private media;
-- internal admin/treasury implementation details.
+- production provider adapters;
+- provider-specific request/response transformations;
+- production prompts or prompt templates;
+- detailed scene-planning algorithms;
+- production routing and fallback rules;
+- exact model selection and tuning parameters;
+- provider credentials or private endpoints;
+- provider balances, quotas, or account configuration;
+- exact costs, margins, or package economics;
+- private vendor correspondence;
+- real external task IDs;
+- private user media;
+- production admin / treasury implementation details.
 
-The goal of this public version is to demonstrate architecture and engineering decisions without publishing operational or commercial secrets.
+The purpose of this repository is to demonstrate architecture, product thinking, and engineering quality without providing a reconstruction-ready copy of the production system.
