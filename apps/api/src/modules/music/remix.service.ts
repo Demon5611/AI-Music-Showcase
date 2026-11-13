@@ -184,7 +184,7 @@ export async function remixMusicTrackForUser(
     resolveRemixLyricsLanguage(track.musicGeneration.providerRequestJson),
   );
 
-  // Server-side storage → Suno file upload URL (never client-supplied).
+  // Server-side storage → Legacyengine file upload URL (never client-supplied).
   const referenceAudioUrl = await uploadRemixReferenceAudioUrl(track);
 
   const songInput: GenerateSongInput = buildRemixSongInput({
@@ -213,8 +213,8 @@ export async function remixMusicTrackForUser(
   const record = await createMusicGenerationRecord({
     userId,
     type: "song",
-    // Remix is a NEW Suno upload-cover generation from reference audio (not source affinity).
-    provider: "sunoapi",
+    // Remix is a NEW Legacyengine upload-cover generation from reference audio (not source affinity).
+    provider: "legacyengineapi",
     providerTaskId: queuePlaceholder,
     prompt,
     style: styleTag,
@@ -249,7 +249,7 @@ export async function remixMusicTrackForUser(
 
     return {
       recordId: record.id,
-      provider: "sunoapi" as const,
+      provider: "legacyengineapi" as const,
       taskId: record.id,
       status: "pending" as const,
     };

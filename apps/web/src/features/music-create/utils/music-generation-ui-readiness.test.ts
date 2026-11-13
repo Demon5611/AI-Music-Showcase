@@ -38,7 +38,7 @@ function status(
   return {
     recordId: "rec",
     taskId: "task",
-    provider: overrides.provider ?? "sunoapi",
+    provider: overrides.provider ?? "legacyengineapi",
     status: overrides.status,
     tracks: overrides.tracks,
     phaseHint: overrides.phaseHint,
@@ -232,10 +232,10 @@ assert.equal(
   });
 }
 
-// N. Mureka default 1 output: completed + 1 playable is terminal (no second slot)
+// N. Audioengine default 1 output: completed + 1 playable is terminal (no second slot)
 {
   const body = status({
-    provider: "mureka",
+    provider: "audioengine",
     status: "completed",
     tracks: [playable],
     audioPersistence: "ready",

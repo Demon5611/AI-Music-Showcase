@@ -12,7 +12,7 @@ function profile(
 ): VoiceProfileDto {
   return {
     id: overrides?.id ?? "vp-1",
-    provider: "mureka",
+    provider: "audioengine",
     status,
     sourceVoiceSampleId: overrides?.sourceVoiceSampleId ?? "sample-1",
     createdAt: new Date().toISOString(),

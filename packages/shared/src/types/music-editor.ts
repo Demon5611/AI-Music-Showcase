@@ -162,7 +162,7 @@ export interface SongDto {
   /** True when vocal+instrumental stems are persisted. */
   stemsReady: boolean;
   stemSeparationPhase: StemSeparationPhase;
-  /** Paid Suno vocal-removal available for this source asset. */
+  /** Paid Legacyengine vocal-removal available for this source asset. */
   stemSeparationAvailable: boolean;
   stemSeparationCostCredits: number;
   createdAt: string;

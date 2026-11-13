@@ -1,4 +1,4 @@
-import { VOICE_PROFILE_UNUSABLE_STATUSES } from "./mureka-flags.js";
+import { VOICE_PROFILE_UNUSABLE_STATUSES } from "./audioengine-flags.js";
 
 /**
  * Semantic mapping (docs / legal — DB values unchanged):
@@ -17,7 +17,7 @@ export type VoiceDeletionScope = {
   otherAssociatedVoiceData: boolean;
 };
 
-export const DEFAULT_MUREKA_VOICE_DELETION_SCOPE: VoiceDeletionScope = {
+export const DEFAULT_AUDIOENGINE_VOICE_DELETION_SCOPE: VoiceDeletionScope = {
   vocalId: true,
   sourceVoiceSample: true,
   derivedVoiceEmbeddings: true,
@@ -42,10 +42,10 @@ const DELETION_FLOW_PROFILE_STATUSES = [
   "provider_deleted",
 ] as const;
 
-export function resolveMurekaVoiceDeletionEnabled(
+export function resolveAudioengineVoiceDeletionEnabled(
   env: NodeJS.ProcessEnv = process.env,
 ): boolean {
-  return env.MUREKA_VOICE_DELETION_ENABLED?.trim() === "true";
+  return env.AUDIOENGINE_VOICE_DELETION_ENABLED?.trim() === "true";
 }
 
 export function hasRealProviderExternalId(externalId: string): boolean {

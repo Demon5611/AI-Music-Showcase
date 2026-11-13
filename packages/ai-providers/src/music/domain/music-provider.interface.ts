@@ -18,12 +18,12 @@ import type {
 } from "./music.types.js";
 
 /**
- * Music generation contract shared by Suno, ElevenLabs Music, Udio, etc.
+ * Music generation contract shared by Legacyengine, Voiceengine Music, alternateengine, etc.
  *
  * Abstraction layer keeps API/worker/UI independent from a single vendor so we
  * can switch providers via MUSIC_PROVIDER without rewriting business logic.
  *
- * Voice transfer (Kits) was removed from the editor; Kits client remains for future integrations.
+ * Voice transfer (Voiceadapter) was removed from the editor; Voiceadapter client remains for future integrations.
  */
 export interface MusicProvider {
   readonly id: MusicProviderId;
@@ -44,7 +44,7 @@ export interface MusicProvider {
 
   getTimestampedLyrics?(input: TimestampedLyricsInput): Promise<TimestampedLyricsResult>;
 
-  generateAlbumCover?(sunoMusicTaskId: string): Promise<{ taskId: string }>;
+  generateAlbumCover?(legacyengineMusicTaskId: string): Promise<{ taskId: string }>;
 
   getAlbumCoverStatus?(taskId: string): Promise<AlbumCoverStatusResult>;
 

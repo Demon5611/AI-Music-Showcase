@@ -110,24 +110,24 @@ describe("completed-but-approved impossible state", () => {
 });
 
 describe("worker CAS duplicate job contract", () => {
-  const flittProcessor = readFileSync(
-    join(here, "../../../../../packages/flitt-checkout/src/process-flitt-refund.ts"),
+  const checkoutgatewayProcessor = readFileSync(
+    join(here, "../../../../../packages/checkoutgateway-checkout/src/process-checkoutgateway-refund.ts"),
     "utf8",
   );
-  const tbcProcessor = readFileSync(
-    join(here, "../../../../../packages/tbc-checkout/src/process-tbc-refund.ts"),
+  const legacygatewayProcessor = readFileSync(
+    join(here, "../../../../../packages/legacygateway-checkout/src/process-legacygateway-refund.ts"),
     "utf8",
   );
 
-  it("Flitt CAS approved→processing before provider.refund", () => {
-    const casIdx = flittProcessor.indexOf('where: { id: row.id, status: "approved" }');
-    const refundCallIdx = flittProcessor.indexOf("await provider.refund(");
+  it("Checkoutgateway CAS approved→processing before provider.refund", () => {
+    const casIdx = checkoutgatewayProcessor.indexOf('where: { id: row.id, status: "approved" }');
+    const refundCallIdx = checkoutgatewayProcessor.indexOf("await provider.refund(");
     assert.ok(casIdx > 0 && refundCallIdx > casIdx);
   });
 
-  it("TBC CAS approved→processing before provider.refund", () => {
-    const casIdx = tbcProcessor.indexOf('where: { id: row.id, status: "approved" }');
-    const refundCallIdx = tbcProcessor.indexOf("await provider.refund(");
+  it("LEGACYGATEWAY CAS approved→processing before provider.refund", () => {
+    const casIdx = legacygatewayProcessor.indexOf('where: { id: row.id, status: "approved" }');
+    const refundCallIdx = legacygatewayProcessor.indexOf("await provider.refund(");
     assert.ok(casIdx > 0 && refundCallIdx > casIdx);
   });
 });

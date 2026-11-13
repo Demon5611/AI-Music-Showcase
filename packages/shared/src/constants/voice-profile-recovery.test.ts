@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { isProviderDeletionRequestStatus } from "./mureka-flags.js";
+import { isProviderDeletionRequestStatus } from "./audioengine-flags.js";
 import {
   VOICE_DELETION_ACTIVE_REQUEST_STATUSES,
   isProviderDeletionRequestOpen,
@@ -21,7 +21,7 @@ const baseProfile = {
   userId: "user-1",
   status: "deleted_locally",
   deletedAt: new Date("2026-08-08T11:34:22.605Z"),
-  externalId: "mureka-vocal-real-id",
+  externalId: "audioengine-vocal-real-id",
 };
 
 const baseRequest = {

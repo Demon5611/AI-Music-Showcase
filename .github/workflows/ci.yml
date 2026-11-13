@@ -43,6 +43,9 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
+      - name: Check public publication boundary
+        run: pnpm public:check
+
       - name: Generate Prisma client
         run: pnpm db:generate
 

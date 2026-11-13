@@ -13,10 +13,10 @@
   "scripts": {
     "build": "tsc -p tsconfig.build.json",
     "typecheck": "tsc --noEmit",
-    "test:callback-normalizer": "tsx src/music/providers/suno-api/suno-callback.normalizer.test.ts",
-    "test:suno-submit-contract": "tsx src/music/providers/suno-api/suno-submit-once.contract.test.ts",
+    "test:callback-normalizer": "tsx src/music/providers/legacyengine-api/legacyengine-callback.normalizer.test.ts",
+    "test:legacyengine-submit-contract": "tsx src/music/providers/legacyengine-api/legacyengine-submit-once.contract.test.ts",
     "test:music-base-url": "tsx src/music/music-config.base-url.test.ts",
-    "test:mureka": "tsx src/music/providers/mureka/mureka-status-mapper.test.ts && tsx src/music/providers/mureka/mureka-music-generation.provider.test.ts && tsx src/music/resolve-music-provider.test.ts && tsx src/voice/providers/mureka/mureka-voice-provider.test.ts",
+    "test:audioengine": "tsx src/music/providers/audioengine/audioengine-status-mapper.test.ts && tsx src/music/providers/audioengine/audioengine-music-generation.provider.test.ts && tsx src/music/resolve-music-provider.test.ts && tsx src/voice/providers/audioengine/audioengine-voice-provider.test.ts",
     "lint": "eslint ."
   },
   "dependencies": {

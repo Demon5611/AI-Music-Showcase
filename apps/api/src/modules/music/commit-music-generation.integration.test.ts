@@ -8,22 +8,22 @@ import "../../common/load-dotenv.js";
 import { randomUUID } from "node:crypto";
 import type { GenerateSongInput } from "@ai-music/ai-providers";
 import { getCreditsBalanceUnits, grantCredits, prisma } from "@ai-music/db";
-import { murekaProviderJobId, OPERATION_COST_UNITS } from "@ai-music/shared";
+import { audioengineProviderJobId, OPERATION_COST_UNITS } from "@ai-music/shared";
 import { commitMusicGeneration } from "./service.js";
 import {
   buildCanonicalMusicGenerateRequest,
   hashCanonicalRequest,
 } from "./music-generate-idempotency.js";
-import { murekaSpendIdempotencyKey } from "./music-generate-mureka.js";
+import { audioengineSpendIdempotencyKey } from "./music-generate-audioengine.js";
 import { closeProviderJobQueue, getProviderJobQueue } from "../queue/provider-job-queue.js";
 import {
-  closeMurekaProviderJobQueue,
-  getMurekaProviderJobQueue,
-} from "../queue/mureka-provider-job-queue.js";
+  closeAudioengineProviderJobQueue,
+  getAudioengineProviderJobQueue,
+} from "../queue/audioengine-provider-job-queue.js";
 import { InsufficientCreditsError, isAppError } from "../../common/errors.js";
 
 const COST = OPERATION_COST_UNITS.generateTrack;
-const MUREKA_COST = OPERATION_COST_UNITS.generateSongs;
+const AUDIOENGINE_COST = OPERATION_COST_UNITS.generateSongs;
 const createdUserIds: string[] = [];
 const createdRecordIds: string[] = [];
 
@@ -57,7 +57,7 @@ function songInputFor(prompt: string): GenerateSongInput {
     durationSec: 60,
     mode: "song",
     providerOptions: {
-      providerId: "sunoapi",
+      providerId: "legacyengineapi",
       options: { customMode: true },
     },
   };
@@ -88,14 +88,14 @@ async function removeJobBestEffort(recordId: string): Promise<void> {
   }
 
   try {
-    const jobId = murekaProviderJobId({
-      type: "mureka_music_generate",
+    const jobId = audioengineProviderJobId({
+      type: "audioengine_music_generate",
       userId: "noop",
       recordId,
       songInputJson: "{}",
       spendReason: "noop",
     });
-    const job = await getMurekaProviderJobQueue().getJob(jobId);
+    const job = await getAudioengineProviderJobQueue().getJob(jobId);
     if (job) {
       await job.remove();
     }
@@ -104,7 +104,7 @@ async function removeJobBestEffort(recordId: string): Promise<void> {
   }
 }
 
-function murekaCommitParams(
+function audioengineCommitParams(
   userId: string,
   clientRequestId: string,
   input: GenerateSongInput,
@@ -112,12 +112,12 @@ function murekaCommitParams(
   return {
     userId,
     songInput: input,
-    provider: "mureka" as const,
+    provider: "audioengine" as const,
     clientRequestId,
     clientRequestHash: hashFor(input),
-    creditAmountUnits: MUREKA_COST,
-    creditIdempotencyKeyBuilder: murekaSpendIdempotencyKey,
-    creditReason: "mureka_music_generate",
+    creditAmountUnits: AUDIOENGINE_COST,
+    creditIdempotencyKeyBuilder: audioengineSpendIdempotencyKey,
+    creditReason: "audioengine_music_generate",
     meta: metaFor(input),
   };
 }
@@ -205,14 +205,14 @@ async function testSameKeyDifferentBody(): Promise<void> {
 }
 
 async function testConcurrentFiveUniqueKeys(): Promise<void> {
-  console.log("test: 5 concurrent generate, unique keys, enough Mureka credits");
-  const userId = await createTestUser(MUREKA_COST * 5);
+  console.log("test: 5 concurrent generate, unique keys, enough Audioengine credits");
+  const userId = await createTestUser(AUDIOENGINE_COST * 5);
   const input = songInputFor("five unique keys");
   const keys = Array.from({ length: 5 }, () => randomUUID());
 
   const results = await Promise.all(
     keys.map((clientRequestId) =>
-      commitMusicGeneration(murekaCommitParams(userId, clientRequestId, input)),
+      commitMusicGeneration(audioengineCommitParams(userId, clientRequestId, input)),
     ),
   );
 
@@ -239,30 +239,30 @@ async function testConcurrentFiveUniqueKeys(): Promise<void> {
     where: { userId, type: "spend" },
     _sum: { amountUnits: true },
   });
-  assert(spendSum._sum.amountUnits === -MUREKA_COST * 5, "5 × 24 credit spend");
+  assert(spendSum._sum.amountUnits === -AUDIOENGINE_COST * 5, "5 × 24 credit spend");
 
   const balance = await getCreditsBalanceUnits(userId);
   assert(balance >= 0, "balance never goes negative");
 
   for (const result of results) {
-    const jobId = murekaProviderJobId({
-      type: "mureka_music_generate",
+    const jobId = audioengineProviderJobId({
+      type: "audioengine_music_generate",
       userId,
       recordId: result.record.id,
       songInputJson: "{}",
       spendReason: "noop",
     });
-    const job = await getMurekaProviderJobQueue().getJob(jobId);
-    assert(Boolean(job), `mureka job dispatched for ${result.record.id}`);
+    const job = await getAudioengineProviderJobQueue().getJob(jobId);
+    assert(Boolean(job), `audioengine job dispatched for ${result.record.id}`);
   }
 }
 
 async function testConcurrentFiveSameKey(): Promise<void> {
   console.log("test: 5 concurrent generate, same Idempotency-Key");
-  const userId = await createTestUser(MUREKA_COST * 5);
+  const userId = await createTestUser(AUDIOENGINE_COST * 5);
   const clientRequestId = randomUUID();
   const input = songInputFor("five same key");
-  const params = murekaCommitParams(userId, clientRequestId, input);
+  const params = audioengineCommitParams(userId, clientRequestId, input);
 
   const results = await Promise.all(
     Array.from({ length: 5 }, () => commitMusicGeneration({ ...params })),
@@ -291,31 +291,31 @@ async function testConcurrentFiveSameKey(): Promise<void> {
     where: { userId, type: "spend" },
     _sum: { amountUnits: true },
   });
-  assert(spendSum._sum.amountUnits === -MUREKA_COST, "only one 24-credit debit");
+  assert(spendSum._sum.amountUnits === -AUDIOENGINE_COST, "only one 24-credit debit");
 
   const balance = await getCreditsBalanceUnits(userId);
   assert(balance >= 0, "balance never goes negative");
 
-  const jobId = murekaProviderJobId({
-    type: "mureka_music_generate",
+  const jobId = audioengineProviderJobId({
+    type: "audioengine_music_generate",
     userId,
     recordId: results[0].record.id,
     songInputJson: "{}",
     spendReason: "noop",
   });
-  const job = await getMurekaProviderJobQueue().getJob(jobId);
-  assert(Boolean(job), "exactly one mureka queue dispatch");
+  const job = await getAudioengineProviderJobQueue().getJob(jobId);
+  assert(Boolean(job), "exactly one audioengine queue dispatch");
 }
 
 async function testConcurrentInsufficientBalance(): Promise<void> {
   console.log("test: 5 concurrent generate, credits for only 2");
-  const userId = await createTestUser(MUREKA_COST * 2);
+  const userId = await createTestUser(AUDIOENGINE_COST * 2);
   const input = songInputFor("insufficient concurrent");
   const keys = Array.from({ length: 5 }, () => randomUUID());
 
   const settled = await Promise.allSettled(
     keys.map((clientRequestId) =>
-      commitMusicGeneration(murekaCommitParams(userId, clientRequestId, input)),
+      commitMusicGeneration(audioengineCommitParams(userId, clientRequestId, input)),
     ),
   );
 
@@ -409,7 +409,7 @@ async function main(): Promise<void> {
   } finally {
     await cleanup();
     await closeProviderJobQueue();
-    await closeMurekaProviderJobQueue();
+    await closeAudioengineProviderJobQueue();
     await prisma.$disconnect();
   }
 }

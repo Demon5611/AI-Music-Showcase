@@ -19,7 +19,7 @@ const css = readFileSync(
   "utf8",
 );
 const aiStatus = readFileSync(
-  join(webSrc, "shared/ui/elevenlabs/ai-processing-status.tsx"),
+  join(webSrc, "shared/ui/voiceengine/ai-processing-status.tsx"),
   "utf8",
 );
 const lyrics = readFileSync(join(here, "music-lyrics-from-prompt.tsx"), "utf8");

@@ -13,8 +13,8 @@ const publicBooleanSchema = z
 const webEnvSchema = z.object({
   NEXT_PUBLIC_API_URL: z.string().trim().url().default("http://localhost:3001"),
   NEXT_PUBLIC_APP_ENV: z.enum(["development", "staging", "production"]).optional(),
-  NEXT_PUBLIC_MUREKA_PERSONAL_VOICE_ENABLED: publicBooleanSchema,
-  NEXT_PUBLIC_MUREKA_VOICE_DELETION_ENABLED: publicBooleanSchema,
+  NEXT_PUBLIC_AUDIOENGINE_PERSONAL_VOICE_ENABLED: publicBooleanSchema,
+  NEXT_PUBLIC_AUDIOENGINE_VOICE_DELETION_ENABLED: publicBooleanSchema,
   NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: z.string().trim().default(""),
   NEXT_PUBLIC_FORCE_CLERK: z
     .string()
@@ -46,10 +46,10 @@ function readWebEnvInput() {
   return {
     NEXT_PUBLIC_API_URL: process.env.NEXT_PUBLIC_API_URL,
     NEXT_PUBLIC_APP_ENV: process.env.NEXT_PUBLIC_APP_ENV,
-    NEXT_PUBLIC_MUREKA_PERSONAL_VOICE_ENABLED:
-      process.env.NEXT_PUBLIC_MUREKA_PERSONAL_VOICE_ENABLED,
-    NEXT_PUBLIC_MUREKA_VOICE_DELETION_ENABLED:
-      process.env.NEXT_PUBLIC_MUREKA_VOICE_DELETION_ENABLED,
+    NEXT_PUBLIC_AUDIOENGINE_PERSONAL_VOICE_ENABLED:
+      process.env.NEXT_PUBLIC_AUDIOENGINE_PERSONAL_VOICE_ENABLED,
+    NEXT_PUBLIC_AUDIOENGINE_VOICE_DELETION_ENABLED:
+      process.env.NEXT_PUBLIC_AUDIOENGINE_VOICE_DELETION_ENABLED,
     NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY,
     NEXT_PUBLIC_FORCE_CLERK: process.env.NEXT_PUBLIC_FORCE_CLERK,
     NEXT_PUBLIC_DEV_AUTH_USER_ID: process.env.NEXT_PUBLIC_DEV_AUTH_USER_ID,
@@ -141,12 +141,12 @@ export const env = {
   clerkPublishableKey: webEnv.clerkPublishableKey,
   devAuthUserId: webEnv.NEXT_PUBLIC_DEV_AUTH_USER_ID,
   isClerkEnabled: webEnv.isClerkEnabled,
-  murekaPersonalVoiceEnabled:
+  audioenginePersonalVoiceEnabled:
     webEnv.NEXT_PUBLIC_APP_ENV !== "production" &&
-    webEnv.NEXT_PUBLIC_MUREKA_PERSONAL_VOICE_ENABLED,
-  murekaVoiceDeletionEnabled:
+    webEnv.NEXT_PUBLIC_AUDIOENGINE_PERSONAL_VOICE_ENABLED,
+  audioengineVoiceDeletionEnabled:
     webEnv.NEXT_PUBLIC_APP_ENV !== "production" &&
-    webEnv.NEXT_PUBLIC_MUREKA_VOICE_DELETION_ENABLED,
+    webEnv.NEXT_PUBLIC_AUDIOENGINE_VOICE_DELETION_ENABLED,
   sentryDsn: webEnv.NEXT_PUBLIC_SENTRY_DSN,
 };
 

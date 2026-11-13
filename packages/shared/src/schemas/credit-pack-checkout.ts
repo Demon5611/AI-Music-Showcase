@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { PURCHASABLE_CREDIT_PACKAGE_IDS } from "../constants/tbc-checkout.js";
+import { PURCHASABLE_CREDIT_PACKAGE_IDS } from "../constants/legacygateway-checkout.js";
 
 /** Client may send only packageId (+ optional idempotency). Never amount/credits. */
 export const createCreditPackCheckoutSchema = z
@@ -34,21 +34,21 @@ export type CreditPackCheckoutClientResult = z.infer<
   typeof creditPackCheckoutClientResultSchema
 >;
 
-export const tbcCallbackBodySchema = z
+export const legacygatewayCallbackBodySchema = z
   .object({
     PaymentId: z.string().trim().min(1),
   })
   .strict();
 
-export type TbcCallbackBody = z.infer<typeof tbcCallbackBodySchema>;
+export type LegacygatewayCallbackBody = z.infer<typeof legacygatewayCallbackBodySchema>;
 
 /**
- * Flitt host-to-host callback is a loosely-typed JSON object (flat or `{ response }`).
+ * Checkoutgateway host-to-host callback is a loosely-typed JSON object (flat or `{ response }`).
  * Signature verification happens in the service before any field is trusted.
  */
-export const flittCallbackBodySchema = z.record(z.unknown());
+export const checkoutgatewayCallbackBodySchema = z.record(z.unknown());
 
-export type FlittCallbackBody = z.infer<typeof flittCallbackBodySchema>;
+export type CheckoutgatewayCallbackBody = z.infer<typeof checkoutgatewayCallbackBodySchema>;
 
 /** Authenticated purchase status for browser return polling. Never payment proof. */
 export const creditPackPurchaseStatusViewSchema = z

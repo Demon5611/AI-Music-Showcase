@@ -1,32 +1,32 @@
 /**
- * Music base URL isolation from Suno Voice.
+ * Music base URL isolation from Legacyengine Voice.
  * Run: pnpm --filter @ai-music/ai-providers exec tsx src/music/music-config.base-url.test.ts
  */
 import assert from "node:assert/strict";
 import {
-  assertSafeSunoMusicApiBaseUrl,
+  assertSafeLegacyengineMusicApiBaseUrl,
   resolveMusicProviderConfig,
 } from "./music-config.js";
-import { resolveSunoVoiceConfig } from "../suno-voice/suno-voice-config.js";
+import { resolveLegacyengineVoiceConfig } from "../legacyengine-voice/legacyengine-voice-config.js";
 
 function run() {
   const music = resolveMusicProviderConfig({
-    SUNO_MUSIC_API_BASE_URL: "http://fake.example:4010",
-    SUNO_API_BASE_URL: "https://api.sunoapi.org",
+    LEGACYENGINE_MUSIC_API_BASE_URL: "http://fake.example:4010",
+    LEGACYENGINE_API_BASE_URL: "https://integration.example.invalid",
     APP_ENV: "staging",
   });
-  assert.equal(music.sunoApiBaseUrl, "http://fake.example:4010");
+  assert.equal(music.legacyengineApiBaseUrl, "http://fake.example:4010");
 
-  const voice = resolveSunoVoiceConfig({
-    SUNO_MUSIC_API_BASE_URL: "http://fake.example:4010",
-    SUNO_API_BASE_URL: "https://api.sunoapi.org",
+  const voice = resolveLegacyengineVoiceConfig({
+    LEGACYENGINE_MUSIC_API_BASE_URL: "http://fake.example:4010",
+    LEGACYENGINE_API_BASE_URL: "https://integration.example.invalid",
   });
-  assert.equal(voice.apiBaseUrl, "https://api.sunoapi.org");
+  assert.equal(voice.apiBaseUrl, "https://integration.example.invalid");
 
   assert.doesNotThrow(() =>
-    assertSafeSunoMusicApiBaseUrl("https://api.sunoapi.org", "production"),
+    assertSafeLegacyengineMusicApiBaseUrl("https://integration.example.invalid", "production"),
   );
-  assert.throws(() => assertSafeSunoMusicApiBaseUrl("http://fake.example", "production"));
+  assert.throws(() => assertSafeLegacyengineMusicApiBaseUrl("http://fake.example", "production"));
 
   console.log("music-config base URL isolation tests passed");
 }

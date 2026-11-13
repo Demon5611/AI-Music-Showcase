@@ -1,16 +1,16 @@
 import {
-  FLITT_PAYMENT_PROVIDER,
+  CHECKOUTGATEWAY_PAYMENT_PROVIDER,
   parseCheckoutPaymentProvider,
   type CheckoutPaymentProvider,
 } from "@ai-music/shared";
 import {
-  isFlittCheckoutReady,
-  type FlittCheckoutEnvBag,
-} from "./providers/flitt.js";
-import type { TbcCheckoutEnvBag } from "./providers/tbc.js";
+  isCheckoutgatewayCheckoutReady,
+  type CheckoutgatewayCheckoutEnvBag,
+} from "./providers/checkoutgateway.js";
+import type { LegacygatewayCheckoutEnvBag } from "./providers/legacygateway.js";
 
-export type CheckoutSelectionEnv = TbcCheckoutEnvBag &
-  FlittCheckoutEnvBag & {
+export type CheckoutSelectionEnv = LegacygatewayCheckoutEnvBag &
+  CheckoutgatewayCheckoutEnvBag & {
     PAYMENT_PROVIDER?: string;
     FX_USD_GEL_PROVIDER?: string;
   };
@@ -20,8 +20,8 @@ function readPaymentProviderRaw(env?: CheckoutSelectionEnv): string | undefined 
 }
 
 /**
- * Unset → Flitt-only (allowed). `flitt` → allowed.
- * `tbc` / unknown → fail closed. When `env` is passed, do not leak process.env.
+ * Unset → Checkoutgateway-only (allowed). `checkoutgateway` → allowed.
+ * `legacygateway` / unknown → fail closed. When `env` is passed, do not leak process.env.
  */
 export function isCheckoutSelectorAllowed(env?: CheckoutSelectionEnv): boolean {
   const raw = readPaymentProviderRaw(env);
@@ -29,12 +29,12 @@ export function isCheckoutSelectorAllowed(env?: CheckoutSelectionEnv): boolean {
   if (!trimmed) {
     return true;
   }
-  return parseCheckoutPaymentProvider(trimmed) === FLITT_PAYMENT_PROVIDER;
+  return parseCheckoutPaymentProvider(trimmed) === CHECKOUTGATEWAY_PAYMENT_PROVIDER;
 }
 
 /**
  * Active checkout provider, or null when checkout is disabled.
- * Never returns `tbc`.
+ * Never returns `legacygateway`.
  */
 export function resolveConfiguredCheckoutProvider(
   env?: CheckoutSelectionEnv,
@@ -42,17 +42,17 @@ export function resolveConfiguredCheckoutProvider(
   if (!isConfiguredCheckoutEnabled(env)) {
     return null;
   }
-  return FLITT_PAYMENT_PROVIDER;
+  return CHECKOUTGATEWAY_PAYMENT_PROVIDER;
 }
 
 /**
  * CTA / POST checkout gate.
- * Enabled only when the selector allows Flitt and Flitt config is ready.
- * TBC env must never enable checkout.
+ * Enabled only when the selector allows Checkoutgateway and Checkoutgateway config is ready.
+ * LEGACYGATEWAY env must never enable checkout.
  */
 export function isConfiguredCheckoutEnabled(env?: CheckoutSelectionEnv): boolean {
   if (!isCheckoutSelectorAllowed(env)) {
     return false;
   }
-  return isFlittCheckoutReady(env);
+  return isCheckoutgatewayCheckoutReady(env);
 }

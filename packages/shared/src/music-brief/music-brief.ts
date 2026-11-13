@@ -21,10 +21,10 @@ function pushPart(parts: string[], label: string, value: string | undefined): vo
 }
 
 /**
- * Build Mureka `prompt` (style/arrangement description) from a MusicBrief.
+ * Build Audioengine `prompt` (style/arrangement description) from a MusicBrief.
  * Does not include lyrics. No hardcoded Russian instructions.
  */
-export function buildMurekaPrompt(brief: MusicBrief): string {
+export function buildAudioenginePrompt(brief: MusicBrief): string {
   const parts: string[] = [];
 
   pushPart(parts, "genre", brief.genre);
@@ -48,9 +48,9 @@ export function buildMurekaPrompt(brief: MusicBrief): string {
 }
 
 /**
- * Build a comma-separated Suno-style tags string from MusicBrief (legacy path).
+ * Build a comma-separated Legacyengine-style tags string from MusicBrief (legacy path).
  */
-export function buildSunoStyle(brief: MusicBrief): string {
+export function buildLegacyengineStyle(brief: MusicBrief): string {
   const tags: string[] = [];
 
   for (const value of [

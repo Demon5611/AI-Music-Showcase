@@ -3,7 +3,7 @@ import { hasLocale } from "next-intl";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
-import { SunoVoiceVerifyPanel } from "@/features/voice/suno-voice-verify-panel";
+import { LegacyengineVoiceVerifyPanel } from "@/features/voice/legacyengine-voice-verify-panel";
 import { SITE_URL } from "@/shared/config/site";
 import { buildLocaleLanguageAlternates } from "@/i18n/locale-metadata";
 import { routing, type Locale } from "@/i18n/routing";
@@ -53,7 +53,7 @@ export default async function ConsentPage({ params }: ConsentPageProps) {
 
   return (
     <Suspense fallback={<ConsentLoadingFallback label={t("consentLoading")} />}>
-      <SunoVoiceVerifyPanel />
+      <LegacyengineVoiceVerifyPanel />
     </Suspense>
   );
 }

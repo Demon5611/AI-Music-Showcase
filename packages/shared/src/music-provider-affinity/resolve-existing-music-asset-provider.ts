@@ -7,7 +7,7 @@
  * Never fall back to MUSIC_DEFAULT_PROVIDER / MUSIC_PROVIDER here.
  */
 
-export const EXISTING_MUSIC_ASSET_PROVIDERS = ["sunoapi", "mureka"] as const;
+export const EXISTING_MUSIC_ASSET_PROVIDERS = ["legacyengineapi", "audioengine"] as const;
 
 export type ExistingMusicAssetProviderId = (typeof EXISTING_MUSIC_ASSET_PROVIDERS)[number];
 

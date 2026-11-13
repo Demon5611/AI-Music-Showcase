@@ -1,18 +1,18 @@
 import {
-  isMurekaSupportedLyricsLanguage,
-  resolveMurekaPersonalVoiceAvailability,
+  isAudioengineSupportedLyricsLanguage,
+  resolveAudioenginePersonalVoiceAvailability,
 } from "@ai-music/shared";
 import type { MusicProviderId } from "./domain/music-provider-id.js";
 import { MusicProviderError } from "./domain/errors/music-provider.error.js";
 
 export type ResolveMusicProviderInput = {
-  /** Explicit provider from client (ignored for non-personal Mureka). */
+  /** Explicit provider from client (ignored for non-personal Audioengine). */
   explicitProvider?: MusicProviderId;
   /**
-   * True only when the user opted into Personal Voice AND a ready Mureka
+   * True only when the user opted into Personal Voice AND a ready Audioengine
    * VoiceProfile was resolved. Ready profile alone must not set this.
    */
-  hasPersonalMurekaVoice: boolean;
+  hasPersonalAudioengineVoice: boolean;
   /** Lyrics language code (execution language). */
   lyricsLanguage?: string;
   /** APP_ENV — required for production rollout gate. */
@@ -26,11 +26,11 @@ export type ResolveMusicProviderResult =
 
 /**
  * Product music routing (deterministic; ignores MUSIC_DEFAULT_PROVIDER for songs):
- * - Personal Voice ON + ready profile → Mureka (when Personal Voice available)
- * - otherwise → SunoAPI
+ * - Personal Voice ON + ready profile → Audioengine (when Personal Voice available)
+ * - otherwise → LegacyengineAPI
  *
- * Ready VoiceProfile alone never selects Mureka.
- * Production additionally requires MUREKA_PRODUCTION_ROLLOUT_ENABLED.
+ * Ready VoiceProfile alone never selects Audioengine.
+ * Production additionally requires AUDIOENGINE_PRODUCTION_ROLLOUT_ENABLED.
  */
 export function resolveMusicProviderForGeneration(
   input: ResolveMusicProviderInput,
@@ -38,14 +38,14 @@ export function resolveMusicProviderForGeneration(
   const env = input.env ?? process.env;
   const appEnv = input.appEnv ?? env.APP_ENV;
 
-  if (input.hasPersonalMurekaVoice) {
-    const availability = resolveMurekaPersonalVoiceAvailability({ appEnv, env });
+  if (input.hasPersonalAudioengineVoice) {
+    const availability = resolveAudioenginePersonalVoiceAvailability({ appEnv, env });
     if (!availability.available) {
       return {
         error: new MusicProviderError(
-          "Personal AI voice requires Mureka, which is unavailable",
-          "MUREKA_PERSONAL_VOICE_UNAVAILABLE",
-          "mureka",
+          "Personal AI voice requires Audioengine, which is unavailable",
+          "AUDIOENGINE_PERSONAL_VOICE_UNAVAILABLE",
+          "audioengine",
           503,
         ),
       };
@@ -56,30 +56,30 @@ export function resolveMusicProviderForGeneration(
       return {
         error: new MusicProviderError(
           'lyricsLanguage "auto" must be resolved before provider routing',
-          "MUREKA_LANGUAGE_UNSUPPORTED",
-          "mureka",
+          "AUDIOENGINE_LANGUAGE_UNSUPPORTED",
+          "audioengine",
           400,
         ),
       };
     }
-    if (language && !isMurekaSupportedLyricsLanguage(language)) {
+    if (language && !isAudioengineSupportedLyricsLanguage(language)) {
       return {
         error: new MusicProviderError(
           `Language "${language}" is not supported for personal AI voice`,
-          "MUREKA_LANGUAGE_UNSUPPORTED",
-          "mureka",
+          "AUDIOENGINE_LANGUAGE_UNSUPPORTED",
+          "audioengine",
           400,
         ),
       };
     }
 
-    return { providerId: "mureka" };
+    return { providerId: "audioengine" };
   }
 
   if (input.explicitProvider === "mock") {
     return { providerId: "mock" };
   }
 
-  // Non-personal path is always Suno — ignore explicit mureka / MUSIC_DEFAULT_PROVIDER=mureka.
-  return { providerId: "sunoapi" };
+  // Non-personal path is always Legacyengine — ignore explicit audioengine / MUSIC_DEFAULT_PROVIDER=audioengine.
+  return { providerId: "legacyengineapi" };
 }

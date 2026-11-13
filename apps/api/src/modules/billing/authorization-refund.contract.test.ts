@@ -8,11 +8,11 @@ import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import {
   REFUND_STATUSES,
-  TBC_REFUND_QUEUE_NAME,
+  LEGACYGATEWAY_REFUND_QUEUE_NAME,
   approveRefundRequestSchema,
   createRefundRequestSchema,
   createSignedReadUrlSchema,
-  tbcRefundJobId,
+  legacygatewayRefundJobId,
 } from "@ai-music/shared";
 
 const here = dirname(fileURLToPath(import.meta.url));
@@ -77,9 +77,9 @@ assert.match(read("modules/billing/refund.routes.ts"), /\/api\/admin\/refunds\/:
 
 // J–K: deterministic job id; approve schema
 {
-  assert.equal(tbcRefundJobId("req_abc"), "tbc-refund-req_abc");
-  assert.equal(tbcRefundJobId("req_abc").includes(":"), false);
-  assert.equal(TBC_REFUND_QUEUE_NAME, "tbc-refund");
+  assert.equal(legacygatewayRefundJobId("req_abc"), "legacygateway-refund-req_abc");
+  assert.equal(legacygatewayRefundJobId("req_abc").includes(":"), false);
+  assert.equal(LEGACYGATEWAY_REFUND_QUEUE_NAME, "legacygateway-refund");
 
   const full = approveRefundRequestSchema.safeParse({ mode: "full" });
   assert.equal(full.success, true);
@@ -103,11 +103,11 @@ assert.match(read("modules/billing/refund.routes.ts"), /\/api\/admin\/refunds\/:
 
 // Album cover HMAC ordering
 {
-  const callback = read("modules/music/suno-callback.service.ts");
-  const verifyIdx = callback.indexOf("verifySunoCallbackToken");
+  const callback = read("modules/music/legacyengine-callback.service.ts");
+  const verifyIdx = callback.indexOf("verifyLegacyengineCallbackToken");
   const coverIdx = callback.indexOf("applyAlbumCoverCallback(coverEarly");
   assert.ok(verifyIdx > 0 && coverIdx > verifyIdx, "HMAC before album-cover apply");
-  assert.match(callback, /SUNO_CALLBACK_LEGACY_ENABLED/);
+  assert.match(callback, /LEGACYENGINE_CALLBACK_LEGACY_ENABLED/);
 }
 
 // Metrics staging+production token required (fail closed)
@@ -136,9 +136,9 @@ assert.match(read("modules/billing/refund.routes.ts"), /\/api\/admin\/refunds\/:
 
 // Credit refund vs money refund separation (no auto RefundRequest on generation fail)
 {
-  const sunoCallback = read("modules/music/suno-callback.service.ts");
-  assert.match(sunoCallback, /refundOriginalSpend/);
-  assert.doesNotMatch(sunoCallback, /createRefundRequest|RefundRequest/);
+  const legacyengineCallback = read("modules/music/legacyengine-callback.service.ts");
+  assert.match(legacyengineCallback, /refundOriginalSpend/);
+  assert.doesNotMatch(legacyengineCallback, /createRefundRequest|RefundRequest/);
 }
 
 console.log("authorization-refund.contract.test.ts: ok");

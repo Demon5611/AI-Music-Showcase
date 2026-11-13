@@ -7,7 +7,7 @@ import { readFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import {
-  getSunoGenerationOptions,
+  getLegacyengineGenerationOptions,
   toPersistedSongInput,
 } from "@ai-music/ai-providers";
 import {
@@ -38,26 +38,26 @@ const sampleInput = buildRemixSongInput({
   lyricsLanguage: "en",
   referenceAudioUrl: "https://provider.example/upload/remix.mp3",
 });
-const sunoOptions = getSunoGenerationOptions(sampleInput);
+const legacyengineOptions = getLegacyengineGenerationOptions(sampleInput);
 const persisted = toPersistedSongInput(sampleInput);
 
-// A. Legacy Suno persona must not be injected into Remix input
+// A. Legacy Legacyengine persona must not be injected into Remix input
 assert.equal(remixService.includes("resolveMusicPersonaForUser"), false);
 assert.equal(remixService.includes("buildPersonaSongInput"), false);
 assert.equal(remixSongInputHasPersona(sampleInput), false);
-assert.equal(sunoOptions?.personaId, undefined);
+assert.equal(legacyengineOptions?.personaId, undefined);
 assert.equal(persisted.personaId, undefined);
 
-// B. Ready Mureka VoiceProfile / vocal_id must not be passed
+// B. Ready Audioengine VoiceProfile / vocal_id must not be passed
 assert.equal(remixService.includes("vocalId"), false);
 assert.equal(remixService.includes("vocal_id"), false);
 assert.equal(remixSongInputHasVocalId(sampleInput), false);
 assert.equal(persisted.vocalId, undefined);
-assert.equal(sampleInput.providerOptions?.providerId, "sunoapi");
+assert.equal(sampleInput.providerOptions?.providerId, "legacyengineapi");
 
 // C. My Voice toggle / music-create selection does not affect Editor Remix request
 assert.equal(editorPanel.includes("usePersonalVoice"), false);
-assert.equal(editorPanel.includes("hasPersonalMurekaVoice"), false);
+assert.equal(editorPanel.includes("hasPersonalAudioengineVoice"), false);
 assert.equal(remixService.includes("usePersonalVoice"), false);
 assert.match(editorPanel, /api\.music\.remixTrack\(sourceTrackId/);
 
@@ -93,16 +93,16 @@ assert.match(remixService, /Ремикс недоступен: исходное 
 const audioReadyIdx = remixService.indexOf("assertRemixSourceEligible");
 assert.ok(audioReadyIdx >= 0 && spendCallIdx > audioReadyIdx);
 
-// G. Valid path → Suno remix + 15 credits once
-assert.match(remixService, /provider: "sunoapi"/);
+// G. Valid path → Legacyengine remix + 15 credits once
+assert.match(remixService, /provider: "legacyengineapi"/);
 assert.match(remixService, /OPERATION_COST_UNITS\.generateTrack/);
 assert.equal(OPERATION_COST_CREDITS.generateTrack, 15);
 assert.equal(OPERATION_COST_UNITS.generateTrack, 15_000);
 assert.match(remixRoute, /\/api\/music\/tracks\/:trackId\/remix/);
 assert.match(remixRoute, /musicRemixBodySchema/);
 assert.match(remixRoute, /parsed\.data\.styleId/);
-assert.equal(Boolean(sunoOptions?.referenceAudioUrl), true);
-assert.equal(sunoOptions?.vocalGender, undefined);
+assert.equal(Boolean(legacyengineOptions?.referenceAudioUrl), true);
+assert.equal(legacyengineOptions?.vocalGender, undefined);
 
 // H. Original unchanged → separate MusicGeneration record
 assert.match(remixService, /createMusicGenerationRecord/);

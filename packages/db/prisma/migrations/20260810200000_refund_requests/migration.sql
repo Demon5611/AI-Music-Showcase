@@ -1,4 +1,4 @@
--- Monetary refund requests for credit pack purchases (TBC).
+-- Monetary refund requests for credit pack purchases (LEGACYGATEWAY).
 -- Separate from ledger credit refunds.
 
 CREATE TABLE "refund_requests" (
@@ -13,7 +13,7 @@ CREATE TABLE "refund_requests" (
     "reviewed_at" TIMESTAMP(3),
     "reviewed_by" TEXT,
     "reject_reason" TEXT,
-    "provider" TEXT NOT NULL DEFAULT 'tbc',
+    "provider" TEXT NOT NULL DEFAULT 'legacygateway',
     "provider_refund_id" TEXT,
     "provider_reference" TEXT,
     "provider_error" TEXT,

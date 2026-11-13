@@ -2,7 +2,7 @@
 
 import { useTranslations } from "next-intl";
 import { useEffect, useState } from "react";
-import { AiProcessingStatus } from "@/shared/ui/elevenlabs";
+import { AiProcessingStatus } from "@/shared/ui/voiceengine";
 
 const EXPECTED_WAIT_SEC = 60;
 

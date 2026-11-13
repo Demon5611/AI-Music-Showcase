@@ -9,11 +9,11 @@ import {
   listVoiceSamples,
 } from "./service.js";
 import {
-  cancelSunoVoiceClone,
-  getSunoVoiceCloneStatus,
-  prepareSunoVoiceClone,
-  submitSunoVoiceVerification,
-} from "./suno-voice.service.js";
+  cancelLegacyengineVoiceClone,
+  getLegacyengineVoiceCloneStatus,
+  prepareLegacyengineVoiceClone,
+  submitLegacyengineVoiceVerification,
+} from "./legacyengine-voice.service.js";
 
 export async function registerVoiceSampleRoutes(app: FastifyInstance) {
   app.get(
@@ -104,7 +104,7 @@ export async function registerVoiceSampleRoutes(app: FastifyInstance) {
   );
 
   app.post<{ Params: { id: string }; Body: { restart?: boolean } }>(
-    "/api/voice-samples/:id/suno-voice/prepare",
+    "/api/voice-samples/:id/legacyengine-voice/prepare",
     {
       config: userRateLimitRouteConfig(
         RATE_LIMITS.voicePrepare.max,
@@ -114,7 +114,7 @@ export async function registerVoiceSampleRoutes(app: FastifyInstance) {
     },
     async (request, reply) => {
       try {
-        const sample = await prepareSunoVoiceClone(
+        const sample = await prepareLegacyengineVoiceClone(
           request.userId!,
           request.params.id,
           { restart: request.body?.restart === true },
@@ -127,11 +127,11 @@ export async function registerVoiceSampleRoutes(app: FastifyInstance) {
   );
 
   app.get<{ Params: { id: string } }>(
-    "/api/voice-samples/:id/suno-voice/status",
+    "/api/voice-samples/:id/legacyengine-voice/status",
     { preHandler: requireAuth },
     async (request, reply) => {
       try {
-        const sample = await getSunoVoiceCloneStatus(
+        const sample = await getLegacyengineVoiceCloneStatus(
           request.userId!,
           request.params.id,
         );
@@ -143,11 +143,11 @@ export async function registerVoiceSampleRoutes(app: FastifyInstance) {
   );
 
   app.post<{ Params: { id: string } }>(
-    "/api/voice-samples/:id/suno-voice/cancel",
+    "/api/voice-samples/:id/legacyengine-voice/cancel",
     { preHandler: requireAuth },
     async (request, reply) => {
       try {
-        const sample = await cancelSunoVoiceClone(
+        const sample = await cancelLegacyengineVoiceClone(
           request.userId!,
           request.params.id,
         );
@@ -159,7 +159,7 @@ export async function registerVoiceSampleRoutes(app: FastifyInstance) {
   );
 
   app.post<{ Params: { id: string } }>(
-    "/api/voice-samples/:id/suno-voice/verify",
+    "/api/voice-samples/:id/legacyengine-voice/verify",
     {
       config: userRateLimitRouteConfig(
         RATE_LIMITS.voiceVerify.max,
@@ -194,7 +194,7 @@ export async function registerVoiceSampleRoutes(app: FastifyInstance) {
           return reply.status(400).send({ error: "soundFile is required" });
         }
 
-        const sample = await submitSunoVoiceVerification({
+        const sample = await submitLegacyengineVoiceVerification({
           userId: request.userId!,
           sampleId: request.params.id,
           filename,

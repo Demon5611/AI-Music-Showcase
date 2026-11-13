@@ -1,9 +1,9 @@
 export const MUSIC_PROVIDER_IDS = [
-  "sunoapi",
-  "mureka",
-  "elevenlabs",
-  "official-suno",
-  "udio",
+  "legacyengineapi",
+  "audioengine",
+  "voiceengine",
+  "official-legacyengine",
+  "alternateengine",
   "mock",
 ] as const;
 
@@ -26,7 +26,7 @@ export function resolveMusicProviderId(
     return "mock";
   }
 
-  const raw = env.MUSIC_DEFAULT_PROVIDER ?? env.MUSIC_PROVIDER ?? "sunoapi";
+  const raw = env.MUSIC_DEFAULT_PROVIDER ?? env.MUSIC_PROVIDER ?? "legacyengineapi";
 
   if (!isMusicProviderId(raw)) {
     throw new Error(`Unsupported music provider: ${raw}`);

@@ -2,13 +2,13 @@ import assert from "node:assert/strict";
 import { describe, it } from "node:test";
 import {
   buildProviderDeletionRequestMetadata,
-  DEFAULT_MUREKA_VOICE_DELETION_SCOPE,
+  DEFAULT_AUDIOENGINE_VOICE_DELETION_SCOPE,
   hasRealProviderExternalId,
   isProviderDeletionRequestOpen,
   isProviderDeletionRequestTerminal,
   isVoiceProfileBlockedForProviderUse,
   isVoiceProfileInDeletionFlow,
-  resolveMurekaVoiceDeletionEnabled,
+  resolveAudioengineVoiceDeletionEnabled,
 } from "./voice-deletion.js";
 
 describe("voice-deletion helpers", () => {
@@ -39,11 +39,11 @@ describe("voice-deletion helpers", () => {
 
   it("builds provider deletion metadata with scope", () => {
     const metadata = buildProviderDeletionRequestMetadata({
-      deletionScope: DEFAULT_MUREKA_VOICE_DELETION_SCOPE,
+      deletionScope: DEFAULT_AUDIOENGINE_VOICE_DELETION_SCOPE,
       providerMode: "manual",
       requiresOperatorAction: true,
     });
-    assert.deepEqual(metadata.deletionScope, DEFAULT_MUREKA_VOICE_DELETION_SCOPE);
+    assert.deepEqual(metadata.deletionScope, DEFAULT_AUDIOENGINE_VOICE_DELETION_SCOPE);
     assert.equal(metadata.providerMode, "manual");
   });
 
@@ -56,7 +56,7 @@ describe("voice-deletion helpers", () => {
   });
 
   it("resolves voice deletion feature flag", () => {
-    assert.equal(resolveMurekaVoiceDeletionEnabled({ MUREKA_VOICE_DELETION_ENABLED: "true" }), true);
-    assert.equal(resolveMurekaVoiceDeletionEnabled({}), false);
+    assert.equal(resolveAudioengineVoiceDeletionEnabled({ AUDIOENGINE_VOICE_DELETION_ENABLED: "true" }), true);
+    assert.equal(resolveAudioengineVoiceDeletionEnabled({}), false);
   });
 });

@@ -7,10 +7,10 @@ import { readFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import {
-  buildTbcRefundMockPayId,
+  buildLegacygatewayRefundMockPayId,
   isProtectedRuntimeEnvironment,
   isProductionRuntimeEnvironment,
-  parseTbcRefundMockScenario,
+  parseLegacygatewayRefundMockScenario,
 } from "@ai-music/shared";
 
 const here = dirname(fileURLToPath(import.meta.url));
@@ -78,24 +78,24 @@ function readRepo(rel: string): string {
 // E: mock refund provider impossible in production (env + factory)
 {
   const apiEnv = readApi("config/env.ts");
-  assert.match(apiEnv, /TBC_REFUND_PROVIDER_MODE=mock is forbidden when APP_ENV=production/);
+  assert.match(apiEnv, /LEGACYGATEWAY_REFUND_PROVIDER_MODE=mock is forbidden when APP_ENV=production/);
 
   const workerEnv = readRepo("apps/worker/src/config/env.ts");
   assert.match(
     workerEnv,
-    /TBC_REFUND_PROVIDER_MODE=mock is forbidden when APP_ENV=production/,
+    /LEGACYGATEWAY_REFUND_PROVIDER_MODE=mock is forbidden when APP_ENV=production/,
   );
 
-  const factory = readRepo("packages/tbc-checkout/src/refund-payment-provider.ts");
+  const factory = readRepo("packages/legacygateway-checkout/src/refund-payment-provider.ts");
   assert.match(factory, /forbidden when APP_ENV=production/);
-  assert.match(factory, /MockTbcPaymentProvider/);
+  assert.match(factory, /MockLegacygatewayPaymentProvider/);
 }
 
 // F: fixture script impossible in production
 {
   const fixture = readRepo("apps/api/scripts/refund-create-fixture.ts");
   assert.match(fixture, /forbidden when APP_ENV=production/);
-  assert.match(fixture, /TBC_REFUND_PROVIDER_MODE=mock/);
+  assert.match(fixture, /LEGACYGATEWAY_REFUND_PROVIDER_MODE=mock/);
   assert.doesNotMatch(fixture, /app\.(get|post)\(/);
 }
 
@@ -114,18 +114,18 @@ function readRepo(rel: string): string {
 // H–J: mock scenarios encoded in payId (not user body)
 {
   assert.equal(
-    parseTbcRefundMockScenario(buildTbcRefundMockPayId("returned", "x")),
+    parseLegacygatewayRefundMockScenario(buildLegacygatewayRefundMockPayId("returned", "x")),
     "returned",
   );
   assert.equal(
-    parseTbcRefundMockScenario(
-      buildTbcRefundMockPayId("ambiguous_then_returned", "x"),
+    parseLegacygatewayRefundMockScenario(
+      buildLegacygatewayRefundMockPayId("ambiguous_then_returned", "x"),
     ),
     "ambiguous_then_returned",
   );
   assert.equal(
-    parseTbcRefundMockScenario(
-      buildTbcRefundMockPayId("ambiguous_unresolved", "x"),
+    parseLegacygatewayRefundMockScenario(
+      buildLegacygatewayRefundMockPayId("ambiguous_unresolved", "x"),
     ),
     "ambiguous_unresolved",
   );
@@ -136,24 +136,24 @@ function readRepo(rel: string): string {
 
 // K: monetary refund processor must not mutate credit ledger
 {
-  const processor = readRepo("packages/tbc-checkout/src/process-tbc-refund.ts");
+  const processor = readRepo("packages/legacygateway-checkout/src/process-legacygateway-refund.ts");
   assert.doesNotMatch(processor, /refundCredits|spendCredits|grantCredits/);
   assert.match(processor, /createRefundPaymentProviderFromEnv/);
 }
 
 // Cancel-at-most-once still present
 {
-  const processor = readRepo("packages/tbc-checkout/src/process-tbc-refund.ts");
+  const processor = readRepo("packages/legacygateway-checkout/src/process-legacygateway-refund.ts");
   assert.match(processor, /cancelAlreadyAttempted/);
   assert.match(processor, /needs_review/);
 }
 
 // Mock never performs HTTP
 {
-  const mock = readRepo("packages/tbc-checkout/src/mock-tbc-payment-provider.ts");
+  const mock = readRepo("packages/legacygateway-checkout/src/mock-legacygateway-payment-provider.ts");
   assert.doesNotMatch(mock, /\bfetch\s*\(/);
-  assert.match(mock, /networkCallsToTbcBank = 0/);
-  assert.match(mock, /Never performs HTTP to api\.tbcbank\.ge/);
+  assert.match(mock, /networkCallsToLegacygatewayBank = 0/);
+  assert.match(mock, /Never performs HTTP to api\.legacygatewaybank\.ge/);
 }
 
 console.log("staging-ops-refund.contract.test.ts: ok");

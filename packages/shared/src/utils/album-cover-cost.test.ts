@@ -15,8 +15,8 @@ assert.equal(resolveAlbumCoverProductCostUnits(), 0);
 assert.notEqual(resolveAlbumCoverProductCostCredits(), 15);
 assert.notEqual(resolveAlbumCoverProductCostCredits(), 24);
 
-assert.equal(canRequestAlbumCoverVariants("sunoapi"), true);
-assert.equal(canRequestAlbumCoverVariants("mureka"), false);
+assert.equal(canRequestAlbumCoverVariants("legacyengineapi"), true);
+assert.equal(canRequestAlbumCoverVariants("audioengine"), false);
 assert.equal(canRequestAlbumCoverVariants(null), false);
 
 assert.equal(isAlbumCoverGenerationReady({ status: "completed" }), true);

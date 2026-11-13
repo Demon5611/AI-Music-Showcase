@@ -18,21 +18,21 @@ export const VOICE_CLONE_PREPARE_CREDIT_COST = 0;
 export const VOICE_CLONE_VERIFY_CREDIT_COST = 0;
 
 export * from "./credits-economy.js";
-export * from "./mureka-credits.js";
-export * from "./mureka-economics.js";
+export * from "./audioengine-credits.js";
+export * from "./audioengine-economics.js";
 export * from "./music-generate-cost.js";
 export * from "./lyrics-credits.js";
-export * from "./mureka-base-url.js";
-export * from "./mureka-flags.js";
-export * from "./mureka-availability.js";
-export * from "./mureka-worker-heartbeat.js";
+export * from "./audioengine-base-url.js";
+export * from "./audioengine-flags.js";
+export * from "./audioengine-availability.js";
+export * from "./audioengine-worker-heartbeat.js";
 export * from "./voice-deletion.js";
 export * from "./voice-profile-recovery.js";
 export * from "./account-deletion.js";
 export * from "./credit-packages.js";
 export * from "./pricing-examples.js";
-export * from "./tbc-checkout.js";
-export * from "./flitt-checkout.js";
+export * from "./legacygateway-checkout.js";
+export * from "./checkoutgateway-checkout.js";
 export * from "./payment-provider.js";
 export * from "./plans.js";
 export * from "./music-combo-styles.js";
@@ -64,7 +64,7 @@ export const RECOMMENDED_VOICE_SAMPLE_DURATION_MIN_SEC = 20;
 
 export const RECOMMENDED_VOICE_SAMPLE_DURATION_MAX_SEC = 30;
 
-/** Минимальная длина записи фразы Suno на /consent. */
+/** Минимальная длина записи фразы Legacyengine на /consent. */
 export const MIN_VOICE_VERIFY_DURATION_SEC = 5;
 
 /**
@@ -89,7 +89,7 @@ export const GENERATION_QUEUE_NAME = "generation";
 
 export * from "./provider-job-queue.js";
 export * from "./bullmq-job-id.js";
-export * from "./mureka-provider-job-queue.js";
+export * from "./audioengine-provider-job-queue.js";
 export * from "./music-track-persistence-queue.js";
 export * from "./provider-data-deletion-queue.js";
 export * from "./refund.js";

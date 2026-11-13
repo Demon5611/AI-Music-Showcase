@@ -5,13 +5,13 @@
  */
 import "../../common/load-env.js";
 import { randomUUID } from "node:crypto";
-import { createMurekaVoiceProvider } from "@ai-music/ai-providers";
+import { createAudioengineVoiceProvider } from "@ai-music/ai-providers";
 import { grantCredits, prisma } from "@ai-music/db";
 import {
-  DEFAULT_MUREKA_VOICE_DELETION_SCOPE,
-  MUREKA_CREDIT_COST_UNITS,
+  DEFAULT_AUDIOENGINE_VOICE_DELETION_SCOPE,
+  AUDIOENGINE_CREDIT_COST_UNITS,
 } from "@ai-music/shared";
-import { loadReadyMurekaVoiceProfile } from "../music/music-generate-mureka.js";
+import { loadReadyAudioengineVoiceProfile } from "../music/music-generate-audioengine.js";
 import {
   markProviderDeletionConfirmed,
   markProviderDeletionSubmitted,
@@ -40,7 +40,7 @@ async function createUser(): Promise<string> {
   createdUserIds.push(id);
   await grantCredits({
     userId: id,
-    amountUnits: MUREKA_CREDIT_COST_UNITS.createPersonalVoice * 2,
+    amountUnits: AUDIOENGINE_CREDIT_COST_UNITS.createPersonalVoice * 2,
     reason: "test_grant",
     idempotencyKey: `test:${id}:grant`,
   });
@@ -66,7 +66,7 @@ async function createReadyProfile(userId: string, externalId: string) {
     data: {
       id: profileId,
       userId,
-      provider: "mureka",
+      provider: "audioengine",
       externalId,
       status: "ready",
       sourceVoiceSampleId: sampleId,
@@ -110,8 +110,8 @@ async function run(): Promise<void> {
     return;
   }
 
-  const previousFlag = process.env.MUREKA_VOICE_DELETION_ENABLED;
-  process.env.MUREKA_VOICE_DELETION_ENABLED = "true";
+  const previousFlag = process.env.AUDIOENGINE_VOICE_DELETION_ENABLED;
+  process.env.AUDIOENGINE_VOICE_DELETION_ENABLED = "true";
 
   try {
     const userId = await createUser();
@@ -133,19 +133,19 @@ async function run(): Promise<void> {
     assertOk(Boolean(request), "ProviderDataDeletionRequest persisted");
     if (request) {
       createdRequestIds.push(request.id);
-      const metadata = request.metadata as { deletionScope?: typeof DEFAULT_MUREKA_VOICE_DELETION_SCOPE };
+      const metadata = request.metadata as { deletionScope?: typeof DEFAULT_AUDIOENGINE_VOICE_DELETION_SCOPE };
       assertOk(Boolean(metadata.deletionScope?.vocalId), "deletionScope saved");
     }
 
-    const generateBlocked = await loadReadyMurekaVoiceProfile(userId, profileId);
+    const generateBlocked = await loadReadyAudioengineVoiceProfile(userId, profileId);
     assertOk(generateBlocked === null, "generate blocked after deletion request");
 
-    const mureka = createMurekaVoiceProvider();
-    const providerResult = await mureka.requestVoiceProfileDeletion!({
-      provider: "mureka",
+    const audioengine = createAudioengineVoiceProvider();
+    const providerResult = await audioengine.requestVoiceProfileDeletion!({
+      provider: "audioengine",
       externalId: request!.providerExternalId,
       voiceProfileId: profileId,
-      deletionScope: DEFAULT_MUREKA_VOICE_DELETION_SCOPE,
+      deletionScope: DEFAULT_AUDIOENGINE_VOICE_DELETION_SCOPE,
     });
     assertOk(providerResult.mode === "manual", "manual provider mode");
 
@@ -171,7 +171,7 @@ async function run(): Promise<void> {
     const profileDeleted = await prisma.voiceProfile.findUnique({ where: { id: profileId } });
     assertOk(profileDeleted?.status === "provider_deleted", "provider_deleted terminal");
 
-    process.env.MUREKA_VOICE_DELETION_ENABLED = "false";
+    process.env.AUDIOENGINE_VOICE_DELETION_ENABLED = "false";
     const user2 = await createUser();
     const profile2 = await createReadyProfile(user2, `vocal-${randomUUID()}`);
     try {
@@ -208,7 +208,7 @@ async function run(): Promise<void> {
       data: {
         id: creatingProfileId,
         userId: noExternalUser,
-        provider: "mureka",
+        provider: "audioengine",
         externalId: `pending:${creatingProfileId}`,
         status: "creating",
         sourceVoiceSampleId: sampleId,
@@ -224,7 +224,7 @@ async function run(): Promise<void> {
     });
     assertOk(noopRequest === null, "profile without externalId skips provider ticket");
   } finally {
-    process.env.MUREKA_VOICE_DELETION_ENABLED = previousFlag;
+    process.env.AUDIOENGINE_VOICE_DELETION_ENABLED = previousFlag;
     await cleanup();
   }
 

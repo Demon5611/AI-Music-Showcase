@@ -13,7 +13,7 @@ import { assertFeature } from "../billing/entitlements.service.js";
 import {
   resolveTimedLyricsStrategy,
   timedLyricsStrategyErrorCode,
-  type TimedLyricsSunoIds,
+  type TimedLyricsLegacyengineIds,
 } from "./timed-lyrics-strategy.js";
 
 const musicService = createMusicService();
@@ -66,10 +66,10 @@ function assertKaraokeEligibleTrack(track: TrackWithGeneration): void {
 }
 
 /**
- * Resolve Suno timed-lyrics ids from the track that created the audio.
+ * Resolve Legacyengine timed-lyrics ids from the track that created the audio.
  * Must run before credit spend. Does not use active/default MusicProvider.
  */
-function requireTimedLyricsSunoIds(track: TrackWithGeneration): TimedLyricsSunoIds {
+function requireTimedLyricsLegacyengineIds(track: TrackWithGeneration): TimedLyricsLegacyengineIds {
   const strategy = resolveTimedLyricsStrategy({
     musicProvider: track.musicGeneration.provider,
     providerTaskId: track.musicGeneration.providerTaskId,
@@ -89,8 +89,8 @@ function requireTimedLyricsSunoIds(track: TrackWithGeneration): TimedLyricsSunoI
   }
 
   return {
-    sunoTaskId: strategy.sunoTaskId,
-    sunoAudioId: strategy.sunoAudioId,
+    legacyengineTaskId: strategy.legacyengineTaskId,
+    legacyengineAudioId: strategy.legacyengineAudioId,
   };
 }
 
@@ -109,11 +109,11 @@ async function loadTrackForUser(userId: string, trackId: string): Promise<TrackW
 
 async function fetchAndPersistTimedLyrics(
   track: TrackWithGeneration,
-  sunoIds: { sunoTaskId: string; sunoAudioId: string },
+  legacyengineIds: { legacyengineTaskId: string; legacyengineAudioId: string },
 ): Promise<TimedLyricsPayload> {
   const result = await musicService.getTimestampedLyrics({
-    taskId: sunoIds.sunoTaskId,
-    audioId: sunoIds.sunoAudioId,
+    taskId: legacyengineIds.legacyengineTaskId,
+    audioId: legacyengineIds.legacyengineAudioId,
   });
 
   const payload: TimedLyricsPayload = {
@@ -163,7 +163,7 @@ export async function fetchTimedLyricsForTrack(
   }
 
   // Fail closed on provider/capability/ids before any spend.
-  const sunoIds = requireTimedLyricsSunoIds(track);
+  const legacyengineIds = requireTimedLyricsLegacyengineIds(track);
 
   const isWordUpgrade = hasLineLevelCache(cachedPayload);
   const spendKey = `karaoke_lyrics:${trackId}:spend`;
@@ -203,7 +203,7 @@ export async function fetchTimedLyricsForTrack(
     }
 
     const trackForFetch = freshTrack ?? track;
-    const payload = await fetchAndPersistTimedLyrics(trackForFetch, sunoIds);
+    const payload = await fetchAndPersistTimedLyrics(trackForFetch, legacyengineIds);
 
     return toResponseDto(payload, isWordUpgrade);
   } catch (error) {

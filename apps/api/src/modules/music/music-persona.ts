@@ -1,20 +1,20 @@
 import type { GenerateSongInput } from "@ai-music/ai-providers";
-import { createSunoVoiceClients, withSunoGenerationOptions } from "@ai-music/ai-providers";
+import { createLegacyengineVoiceClients, withLegacyengineGenerationOptions } from "@ai-music/ai-providers";
 import { stripPersonaConflictingStyleTags } from "@ai-music/shared";
 import { ForbiddenError } from "../../common/errors.js";
 import { PERSONA_VOICE_UNAVAILABLE_MESSAGE } from "../voice-samples/persona-voice-id.service.js";
-import { resolveSunoVoicePersonaForUser } from "../voice-samples/resolve-suno-voice-persona.js";
+import { resolveLegacyengineVoicePersonaForUser } from "../voice-samples/resolve-legacyengine-voice-persona.js";
 
 export interface MusicGenerateLogger {
   info: (payload: Record<string, unknown>, message: string) => void;
   warn: (payload: Record<string, unknown>, message: string) => void;
 }
 
-async function assertSunoPersonaAvailable(
-  persona: NonNullable<Awaited<ReturnType<typeof resolveSunoVoicePersonaForUser>>>,
+async function assertLegacyenginePersonaAvailable(
+  persona: NonNullable<Awaited<ReturnType<typeof resolveLegacyengineVoicePersonaForUser>>>,
   log?: MusicGenerateLogger,
 ): Promise<void> {
-  const { voice } = createSunoVoiceClients();
+  const { voice } = createLegacyengineVoiceClients();
 
   if (await voice.checkPersonaVoiceAvailability(persona.personaId)) {
     return;
@@ -23,9 +23,9 @@ async function assertSunoPersonaAvailable(
   log?.warn(
     {
       personaId: persona.personaId,
-      sunoVoiceTaskId: persona.sunoVoiceTaskId,
+      legacyengineVoiceTaskId: persona.legacyengineVoiceTaskId,
     },
-    "Suno voice_id check returned unavailable; blocking music generation",
+    "Legacyengine voice_id check returned unavailable; blocking music generation",
   );
 
   throw new ForbiddenError(PERSONA_VOICE_UNAVAILABLE_MESSAGE);
@@ -36,7 +36,7 @@ export async function resolveMusicPersonaForUser(
   voiceSampleId?: string,
   log?: MusicGenerateLogger,
 ) {
-  const persona = await resolveSunoVoicePersonaForUser(userId, voiceSampleId);
+  const persona = await resolveLegacyengineVoicePersonaForUser(userId, voiceSampleId);
 
   if (!persona) {
     if (voiceSampleId) {
@@ -48,17 +48,17 @@ export async function resolveMusicPersonaForUser(
     return null;
   }
 
-  await assertSunoPersonaAvailable(persona, log);
+  await assertLegacyenginePersonaAvailable(persona, log);
 
   log?.info(
     {
       userId,
       voiceSampleId: persona.voiceSampleId,
       personaId: persona.personaId,
-      sunoVoiceTaskId: persona.sunoVoiceTaskId,
+      legacyengineVoiceTaskId: persona.legacyengineVoiceTaskId,
       personaModel: persona.personaModel,
     },
-    "Resolved Suno Voice persona for music generation",
+    "Resolved Legacyengine Voice persona for music generation",
   );
 
   return persona;
@@ -66,9 +66,9 @@ export async function resolveMusicPersonaForUser(
 
 export function buildPersonaSongInput(
   input: GenerateSongInput,
-  persona: NonNullable<Awaited<ReturnType<typeof resolveSunoVoicePersonaForUser>>>,
+  persona: NonNullable<Awaited<ReturnType<typeof resolveLegacyengineVoicePersonaForUser>>>,
 ): GenerateSongInput {
-  const withPersona = withSunoGenerationOptions(input, {
+  const withPersona = withLegacyengineGenerationOptions(input, {
     personaId: persona.personaId,
     personaModel: persona.personaModel,
     vocalGender: undefined,
@@ -76,7 +76,7 @@ export function buildPersonaSongInput(
 
   // Explicitly drop vocalGender from merged options (patch undefined does not delete).
   const options = {
-    ...(withPersona.providerOptions?.providerId === "sunoapi"
+    ...(withPersona.providerOptions?.providerId === "legacyengineapi"
       ? withPersona.providerOptions.options
       : {}),
     personaId: persona.personaId,
@@ -89,7 +89,7 @@ export function buildPersonaSongInput(
     prompt: input.prompt.trim(),
     style: stripPersonaConflictingStyleTags(input.style),
     providerOptions: {
-      providerId: "sunoapi",
+      providerId: "legacyengineapi",
       options,
     },
   };

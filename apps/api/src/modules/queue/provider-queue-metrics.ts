@@ -8,7 +8,7 @@ import {
   PROVIDER_JOB_QUEUE_NAME,
   PROVIDER_QUEUE_ALERT_THRESHOLD,
   PROVIDER_QUEUE_BACKPRESSURE_THRESHOLD,
-  SUNO_SUBMIT_RATE_PER_SEC,
+  LEGACYENGINE_SUBMIT_RATE_PER_SEC,
   type ProviderJobPayload,
 } from "@ai-music/shared";
 import { ServiceUnavailableError } from "../../common/errors.js";
@@ -17,7 +17,7 @@ import { getProviderJobQueue } from "./provider-job-queue.js";
 export {
   PROVIDER_QUEUE_ALERT_THRESHOLD,
   PROVIDER_QUEUE_BACKPRESSURE_THRESHOLD,
-  SUNO_SUBMIT_RATE_PER_SEC,
+  LEGACYENGINE_SUBMIT_RATE_PER_SEC,
 };
 
 export interface ProviderQueueMetrics {
@@ -56,7 +56,7 @@ export function estimateProviderQueueWaitSec(jobsAhead: number): number {
     return 0;
   }
 
-  return Math.ceil(jobsAhead / SUNO_SUBMIT_RATE_PER_SEC);
+  return Math.ceil(jobsAhead / LEGACYENGINE_SUBMIT_RATE_PER_SEC);
 }
 
 export async function assertProviderQueueCapacity(): Promise<void> {

@@ -29,9 +29,9 @@ importers:
       '@ai-music/db':
         specifier: workspace:*
         version: link:../../packages/db
-      '@ai-music/flitt-checkout':
+      '@ai-music/checkoutgateway-checkout':
         specifier: workspace:*
-        version: link:../../packages/flitt-checkout
+        version: link:../../packages/checkoutgateway-checkout
       '@ai-music/observability':
         specifier: workspace:*
         version: link:../../packages/observability
@@ -41,9 +41,9 @@ importers:
       '@ai-music/storage':
         specifier: workspace:*
         version: link:../../packages/storage
-      '@ai-music/tbc-checkout':
+      '@ai-music/legacygateway-checkout':
         specifier: workspace:*
-        version: link:../../packages/tbc-checkout
+        version: link:../../packages/legacygateway-checkout
       '@clerk/backend':
         specifier: ^3.4.13
         version: 3.4.13(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
@@ -113,7 +113,7 @@ importers:
         specifier: ^5.8.3
         version: 5.9.3
 
-  apps/suno-fake:
+  apps/legacyengine-fake:
     devDependencies:
       '@types/node':
         specifier: ^20.17.57
@@ -254,9 +254,9 @@ importers:
       '@ai-music/db':
         specifier: workspace:*
         version: link:../../packages/db
-      '@ai-music/flitt-checkout':
+      '@ai-music/checkoutgateway-checkout':
         specifier: workspace:*
-        version: link:../../packages/flitt-checkout
+        version: link:../../packages/checkoutgateway-checkout
       '@ai-music/observability':
         specifier: workspace:*
         version: link:../../packages/observability
@@ -266,9 +266,9 @@ importers:
       '@ai-music/storage':
         specifier: workspace:*
         version: link:../../packages/storage
-      '@ai-music/tbc-checkout':
+      '@ai-music/legacygateway-checkout':
         specifier: workspace:*
-        version: link:../../packages/tbc-checkout
+        version: link:../../packages/legacygateway-checkout
       bullmq:
         specifier: ^5.53.2
         version: 5.77.2
@@ -382,7 +382,7 @@ importers:
         specifier: ^5.8.3
         version: 5.9.3
 
-  packages/flitt-checkout:
+  packages/checkoutgateway-checkout:
     dependencies:
       '@ai-music/db':
         specifier: workspace:*
@@ -470,7 +470,7 @@ importers:
         specifier: ^5.8.3
         version: 5.9.3
 
-  packages/tbc-checkout:
+  packages/legacygateway-checkout:
     dependencies:
       '@ai-music/db':
         specifier: workspace:*

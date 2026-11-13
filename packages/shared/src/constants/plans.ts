@@ -133,7 +133,7 @@ export const PLANS: Record<PlanId, PlanConfig> = {
   pro: {
     id: "pro",
     label: "Pro",
-    priceUsd: 19,
+    priceUsd: 38,
     monthlyCredits: 500,
     maxTrackDurationSec: 180,
     estimatedFlows: estimateMarketingFlows(500),
@@ -142,7 +142,7 @@ export const PLANS: Record<PlanId, PlanConfig> = {
   studio: {
     id: "studio",
     label: "Studio",
-    priceUsd: 49,
+    priceUsd: 98,
     monthlyCredits: 2000,
     maxTrackDurationSec: 180,
     estimatedFlows: estimateMarketingFlows(2000),

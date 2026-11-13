@@ -1,5 +1,5 @@
 /**
- * Dev/staging-only: create a credited TBC CreditPackPurchase fixture for mock refund E2E.
+ * Dev/staging-only: create a credited LEGACYGATEWAY CreditPackPurchase fixture for mock refund E2E.
  *
  * Usage:
  *   pnpm --filter @ai-music/api refund:create-fixture -- \
@@ -7,7 +7,7 @@
  *
  * Requires:
  *   APP_ENV=development|staging
- *   TBC_REFUND_PROVIDER_MODE=mock
+ *   LEGACYGATEWAY_REFUND_PROVIDER_MODE=mock
  *
  * Production: hard reject.
  */
@@ -16,12 +16,12 @@ import { randomUUID } from "node:crypto";
 import { resolve } from "node:path";
 import { prisma } from "@ai-music/db";
 import {
-  TBC_PAYMENT_PROVIDER,
-  TBC_REFUND_MOCK_SCENARIOS,
-  buildTbcRefundMockPayId,
+  LEGACYGATEWAY_PAYMENT_PROVIDER,
+  LEGACYGATEWAY_REFUND_MOCK_SCENARIOS,
+  buildLegacygatewayRefundMockPayId,
   isProductionRuntimeEnvironment,
   resolveAppRuntimeEnv,
-  type TbcRefundMockScenario,
+  type LegacygatewayRefundMockScenario,
 } from "@ai-music/shared";
 
 config({ path: resolve(import.meta.dirname, "../../../.env") });
@@ -31,7 +31,7 @@ function printUsage(): void {
     [
       "Usage: tsx scripts/refund-create-fixture.ts --userId=<id> --scenario=<scenario>",
       "Optional: --amount=29 --credits=2000 --packageId=creator --suffix=<id>",
-      `Scenarios: ${TBC_REFUND_MOCK_SCENARIOS.join("|")}`,
+      `Scenarios: ${LEGACYGATEWAY_REFUND_MOCK_SCENARIOS.join("|")}`,
     ].join("\n"),
   );
 }
@@ -60,10 +60,10 @@ function assertFixtureAllowed(): void {
     throw new Error(`refund:create-fixture requires APP_ENV=development|staging (got ${appEnv})`);
   }
 
-  const mode = (process.env.TBC_REFUND_PROVIDER_MODE ?? "real").trim().toLowerCase() || "real";
+  const mode = (process.env.LEGACYGATEWAY_REFUND_PROVIDER_MODE ?? "real").trim().toLowerCase() || "real";
   if (mode !== "mock") {
     throw new Error(
-      "refund:create-fixture requires TBC_REFUND_PROVIDER_MODE=mock",
+      "refund:create-fixture requires LEGACYGATEWAY_REFUND_PROVIDER_MODE=mock",
     );
   }
 }
@@ -73,7 +73,7 @@ async function main(): Promise<void> {
 
   const args = parseArgs(process.argv.slice(2));
   const userId = args.userId?.trim();
-  const scenarioRaw = args.scenario?.trim() as TbcRefundMockScenario | undefined;
+  const scenarioRaw = args.scenario?.trim() as LegacygatewayRefundMockScenario | undefined;
   const amount = Number(args.amount ?? "29");
   const credits = Number(args.credits ?? "2000");
   const packageId = (args.packageId ?? "creator").trim();
@@ -84,7 +84,7 @@ async function main(): Promise<void> {
     process.exit(1);
   }
 
-  if (!(TBC_REFUND_MOCK_SCENARIOS as readonly string[]).includes(scenarioRaw)) {
+  if (!(LEGACYGATEWAY_REFUND_MOCK_SCENARIOS as readonly string[]).includes(scenarioRaw)) {
     console.error(`Invalid scenario: ${scenarioRaw}`);
     printUsage();
     process.exit(1);
@@ -105,14 +105,14 @@ async function main(): Promise<void> {
     throw new Error(`User not found: ${userId}`);
   }
 
-  const providerPaymentId = buildTbcRefundMockPayId(scenarioRaw, suffix);
+  const providerPaymentId = buildLegacygatewayRefundMockPayId(scenarioRaw, suffix);
   const merchantPaymentId = `fixture-merchant-${suffix}`;
   const now = new Date();
 
   const purchase = await prisma.creditPackPurchase.create({
     data: {
       userId: user.id,
-      provider: TBC_PAYMENT_PROVIDER,
+      provider: LEGACYGATEWAY_PAYMENT_PROVIDER,
       packageId,
       priceAmount: amount,
       currency: "USD",

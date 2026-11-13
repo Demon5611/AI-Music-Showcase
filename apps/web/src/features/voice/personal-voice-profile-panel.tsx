@@ -1,9 +1,9 @@
 "use client";
 
 import {
-  MUREKA_CREDIT_COSTS,
-  MUREKA_VOCAL_CLONE_MAX_DURATION_SEC,
-  MUREKA_VOCAL_CLONE_MIN_DURATION_SEC,
+  AUDIOENGINE_CREDIT_COSTS,
+  AUDIOENGINE_VOCAL_CLONE_MAX_DURATION_SEC,
+  AUDIOENGINE_VOCAL_CLONE_MIN_DURATION_SEC,
   type VoiceProfileDto,
 } from "@ai-music/shared";
 import { useQueryClient } from "@tanstack/react-query";
@@ -75,7 +75,7 @@ export function PersonalVoiceProfilePanel({
     setError(null);
 
     try {
-      const created = await api.voiceProfiles.createMureka({
+      const created = await api.voiceProfiles.createAudioengine({
         voiceSampleId,
         consentConfirmed: true,
       });
@@ -99,7 +99,7 @@ export function PersonalVoiceProfilePanel({
         <h3 className={voiceUi.personalVoiceTitle}>{t("title")}</h3>
         <p className={voiceUi.creationSectionHint}>
           {t("description", {
-            cost: MUREKA_CREDIT_COSTS.createPersonalVoice,
+            cost: AUDIOENGINE_CREDIT_COSTS.createPersonalVoice,
           })}
         </p>
       </div>
@@ -107,8 +107,8 @@ export function PersonalVoiceProfilePanel({
       {blockedReason && presentation.status !== "ready" ? (
         <p className={voiceUi.personalVoiceStatus} role="status">
           {t(BLOCKED_REASON_KEYS[blockedReason], {
-            min: MUREKA_VOCAL_CLONE_MIN_DURATION_SEC,
-            max: MUREKA_VOCAL_CLONE_MAX_DURATION_SEC,
+            min: AUDIOENGINE_VOCAL_CLONE_MIN_DURATION_SEC,
+            max: AUDIOENGINE_VOCAL_CLONE_MAX_DURATION_SEC,
           })}
         </p>
       ) : null}

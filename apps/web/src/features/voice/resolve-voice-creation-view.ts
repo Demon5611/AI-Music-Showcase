@@ -2,10 +2,10 @@ import type { VoiceProfileStatus, VoiceSampleStatus } from "@ai-music/shared";
 
 /**
  * Active personal-voice path for the voice creation screen.
- * `unavailable` keeps personal voice from silently degrading to the Suno flow
+ * `unavailable` keeps personal voice from silently degrading to the Legacyengine flow
  * when the capability state cannot be loaded at all.
  */
-export type VoiceCreationMode = "mureka" | "suno" | "unavailable";
+export type VoiceCreationMode = "audioengine" | "legacyengine" | "unavailable";
 
 /** `GET /api/voice-profiles/me` observer state. `hasData` means it resolved once. */
 export interface PersonalVoiceCapabilityState {
@@ -24,7 +24,7 @@ export interface VoiceCreationSampleState {
   status: VoiceSampleStatus;
   consentConfirmed: boolean;
   durationSec: number;
-  /** Legacy Suno persona readiness (`isVoiceSampleReadyForGeneration`). */
+  /** Legacy Legacyengine persona readiness (`isVoiceSampleReadyForGeneration`). */
   readyForGeneration: boolean;
 }
 
@@ -43,8 +43,8 @@ export interface VoiceCreationViewInput {
 
 export interface VoiceCreationView {
   mode: VoiceCreationMode;
-  /** Legacy Suno phrase verification block — only on the Suno path. */
-  showSunoVerification: boolean;
+  /** Legacy Legacyengine phrase verification block — only on the Legacyengine path. */
+  showLegacyengineVerification: boolean;
   showPersonalVoicePanel: boolean;
   /** Local validation result; blocks the paid create action until resolved. */
   personalVoiceBlockedReason: PersonalVoiceBlockedReason | null;
@@ -59,10 +59,10 @@ export function resolveVoiceCreationMode(
   capability: PersonalVoiceCapabilityState,
 ): VoiceCreationMode {
   if (!personalVoiceEnabled) {
-    return "suno";
+    return "legacyengine";
   }
 
-  return capability.isError && !capability.hasData ? "unavailable" : "mureka";
+  return capability.isError && !capability.hasData ? "unavailable" : "audioengine";
 }
 
 function resolveLocalBlockedReason(
@@ -117,7 +117,7 @@ export function resolveVoiceCreationView(
   if (mode === "unavailable") {
     return {
       mode,
-      showSunoVerification: false,
+      showLegacyengineVerification: false,
       showPersonalVoicePanel: false,
       personalVoiceBlockedReason: null,
       showPersonalVoiceStaleWarning: false,
@@ -126,13 +126,13 @@ export function resolveVoiceCreationView(
     };
   }
 
-  if (mode === "mureka") {
+  if (mode === "audioengine") {
     const readyProfile = voiceProfileStatus === "ready";
     return {
       mode,
-      showSunoVerification: false,
+      showLegacyengineVerification: false,
       showPersonalVoicePanel: sample !== null,
-      // Ready Mureka vocal_id is reusable without source sample audio.
+      // Ready Audioengine vocal_id is reusable without source sample audio.
       personalVoiceBlockedReason: readyProfile
         ? null
         : resolvePersonalVoiceBlockedReason(
@@ -148,7 +148,7 @@ export function resolveVoiceCreationView(
 
   return {
     mode,
-    showSunoVerification: sample !== null && !sample.readyForGeneration,
+    showLegacyengineVerification: sample !== null && !sample.readyForGeneration,
     showPersonalVoicePanel: false,
     personalVoiceBlockedReason: null,
     showPersonalVoiceStaleWarning: false,

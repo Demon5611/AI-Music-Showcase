@@ -1,9 +1,9 @@
 import { z } from "zod";
 
 /**
- * Full Suno `/voice/validate` language allowlist.
+ * Full Legacyengine `/voice/validate` language allowlist.
  * Not the same as lyrics UI languages — see docs/language-contracts.md.
- * @see https://docs.sunoapi.org/suno-api/suno-voice-validate
+ * @see https://docs.integration.example.invalid/legacyengine-api/legacyengine-voice-validate
  */
 export const VOICE_LANGUAGE_VALUES = [
   "en",

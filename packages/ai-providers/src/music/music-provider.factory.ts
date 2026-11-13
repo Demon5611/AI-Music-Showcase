@@ -4,11 +4,11 @@ import { resolveMusicProviderId } from "./domain/music-provider-id.js";
 import type { MusicProvider } from "./domain/music-provider.interface.js";
 import { MusicProviderError } from "./domain/errors/music-provider.error.js";
 import { createDemoMusicProvider } from "./providers/demo/demo-music.provider.js";
-import { ElevenLabsMusicProviderAdapter } from "./providers/elevenlabs/elevenlabs-music.provider.js";
-import { createMurekaMusicProvider } from "./providers/mureka/mureka-music.provider.js";
-import { OfficialSunoProvider } from "./providers/official-suno/official-suno.provider.js";
-import { createSunoApiProvider } from "./providers/suno-api/suno-api.provider.js";
-import { UdioProvider } from "./providers/udio/udio.provider.js";
+import { VoiceengineMusicProviderAdapter } from "./providers/voiceengine/voiceengine-music.provider.js";
+import { createAudioengineMusicProvider } from "./providers/audioengine/audioengine-music.provider.js";
+import { OfficialLegacyengineProvider } from "./providers/official-legacyengine/official-legacyengine.provider.js";
+import { createLegacyengineApiProvider } from "./providers/legacyengine-api/legacyengine-api.provider.js";
+import { UdioProvider } from "./providers/alternateengine/alternateengine.provider.js";
 
 export type MusicProviderRegistry = Partial<
   Record<MusicProviderId, MusicProvider>
@@ -27,25 +27,25 @@ export class MusicProviderFactory {
     if (isShowcaseMode()) {
       const demo = overrides.mock ?? createDemoMusicProvider();
       this.registry = new Map<MusicProviderId, MusicProvider>([
-        ["sunoapi", demo],
-        ["mureka", demo],
-        ["elevenlabs", demo],
-        ["official-suno", demo],
-        ["udio", demo],
+        ["legacyengineapi", demo],
+        ["audioengine", demo],
+        ["voiceengine", demo],
+        ["official-legacyengine", demo],
+        ["alternateengine", demo],
         ["mock", demo],
       ]);
       return;
     }
 
     this.registry = new Map<MusicProviderId, MusicProvider>([
-      ["sunoapi", overrides.sunoapi ?? createSunoApiProvider()],
-      ["mureka", overrides.mureka ?? createMurekaMusicProvider()],
+      ["legacyengineapi", overrides.legacyengineapi ?? createLegacyengineApiProvider()],
+      ["audioengine", overrides.audioengine ?? createAudioengineMusicProvider()],
       [
-        "elevenlabs",
-        overrides.elevenlabs ?? new ElevenLabsMusicProviderAdapter(),
+        "voiceengine",
+        overrides.voiceengine ?? new VoiceengineMusicProviderAdapter(),
       ],
-      ["official-suno", overrides["official-suno"] ?? new OfficialSunoProvider()],
-      ["udio", overrides.udio ?? new UdioProvider()],
+      ["official-legacyengine", overrides["official-legacyengine"] ?? new OfficialLegacyengineProvider()],
+      ["alternateengine", overrides.alternateengine ?? new UdioProvider()],
       ["mock", overrides.mock ?? createDemoMusicProvider()],
     ]);
   }

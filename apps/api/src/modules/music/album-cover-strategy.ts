@@ -1,23 +1,23 @@
 /**
  * Provider-aware album cover routing (Provider Affinity).
  *
- * Suno `/suno/cover/generate` requires the original *Suno music* taskId.
- * Mureka (and any non-sunoapi) providerTaskId must never be passed there.
+ * Legacyengine `/legacyengine/cover/generate` requires the original *Legacyengine music* taskId.
+ * Audioengine (and any non-legacyengineapi) providerTaskId must never be passed there.
  */
 
 import { resolveExistingMusicAssetProvider } from "@ai-music/shared";
 
 export type AlbumCoverStrategy =
   | {
-      kind: "suno_music_task";
-      /** Must be MusicGeneration.providerTaskId when provider === sunoapi. */
-      sunoMusicTaskId: string;
+      kind: "legacyengine_music_task";
+      /** Must be MusicGeneration.providerTaskId when provider === legacyengineapi. */
+      legacyengineMusicTaskId: string;
     }
   | {
       kind: "unavailable";
       reason:
-        | "non_suno_music_provider"
-        | "missing_suno_task_id"
+        | "non_legacyengine_music_provider"
+        | "missing_legacyengine_task_id"
         | "provider_affinity_mismatch"
         | "provider_affinity_unknown";
     };
@@ -43,17 +43,17 @@ export function resolveAlbumCoverStrategy(input: {
     };
   }
 
-  if (affinity.provider !== "sunoapi") {
-    return { kind: "unavailable", reason: "non_suno_music_provider" };
+  if (affinity.provider !== "legacyengineapi") {
+    return { kind: "unavailable", reason: "non_legacyengine_music_provider" };
   }
 
   if (!affinity.providerTaskId) {
-    return { kind: "unavailable", reason: "missing_suno_task_id" };
+    return { kind: "unavailable", reason: "missing_legacyengine_task_id" };
   }
 
-  return { kind: "suno_music_task", sunoMusicTaskId: affinity.providerTaskId };
+  return { kind: "legacyengine_music_task", legacyengineMusicTaskId: affinity.providerTaskId };
 }
 
 export function isAlbumCoverVariantsAvailable(musicProvider: string): boolean {
-  return musicProvider.trim().toLowerCase() === "sunoapi";
+  return musicProvider.trim().toLowerCase() === "legacyengineapi";
 }

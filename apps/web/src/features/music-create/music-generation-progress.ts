@@ -2,7 +2,7 @@ import type {
   MusicGenerationPhaseHint,
   MusicGenerationRecordStatus,
 } from "@ai-music/shared";
-import type { AgentState } from "@/shared/ui/elevenlabs/agent-state";
+import type { AgentState } from "@/shared/ui/voiceengine/agent-state";
 
 type ProgressTranslate = (
   key:

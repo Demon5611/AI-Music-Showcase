@@ -23,16 +23,16 @@ assert.notEqual(
   resolveMusicGenerateCostUnits({ usePersonalVoice: true }),
 );
 
-const mureka = resolveAlbumCoverStrategy({
-  musicProvider: "mureka",
-  providerTaskId: "mureka-task",
+const audioengine = resolveAlbumCoverStrategy({
+  musicProvider: "audioengine",
+  providerTaskId: "audioengine-task",
 });
-assert.equal(mureka.kind, "unavailable");
+assert.equal(audioengine.kind, "unavailable");
 
-const suno = resolveAlbumCoverStrategy({
-  musicProvider: "sunoapi",
-  providerTaskId: "suno-task",
+const legacyengine = resolveAlbumCoverStrategy({
+  musicProvider: "legacyengineapi",
+  providerTaskId: "legacyengine-task",
 });
-assert.equal(suno.kind, "suno_music_task");
+assert.equal(legacyengine.kind, "legacyengine_music_task");
 
 console.log("album-cover-cost.contract.test.ts: ok");

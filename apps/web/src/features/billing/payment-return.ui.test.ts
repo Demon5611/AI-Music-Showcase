@@ -1,5 +1,5 @@
 /**
- * Guardrails for Flitt browser return UX.
+ * Guardrails for Checkoutgateway browser return UX.
  * Run: pnpm --filter @ai-music/shared exec tsx ../../apps/web/src/features/billing/payment-return.ui.test.ts
  */
 import assert from "node:assert/strict";
@@ -26,7 +26,7 @@ const checkoutService = readFileSync(
   "utf8",
 );
 const fulfillment = readFileSync(
-  join(here, "../../../../../apps/api/src/modules/billing/flitt-payment-fulfillment.service.ts"),
+  join(here, "../../../../../apps/api/src/modules/billing/checkoutgateway-payment-fulfillment.service.ts"),
   "utf8",
 );
 const enMessages = readFileSync(join(here, "../../../messages/en.json"), "utf8");
@@ -38,9 +38,9 @@ assert.match(route, /status:\s*303/);
 assert.match(route, /Location:\s*location/);
 assert.doesNotMatch(route, /url\.origin|localhost/);
 assert.match(route, /readPaymentReturnPurchaseId/);
-assert.doesNotMatch(route, /grantCredits|handleFlittCallback|FLITT_PAYMENT_KEY/);
+assert.doesNotMatch(route, /grantCredits|handleCheckoutgatewayCallback|CHECKOUTGATEWAY_PAYMENT_KEY/);
 assert.match(redirectHelper, /303/);
-assert.match(proxy, /redirectFlittBrowserReturn/);
+assert.match(proxy, /redirectCheckoutgatewayBrowserReturn/);
 assert.match(proxy, /isPaymentReturnApiPath/);
 assert.match(proxy, /isLegacyPricingReturnPath/);
 assert.match(hook, /api\.billing\.getPurchase/);
@@ -49,7 +49,7 @@ assert.match(hook, /order_id/);
 assert.doesNotMatch(hook, /createCreditPackCheckout|grantCredits|signature/);
 assert.match(panel, /usePaymentReturnPurchase/);
 assert.match(panel, /parseApiError/);
-assert.doesNotMatch(panel, /Suno|Flitt|TBC|Kits/);
+assert.doesNotMatch(panel, /Legacyengine|Checkoutgateway|LEGACYGATEWAY|Voiceadapter/);
 assert.doesNotMatch(panel, /searchParams\.get\("signature"\)|searchParams\.get\("amount"\)/);
 assert.match(billingClient, /getPurchase/);
 assert.match(billingClient, /\/api\/billing\/purchases\//);
@@ -59,9 +59,9 @@ assert.doesNotMatch(
     checkoutService.indexOf("export async function getCreditPackPurchaseStatusOnly"),
     checkoutService.indexOf("export {"),
   ),
-  /handleFlittCallback/,
+  /handleCheckoutgatewayCallback/,
 );
-assert.match(fulfillment, /handleFlittCallback/);
+assert.match(fulfillment, /handleCheckoutgatewayCallback/);
 assert.match(enMessages, /Confirming payment/);
 assert.match(ruMessages, /Подтверждаем оплату/);
 assert.match(enMessages, /Credits are added only after the payment is verified by the server/);

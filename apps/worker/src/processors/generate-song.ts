@@ -1,6 +1,6 @@
 import { prisma, refundCredits } from "@ai-music/db";
 import type { GenerationJobPayload, GenerationStatus } from "@ai-music/shared";
-import { generateSongWithSunoVoice } from "./convert-voice.js";
+import { generateSongWithLegacyengineVoice } from "./convert-voice.js";
 import { preprocessVoice } from "./preprocess-voice.js";
 import { uploadGenerationResult } from "./upload-result.js";
 
@@ -35,7 +35,7 @@ export async function processGenerationJob(
     const { voiceSample } = await preprocessVoice(job.voiceSample);
 
     await updateJobStatus(payload.jobId, "generating_song");
-    const resultBuffer = await generateSongWithSunoVoice(job, voiceSample);
+    const resultBuffer = await generateSongWithLegacyengineVoice(job, voiceSample);
 
     await updateJobStatus(payload.jobId, "uploading_result");
     await uploadGenerationResult(job, resultBuffer);

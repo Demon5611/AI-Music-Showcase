@@ -1,7 +1,7 @@
 import { randomUUID } from "node:crypto";
 import { Prisma, prisma, type CreditPackPurchase } from "@ai-music/db";
 import {
-  FLITT_PAYMENT_PROVIDER,
+  CHECKOUTGATEWAY_PAYMENT_PROVIDER,
   FxConversionError,
   FxQuoteUnavailableError,
   appendPurchaseIdToReturnUrl,
@@ -25,18 +25,18 @@ import {
   ServiceUnavailableError,
 } from "../../common/errors.js";
 import {
-  FlittCheckoutError,
-  FlittPaymentProvider,
-  assertFlittCheckoutEnabled,
-  majorStringToFlittMinorUnits,
-  toSafeFlittUserMessage,
-  type FlittCheckoutRuntimeConfig,
+  CheckoutgatewayCheckoutError,
+  CheckoutgatewayPaymentProvider,
+  assertCheckoutgatewayCheckoutEnabled,
+  majorStringToCheckoutgatewayMinorUnits,
+  toSafeCheckoutgatewayUserMessage,
+  type CheckoutgatewayCheckoutRuntimeConfig,
   type PaymentProvider,
-} from "./providers/flitt.js";
+} from "./providers/checkoutgateway.js";
 import {
-  TbcCheckoutError,
-  toSafeTbcUserMessage,
-} from "./providers/tbc.js";
+  LegacygatewayCheckoutError,
+  toSafeLegacygatewayUserMessage,
+} from "./providers/legacygateway.js";
 import {
   isConfiguredCheckoutEnabled,
   type CheckoutSelectionEnv,
@@ -69,9 +69,9 @@ export type CreditPackPurchaseView = {
 type CheckoutDeps = {
   prismaClient?: typeof prisma;
   env?: CheckoutSelectionEnv;
-  createFlittProvider?: (config: FlittCheckoutRuntimeConfig) => FlittPaymentProvider;
+  createCheckoutgatewayProvider?: (config: CheckoutgatewayCheckoutRuntimeConfig) => CheckoutgatewayPaymentProvider;
   createIdFn?: () => string;
-  resolveFlittConfig?: () => FlittCheckoutRuntimeConfig;
+  resolveCheckoutgatewayConfig?: () => CheckoutgatewayCheckoutRuntimeConfig;
   getUsdGelQuote?: () => Promise<FxQuote>;
   fxRateProvider?: FxRateProvider;
 };
@@ -112,38 +112,38 @@ function resolvePackageOrThrow(packageId: string): {
   };
 }
 
-export function mapFlittErrorToAppError(error: unknown): never {
+export function mapCheckoutgatewayErrorToAppError(error: unknown): never {
   if (error instanceof AppError) {
     throw error;
   }
 
-  if (error instanceof FlittCheckoutError) {
+  if (error instanceof CheckoutgatewayCheckoutError) {
     const status =
       error.kind === "configuration"
         ? 503
         : error.kind === "validation"
           ? 400
           : 502;
-    throw new AppError(toSafeFlittUserMessage(error), status, error.code);
+    throw new AppError(toSafeCheckoutgatewayUserMessage(error), status, error.code);
   }
 
   throw error;
 }
 
-/** Legacy TBC callback/refund HTTP mapping. Not used for new checkout. */
-export function mapTbcErrorToAppError(error: unknown): never {
+/** Legacy LEGACYGATEWAY callback/refund HTTP mapping. Not used for new checkout. */
+export function mapLegacygatewayErrorToAppError(error: unknown): never {
   if (error instanceof AppError) {
     throw error;
   }
 
-  if (error instanceof TbcCheckoutError) {
+  if (error instanceof LegacygatewayCheckoutError) {
     const status =
       error.kind === "configuration"
         ? 503
         : error.kind === "validation"
           ? 400
           : 502;
-    throw new AppError(toSafeTbcUserMessage(error), status, error.code);
+    throw new AppError(toSafeLegacygatewayUserMessage(error), status, error.code);
   }
 
   throw error;
@@ -155,17 +155,17 @@ export function normalizeBillingError(error: unknown): unknown {
     return error;
   }
 
-  if (error instanceof FlittCheckoutError) {
+  if (error instanceof CheckoutgatewayCheckoutError) {
     try {
-      mapFlittErrorToAppError(error);
+      mapCheckoutgatewayErrorToAppError(error);
     } catch (mapped) {
       return mapped;
     }
   }
 
-  if (error instanceof TbcCheckoutError) {
+  if (error instanceof LegacygatewayCheckoutError) {
     try {
-      mapTbcErrorToAppError(error);
+      mapLegacygatewayErrorToAppError(error);
     } catch (mapped) {
       return mapped;
     }
@@ -181,7 +181,7 @@ export function assertCheckoutAvailableOrThrow(env?: CheckoutSelectionEnv): void
   throw new ServiceUnavailableError("Credit pack checkout is not available");
 }
 
-/** Public CTA readiness. Flitt-only. TBC env never enables checkout. */
+/** Public CTA readiness. Checkoutgateway-only. LEGACYGATEWAY env never enables checkout. */
 export function getCreditPackCheckoutStatus(
   env?: CheckoutSelectionEnv,
 ): CreditPackCheckoutStatus {
@@ -242,15 +242,15 @@ export async function getCreditPackPricingFxQuote(
 const CHECKOUT_RESUME_IN_FLIGHT = new Map<string, Promise<CreditPackCheckoutResult>>();
 
 const RETRYABLE_STORED_FAILURE_CODES = new Set([
-  "FLITT_NETWORK",
-  "FLITT_CREATE_FAILED",
-  "FLITT_PROVIDER_5XX",
-  "FLITT_REQUEST_FAILED",
-  "FLITT_RESPONSE_NOT_JSON",
-  "FLITT_RESPONSE_NOT_OBJECT",
-  "FLITT_PAYMENT_ID_MISSING",
-  "FLITT_CHECKOUT_URL_UNTRUSTED",
-  "FLITT_STATUS_INCOMPLETE",
+  "CHECKOUTGATEWAY_NETWORK",
+  "CHECKOUTGATEWAY_CREATE_FAILED",
+  "CHECKOUTGATEWAY_PROVIDER_5XX",
+  "CHECKOUTGATEWAY_REQUEST_FAILED",
+  "CHECKOUTGATEWAY_RESPONSE_NOT_JSON",
+  "CHECKOUTGATEWAY_RESPONSE_NOT_OBJECT",
+  "CHECKOUTGATEWAY_PAYMENT_ID_MISSING",
+  "CHECKOUTGATEWAY_CHECKOUT_URL_UNTRUSTED",
+  "CHECKOUTGATEWAY_STATUS_INCOMPLETE",
 ]);
 
 const NON_RESUMABLE_PURCHASE_STATUSES = new Set([
@@ -283,15 +283,15 @@ function isPrismaUniqueConstraintError(error: unknown): boolean {
   );
 }
 
-function isDefinitiveFlittCreateError(error: unknown): boolean {
+function isDefinitiveCheckoutgatewayCreateError(error: unknown): boolean {
   return (
-    error instanceof FlittCheckoutError &&
+    error instanceof CheckoutgatewayCheckoutError &&
     (error.kind === "validation" || error.kind === "provider_4xx")
   );
 }
 
-function canResumeIncompleteFlittCheckout(existing: CreditPackPurchase): boolean {
-  if (existing.provider !== FLITT_PAYMENT_PROVIDER) {
+function canResumeIncompleteCheckoutgatewayCheckout(existing: CreditPackPurchase): boolean {
+  if (existing.provider !== CHECKOUTGATEWAY_PAYMENT_PROVIDER) {
     return false;
   }
   if (existing.approvalUrl) {
@@ -331,13 +331,13 @@ function toCheckoutResult(
 async function reuseExistingCheckout(
   existing: CreditPackPurchase | null,
   options: CheckoutDeps,
-  config: FlittCheckoutRuntimeConfig,
+  config: CheckoutgatewayCheckoutRuntimeConfig,
 ): Promise<CreditPackCheckoutResult | null> {
   if (!existing) {
     return null;
   }
 
-  if (existing.provider !== FLITT_PAYMENT_PROVIDER) {
+  if (existing.provider !== CHECKOUTGATEWAY_PAYMENT_PROVIDER) {
     throwCheckoutInProgress(existing.id);
   }
 
@@ -345,24 +345,24 @@ async function reuseExistingCheckout(
     return toCheckoutResult(existing, existing.approvalUrl);
   }
 
-  if (!canResumeIncompleteFlittCheckout(existing)) {
+  if (!canResumeIncompleteCheckoutgatewayCheckout(existing)) {
     throwCheckoutInProgress(existing.id);
   }
 
-  return completeFlittCheckoutCreation(existing, options, config);
+  return completeCheckoutgatewayCheckoutCreation(existing, options, config);
 }
 
 function mapFxError(error: unknown): never {
-  if (error instanceof FlittCheckoutError) {
+  if (error instanceof CheckoutgatewayCheckoutError) {
     throw error;
   }
   if (error instanceof FxQuoteUnavailableError || error instanceof FxConversionError) {
-    throw new FlittCheckoutError(error.message, "configuration", {
+    throw new CheckoutgatewayCheckoutError(error.message, "configuration", {
       code: error.code,
       cause: error,
     });
   }
-  throw new FlittCheckoutError("USD/GEL FX quote is unavailable", "configuration", {
+  throw new CheckoutgatewayCheckoutError("USD/GEL FX quote is unavailable", "configuration", {
     code: "FX_QUOTE_UNAVAILABLE",
     cause: error,
   });
@@ -392,19 +392,19 @@ async function resolveUsdGelQuote(options: CheckoutDeps): Promise<FxQuote> {
   }
 }
 
-async function createFlittCreditPackCheckout(
+async function createCheckoutgatewayCreditPackCheckout(
   userId: string,
   input: CreateCreditPackCheckoutInput,
   options: CheckoutDeps & { locale?: string },
-  config: FlittCheckoutRuntimeConfig,
+  config: CheckoutgatewayCheckoutRuntimeConfig,
 ): Promise<CreditPackCheckoutResult> {
   const db = options.prismaClient ?? prisma;
   const pkg = resolvePackageOrThrow(input.packageId);
   const usdMajor = getCreditPackagePriceUsd(pkg.id);
 
   if (config.currency !== "GEL") {
-    throw new FlittCheckoutError("Flitt checkout currency must be GEL", "configuration", {
-      code: "FLITT_CURRENCY_UNSUPPORTED",
+    throw new CheckoutgatewayCheckoutError("Checkoutgateway checkout currency must be GEL", "configuration", {
+      code: "CHECKOUTGATEWAY_CURRENCY_UNSUPPORTED",
     });
   }
 
@@ -433,7 +433,7 @@ async function createFlittCreditPackCheckout(
       data: {
         id: purchaseId,
         userId,
-        provider: FLITT_PAYMENT_PROVIDER,
+        provider: CHECKOUTGATEWAY_PAYMENT_PROVIDER,
         packageId: pkg.id,
         priceAmount: new Prisma.Decimal(charge.gelMajor),
         currency: config.currency,
@@ -466,13 +466,13 @@ async function createFlittCreditPackCheckout(
     throw error;
   }
 
-  return completeFlittCheckoutCreation(purchase, options, config);
+  return completeCheckoutgatewayCheckoutCreation(purchase, options, config);
 }
 
-async function completeFlittCheckoutCreation(
+async function completeCheckoutgatewayCheckoutCreation(
   purchase: CreditPackPurchase,
   options: CheckoutDeps,
-  config: FlittCheckoutRuntimeConfig,
+  config: CheckoutgatewayCheckoutRuntimeConfig,
 ): Promise<CreditPackCheckoutResult> {
   const inFlight = CHECKOUT_RESUME_IN_FLIGHT.get(purchase.id);
   if (inFlight) {
@@ -487,14 +487,14 @@ async function completeFlittCheckoutCreation(
   });
   CHECKOUT_RESUME_IN_FLIGHT.set(purchase.id, run);
 
-  void submitFlittCheckout(purchase, options, config).then(resolveRun, rejectRun).finally(() => {
+  void submitCheckoutgatewayCheckout(purchase, options, config).then(resolveRun, rejectRun).finally(() => {
     CHECKOUT_RESUME_IN_FLIGHT.delete(purchase.id);
   });
 
   return run;
 }
 
-async function probeExistingFlittOrder(
+async function probeExistingCheckoutgatewayOrder(
   db: typeof prisma,
   purchase: CreditPackPurchase,
   provider: PaymentProvider,
@@ -513,20 +513,20 @@ async function probeExistingFlittOrder(
   }
 }
 
-async function submitFlittCheckout(
+async function submitCheckoutgatewayCheckout(
   purchase: CreditPackPurchase,
   options: CheckoutDeps,
-  config: FlittCheckoutRuntimeConfig,
+  config: CheckoutgatewayCheckoutRuntimeConfig,
 ): Promise<CreditPackCheckoutResult> {
   const db = options.prismaClient ?? prisma;
   const pkg = resolvePackageOrThrow(purchase.packageId);
   const description = buildCreditPackPurchaseDescription(pkg.name, pkg.credits);
-  const amountMinor = majorStringToFlittMinorUnits(purchase.priceAmount.toString());
+  const amountMinor = majorStringToCheckoutgatewayMinorUnits(purchase.priceAmount.toString());
   const provider =
-    options.createFlittProvider?.(config) ?? FlittPaymentProvider.fromConfig(config);
+    options.createCheckoutgatewayProvider?.(config) ?? CheckoutgatewayPaymentProvider.fromConfig(config);
 
   if (typeof provider.getPayment === "function") {
-    await probeExistingFlittOrder(db, purchase, provider);
+    await probeExistingCheckoutgatewayOrder(db, purchase, provider);
   }
 
   try {
@@ -557,10 +557,10 @@ async function submitFlittCheckout(
     return toCheckoutResult(updated, checkout.approvalUrl);
   } catch (error) {
     const failureCode =
-      error instanceof FlittCheckoutError ? error.code : "FLITT_CREATE_FAILED";
-    const failureMessage = toSafeFlittUserMessage(error);
+      error instanceof CheckoutgatewayCheckoutError ? error.code : "CHECKOUTGATEWAY_CREATE_FAILED";
+    const failureMessage = toSafeCheckoutgatewayUserMessage(error);
 
-    if (isDefinitiveFlittCreateError(error)) {
+    if (isDefinitiveCheckoutgatewayCreateError(error)) {
       await db.creditPackPurchase.update({
         where: { id: purchase.id },
         data: {
@@ -579,7 +579,7 @@ async function submitFlittCheckout(
       });
     }
 
-    mapFlittErrorToAppError(error);
+    mapCheckoutgatewayErrorToAppError(error);
   }
 }
 
@@ -592,8 +592,8 @@ export async function createCreditPackCheckout(
     throw new ServiceUnavailableError("Credit pack checkout is not available");
   }
 
-  const flittConfig = (options.resolveFlittConfig ?? (() => assertFlittCheckoutEnabled(options.env)))();
-  return createFlittCreditPackCheckout(userId, input, options, flittConfig);
+  const checkoutgatewayConfig = (options.resolveCheckoutgatewayConfig ?? (() => assertCheckoutgatewayCheckoutEnabled(options.env)))();
+  return createCheckoutgatewayCreditPackCheckout(userId, input, options, checkoutgatewayConfig);
 }
 
 export async function getCreditPackPurchaseForUser(
@@ -623,13 +623,13 @@ export async function getCreditPackPurchaseStatusOnly(
 }
 
 export {
-  handleTbcCallback,
-  reconcileTbcPurchase,
-  type TbcCallbackResult,
-} from "./tbc-payment-fulfillment.service.js";
+  handleLegacygatewayCallback,
+  reconcileLegacygatewayPurchase,
+  type LegacygatewayCallbackResult,
+} from "./legacygateway-payment-fulfillment.service.js";
 
 export {
-  handleFlittCallback,
-  reconcileFlittPurchase,
-  type FlittCallbackResult,
-} from "./flitt-payment-fulfillment.service.js";
+  handleCheckoutgatewayCallback,
+  reconcileCheckoutgatewayPurchase,
+  type CheckoutgatewayCallbackResult,
+} from "./checkoutgateway-payment-fulfillment.service.js";
