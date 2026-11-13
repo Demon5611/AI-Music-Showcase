@@ -23,7 +23,7 @@ import type {
  * Abstraction layer keeps API/worker/UI independent from a single vendor so we
  * can switch providers via MUSIC_PROVIDER without rewriting business logic.
  *
- * Voice transfer (Kits) was removed from the editor; Kits client remains for future integrations.
+ * Voice transfer (Voiceadapter) was removed from the editor; Voiceadapter client remains for future integrations.
  */
 export interface MusicProvider {
   readonly id: MusicProviderId;

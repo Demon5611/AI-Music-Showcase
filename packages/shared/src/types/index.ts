@@ -135,14 +135,14 @@ export interface GenerationJobPayload {
 }
 
 export type {
-  KitsInferenceJob,
-  KitsJobStatus,
-  KitsPaginationMeta,
-  KitsStemFileUrl,
-  KitsVocalSeparationJob,
-  KitsVoiceModel,
-  KitsVoiceModelsResponse,
-} from "./kits.js";
+  VoiceadapterInferenceJob,
+  VoiceadapterJobStatus,
+  VoiceadapterPaginationMeta,
+  VoiceadapterStemFileUrl,
+  VoiceadapterVocalSeparationJob,
+  VoiceadapterVoiceModel,
+  VoiceadapterVoiceModelsResponse,
+} from "./voiceadapter.js";
 
 export type {
   MusicGenerationPhaseHint,

@@ -142,8 +142,8 @@ const baseSchema = z.object({
   LEGACYENGINE_API_BASE_URL: optionalUrl,
   LEGACYENGINE_MUSIC_API_BASE_URL: optionalUrl,
   LEGACYENGINE_API_KEY: optionalString,
-  KITS_API_BASE_URL: optionalUrl,
-  KITS_API_KEY: optionalString,
+  VOICEADAPTER_API_BASE_URL: optionalUrl,
+  VOICEADAPTER_API_KEY: optionalString,
   /**
    * Legacy LEGACYGATEWAY callback/refund only. Does not enable new checkout.
    * Default off; never enable without full config.

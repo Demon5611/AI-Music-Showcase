@@ -49,7 +49,7 @@ assert.match(hook, /order_id/);
 assert.doesNotMatch(hook, /createCreditPackCheckout|grantCredits|signature/);
 assert.match(panel, /usePaymentReturnPurchase/);
 assert.match(panel, /parseApiError/);
-assert.doesNotMatch(panel, /Legacyengine|Checkoutgateway|LEGACYGATEWAY|Kits/);
+assert.doesNotMatch(panel, /Legacyengine|Checkoutgateway|LEGACYGATEWAY|Voiceadapter/);
 assert.doesNotMatch(panel, /searchParams\.get\("signature"\)|searchParams\.get\("amount"\)/);
 assert.match(billingClient, /getPurchase/);
 assert.match(billingClient, /\/api\/billing\/purchases\//);

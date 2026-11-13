@@ -130,8 +130,8 @@ const workerEnvSchema = z.object({
     .optional()
     .transform((value) => value !== "false"),
   LEGACYENGINE_CALLBACK_TOKEN_TTL_SEC: z.coerce.number().int().positive().default(86_400),
-  KITS_API_BASE_URL: optionalUrl,
-  KITS_API_KEY: optionalString,
+  VOICEADAPTER_API_BASE_URL: optionalUrl,
+  VOICEADAPTER_API_KEY: optionalString,
 });
 
 export type WorkerEnv = z.infer<typeof workerEnvSchema> & {
