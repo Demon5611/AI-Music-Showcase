@@ -52,11 +52,11 @@ assert.equal(
 {
   const next = appendPurchaseIdToReturnUrl(
     "https://web.example.com/pricing?signature=stolen&amount=900",
-    "purchase-flitt-ready",
+    "purchase-checkoutgateway-ready",
   );
   const url = new URL(next);
   assert.equal(url.origin + url.pathname, "https://web.example.com/pricing");
-  assert.equal(url.searchParams.get("purchaseId"), "purchase-flitt-ready");
+  assert.equal(url.searchParams.get("purchaseId"), "purchase-checkoutgateway-ready");
   assert.equal(url.searchParams.get("signature"), null);
   assert.equal(url.searchParams.get("amount"), null);
 }
@@ -69,8 +69,8 @@ assert.equal(isLegacyPricingReturnPath("/ru/pricing"), true);
 assert.equal(isLegacyPricingReturnPath("/ru/payment-return"), false);
 
 assert.equal(
-  buildPaymentReturnPagePath("ru", "purchase-flitt-ready"),
-  "/ru/payment-return?purchaseId=purchase-flitt-ready",
+  buildPaymentReturnPagePath("ru", "purchase-checkoutgateway-ready"),
+  "/ru/payment-return?purchaseId=purchase-checkoutgateway-ready",
 );
 
 assert.equal(resolvePaymentReturnUxState("credited"), "success");

@@ -8,8 +8,8 @@ import {
   type RefundRequest,
 } from "@ai-music/db";
 import {
-  FLITT_PAYMENT_PROVIDER,
-  TBC_PAYMENT_PROVIDER,
+  CHECKOUTGATEWAY_PAYMENT_PROVIDER,
+  LEGACYGATEWAY_PAYMENT_PROVIDER,
   evaluateCreditPackRefundApproval,
   type ApproveRefundRequestInput,
   type CreateRefundRequestInput,
@@ -36,8 +36,8 @@ import {
   roundMoney,
   type RefundableAmountResult,
 } from "./calculate-refundable-amount.js";
-import { enqueueTbcRefundJob } from "../queue/tbc-refund-queue.js";
-import { enqueueFlittRefundJob } from "../queue/flitt-refund-queue.js";
+import { enqueueLegacygatewayRefundJob } from "../queue/legacygateway-refund-queue.js";
+import { enqueueCheckoutgatewayRefundJob } from "../queue/checkoutgateway-refund-queue.js";
 
 export type RefundRequestView = {
   id: string;
@@ -63,8 +63,8 @@ export type RefundRequestView = {
 };
 
 export type EnqueueApprovedRefundDeps = {
-  enqueueFlitt?: typeof enqueueFlittRefundJob;
-  enqueueTbc?: typeof enqueueTbcRefundJob;
+  enqueueCheckoutgateway?: typeof enqueueCheckoutgatewayRefundJob;
+  enqueueLegacygateway?: typeof enqueueLegacygatewayRefundJob;
 };
 
 /**
@@ -90,12 +90,12 @@ function refundOutcome(status: string): RefundRequestView["outcome"] {
 
 export function resolveMonetaryRefundEnqueueTarget(
   storedProvider: string,
-): typeof FLITT_PAYMENT_PROVIDER | typeof TBC_PAYMENT_PROVIDER {
-  if (storedProvider === FLITT_PAYMENT_PROVIDER) {
-    return FLITT_PAYMENT_PROVIDER;
+): typeof CHECKOUTGATEWAY_PAYMENT_PROVIDER | typeof LEGACYGATEWAY_PAYMENT_PROVIDER {
+  if (storedProvider === CHECKOUTGATEWAY_PAYMENT_PROVIDER) {
+    return CHECKOUTGATEWAY_PAYMENT_PROVIDER;
   }
-  if (storedProvider === TBC_PAYMENT_PROVIDER) {
-    return TBC_PAYMENT_PROVIDER;
+  if (storedProvider === LEGACYGATEWAY_PAYMENT_PROVIDER) {
+    return LEGACYGATEWAY_PAYMENT_PROVIDER;
   }
   throw new BadRequestError(
     "Only prepaid pack purchases support monetary refunds",
@@ -447,8 +447,8 @@ export async function enqueueApprovedRefund(
   deps: EnqueueApprovedRefundDeps = {},
 ): Promise<RefundJobEnqueueOutcome> {
   const target = resolveMonetaryRefundEnqueueTarget(row.provider);
-  const enqueueFlitt = deps.enqueueFlitt ?? enqueueFlittRefundJob;
-  const enqueueTbc = deps.enqueueTbc ?? enqueueTbcRefundJob;
+  const enqueueCheckoutgateway = deps.enqueueCheckoutgateway ?? enqueueCheckoutgatewayRefundJob;
+  const enqueueLegacygateway = deps.enqueueLegacygateway ?? enqueueLegacygatewayRefundJob;
   const jobId = refundJobIdForProvider(target, row.id);
 
   logSecurityEvent("refund_enqueue_attempt", {
@@ -459,9 +459,9 @@ export async function enqueueApprovedRefund(
 
   try {
     const outcome =
-      target === FLITT_PAYMENT_PROVIDER
-        ? await enqueueFlitt({ refundRequestId: row.id })
-        : await enqueueTbc({ refundRequestId: row.id });
+      target === CHECKOUTGATEWAY_PAYMENT_PROVIDER
+        ? await enqueueCheckoutgateway({ refundRequestId: row.id })
+        : await enqueueLegacygateway({ refundRequestId: row.id });
 
     logSecurityEvent("refund_enqueue_success", {
       refundRequestId: row.id,

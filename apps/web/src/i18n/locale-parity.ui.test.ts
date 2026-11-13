@@ -69,12 +69,12 @@ assert.match(pricingKa.gelPaymentNote, /საქართველოს ერ
 const termsKa = JSON.stringify((legalKa as { terms: unknown }).terms);
 const privacyKa = JSON.stringify((legalKa as { privacy: unknown }).privacy);
 const refundKa = JSON.stringify((legalKa as { refund: unknown }).refund);
-assert.match(termsKa, /Flitt/);
-assert.doesNotMatch(termsKa, /TBC Bank/);
-assert.match(privacyKa, /Flitt/);
-assert.doesNotMatch(privacyKa, /TBC Bank/);
-assert.match(refundKa, /Flitt/);
-assert.doesNotMatch(refundKa, /TBC Bank/);
+assert.match(termsKa, /Checkoutgateway/);
+assert.doesNotMatch(termsKa, /LEGACYGATEWAY Bank/);
+assert.match(privacyKa, /Checkoutgateway/);
+assert.doesNotMatch(privacyKa, /LEGACYGATEWAY Bank/);
+assert.match(refundKa, /Checkoutgateway/);
+assert.doesNotMatch(refundKa, /LEGACYGATEWAY Bank/);
 assert.doesNotMatch(refundKa, /remain reserved|დარჩება დაჯავშნ/i);
 assert.match(refundKa, /ორიგინალ/);
 assert.match(refundKa, /გამოუყენებელ ფასიან კრედიტ|ნაწილობრივ გამოყენებული/);

@@ -1,5 +1,5 @@
 /**
- * USD→GEL conversion for Flitt checkout.
+ * USD→GEL conversion for Checkoutgateway checkout.
  * Integer/bigint arithmetic only — no IEEE-754 money math.
  */
 

@@ -1,5 +1,5 @@
 import type {
-  CreateMurekaVoiceProfileBody,
+  CreateAudioengineVoiceProfileBody,
   VoiceProfileDto,
 } from "@ai-music/shared";
 import type { ApiClient } from "./client.js";
@@ -8,8 +8,8 @@ export function createVoiceProfilesApi(client: ApiClient) {
   return {
     getMine: () =>
       client.get<VoiceProfileDto | null>("/api/voice-profiles/me"),
-    createMureka: (body: CreateMurekaVoiceProfileBody) =>
-      client.post<VoiceProfileDto>("/api/voice-profiles/mureka", body),
+    createAudioengine: (body: CreateAudioengineVoiceProfileBody) =>
+      client.post<VoiceProfileDto>("/api/voice-profiles/audioengine", body),
     requestDeletion: (id: string) =>
       client.post<{
         profile: VoiceProfileDto;

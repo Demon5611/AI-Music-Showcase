@@ -1,39 +1,26 @@
-# Security design
+# Security design and implementation status
 
 ## Trust boundaries
 
-- Browser talks only to the application API (and signed media URLs).
-- API owns authentication, authorization, billing commits, and enqueue.
-- Worker owns irreversible provider side effects after durable commit.
-- Secrets stay in server environment variables — never in the web bundle.
+The browser is untrusted. API identity and ownership checks authorize resources; frontend plan gates only explain availability. Worker side effects need durable identity and recovery. Secrets must never enter a client bundle or public fixture.
 
-## Authorization
+## Present in this showcase
 
-- User identity is resolved server-side (Clerk session / JWT).
-- Ownership checks gate read/write/delete for generations, tracks, voice profiles, and media.
-- Raw storage keys and foreign provider IDs must not bypass ownership.
+- Local/demo environment defaults and reduced integration boundaries.
+- Domain authorization and payment/ledger examples retained for review.
+- ESLint package import restrictions for web, node services and shared packages.
+- `pnpm public:check`: tracked-text checks for disallowed commercial identifiers, known private host patterns and common credential formats. Whole files are not exempted.
 
-## Payments and credits
+The public-content check is a focused publication guard, not a complete secret scanner. It does not certify Git history or detect every credential type.
 
-- Checkout creation and callback verification are server-only.
-- Credit grants happen only after verified payment state.
-- Refunds are state-machine driven and idempotent.
-- UI plan gates are UX only; paid routes re-check entitlements and credits on the API.
+## Production lessons, not claims of completed demo coverage
 
-## Media privacy
+The separately maintained product uses additional controls around external downloads and authenticated media. The relevant principles are DNS-to-connection pinning, public-address validation, a total operation deadline, redirect revalidation, response disposal and same-origin credential policy. This refresh does not claim to transplant or independently validate every production control in this snapshot.
 
-- Voice samples, stems, and renders are private by default.
-- Playback uses short-lived signed URLs.
-- Storage key builders are centralized to avoid ad-hoc path construction.
+Security tooling should combine secret scanning, dependency advisories, architecture rules and behavioral tests. Passing static checks is not proof against SSRF, unsafe media arguments or incorrect financial transitions.
 
-## Showcase repository policy
+## Publication rules
 
-This public repository intentionally removes:
+Do not add production keys, service hosts, merchant identifiers, customer records, vendor correspondence, routing policy, model settings, prompts or negotiated economics. All example integration endpoints use reserved domains. Keep real credentials out of this repository even for local testing.
 
-- real credentials and webhook secrets
-- production infrastructure identifiers
-- merchant-specific production configuration
-- confidential provider unit economics
-- real user / transaction identifiers
-
-Use `SHOWCASE_MODE=true` for local exploration without commercial APIs.
+Old commits may contain identifiers that a current-tree sanitization removes. This change does not rewrite published history. Removing a tracked value does not revoke a credential; any independently confirmed exposed credential requires rotation.

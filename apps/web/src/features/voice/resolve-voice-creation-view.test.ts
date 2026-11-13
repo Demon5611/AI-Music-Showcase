@@ -37,14 +37,14 @@ const eligibleSample: VoiceCreationSampleState = {
   readyForGeneration: false,
 };
 
-assert.equal(resolveVoiceCreationMode(true, firstLoad), "mureka");
-assert.equal(resolveVoiceCreationMode(true, loaded), "mureka");
-assert.equal(resolveVoiceCreationMode(true, failedRefetch), "mureka");
+assert.equal(resolveVoiceCreationMode(true, firstLoad), "audioengine");
+assert.equal(resolveVoiceCreationMode(true, loaded), "audioengine");
+assert.equal(resolveVoiceCreationMode(true, failedRefetch), "audioengine");
 assert.equal(resolveVoiceCreationMode(true, failedFirstLoad), "unavailable");
-assert.equal(resolveVoiceCreationMode(false, firstLoad), "suno");
-assert.equal(resolveVoiceCreationMode(false, failedFirstLoad), "suno");
+assert.equal(resolveVoiceCreationMode(false, firstLoad), "legacyengine");
+assert.equal(resolveVoiceCreationMode(false, failedFirstLoad), "legacyengine");
 
-// Mureka path: the legacy Suno verification block stays hidden in every sample state.
+// Audioengine path: the legacy Legacyengine verification block stays hidden in every sample state.
 for (const sample of [
   eligibleSample,
   { ...eligibleSample, status: "pending" as const },
@@ -60,8 +60,8 @@ for (const sample of [
     durationBounds,
   });
 
-  assert.equal(view.mode, "mureka");
-  assert.equal(view.showSunoVerification, false);
+  assert.equal(view.mode, "audioengine");
+  assert.equal(view.showLegacyengineVerification, false);
   assert.equal(view.showPersonalVoicePanel, true);
   assert.equal(view.showPersonalVoiceUnavailable, false);
 }
@@ -75,8 +75,8 @@ assert.deepEqual(
     durationBounds,
   }),
   {
-    mode: "mureka",
-    showSunoVerification: false,
+    mode: "audioengine",
+    showLegacyengineVerification: false,
     showPersonalVoicePanel: true,
     personalVoiceBlockedReason: null,
     showPersonalVoiceStaleWarning: false,
@@ -85,7 +85,7 @@ assert.deepEqual(
   },
 );
 
-// First load failed: no Suno fallback, no paid CTA, no profile polling surface.
+// First load failed: no Legacyengine fallback, no paid CTA, no profile polling surface.
 assert.deepEqual(
   resolveVoiceCreationView({
     personalVoiceEnabled: true,
@@ -96,7 +96,7 @@ assert.deepEqual(
   }),
   {
     mode: "unavailable",
-    showSunoVerification: false,
+    showLegacyengineVerification: false,
     showPersonalVoicePanel: false,
     personalVoiceBlockedReason: null,
     showPersonalVoiceStaleWarning: false,
@@ -105,7 +105,7 @@ assert.deepEqual(
   },
 );
 
-// A Suno-verified sample must not resurrect the verification flow on an error either.
+// A Legacyengine-verified sample must not resurrect the verification flow on an error either.
 assert.deepEqual(
   resolveVoiceCreationView({
     personalVoiceEnabled: true,
@@ -116,7 +116,7 @@ assert.deepEqual(
   }),
   {
     mode: "unavailable",
-    showSunoVerification: false,
+    showLegacyengineVerification: false,
     showPersonalVoicePanel: false,
     personalVoiceBlockedReason: null,
     showPersonalVoiceStaleWarning: false,
@@ -135,8 +135,8 @@ assert.deepEqual(
     durationBounds,
   }),
   {
-    mode: "mureka",
-    showSunoVerification: false,
+    mode: "audioengine",
+    showLegacyengineVerification: false,
     showPersonalVoicePanel: true,
     personalVoiceBlockedReason: null,
     showPersonalVoiceStaleWarning: true,
@@ -202,7 +202,7 @@ assert.equal(
   "duration",
 );
 
-// Ready CTA on the Mureka path depends on VoiceProfile, not on the Suno persona.
+// Ready CTA on the Audioengine path depends on VoiceProfile, not on the Legacyengine persona.
 assert.equal(
   resolveVoiceCreationView({
     personalVoiceEnabled: true,
@@ -214,7 +214,7 @@ assert.equal(
   false,
 );
 
-// Legacy Suno path keeps the verification flow.
+// Legacy Legacyengine path keeps the verification flow.
 assert.deepEqual(
   resolveVoiceCreationView({
     personalVoiceEnabled: false,
@@ -224,8 +224,8 @@ assert.deepEqual(
     durationBounds,
   }),
   {
-    mode: "suno",
-    showSunoVerification: true,
+    mode: "legacyengine",
+    showLegacyengineVerification: true,
     showPersonalVoicePanel: false,
     personalVoiceBlockedReason: null,
     showPersonalVoiceStaleWarning: false,
@@ -243,8 +243,8 @@ assert.deepEqual(
     durationBounds,
   }),
   {
-    mode: "suno",
-    showSunoVerification: false,
+    mode: "legacyengine",
+    showLegacyengineVerification: false,
     showPersonalVoicePanel: false,
     personalVoiceBlockedReason: null,
     showPersonalVoiceStaleWarning: false,
@@ -263,7 +263,7 @@ for (const personalVoiceEnabled of [true, false]) {
     durationBounds,
   });
 
-  assert.equal(view.showSunoVerification, false);
+  assert.equal(view.showLegacyengineVerification, false);
   assert.equal(view.showPersonalVoicePanel, false);
   assert.equal(view.personalVoiceBlockedReason, null);
   assert.equal(view.showReadyCta, false);

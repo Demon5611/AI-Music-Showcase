@@ -1,10 +1,10 @@
--- Additive: one-time prepaid credit pack purchases (TBC Checkout Stage 1).
+-- Additive: one-time prepaid credit pack purchases (LEGACYGATEWAY Checkout Stage 1).
 -- Does not alter Stripe Subscription / CreditTransaction columns.
 
 CREATE TABLE "credit_pack_purchases" (
     "id" TEXT NOT NULL,
     "user_id" TEXT NOT NULL,
-    "provider" TEXT NOT NULL DEFAULT 'tbc',
+    "provider" TEXT NOT NULL DEFAULT 'legacygateway',
     "package_id" TEXT NOT NULL,
     "price_amount" DECIMAL(12,2) NOT NULL,
     "currency" TEXT NOT NULL,

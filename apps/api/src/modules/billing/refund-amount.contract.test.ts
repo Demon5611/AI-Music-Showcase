@@ -1,5 +1,5 @@
 /**
- * Refund amount + admin read-snapshot contracts (unit, no live TBC/HTTP).
+ * Refund amount + admin read-snapshot contracts (unit, no live LEGACYGATEWAY/HTTP).
  * Run: pnpm --filter @ai-music/api exec tsx src/modules/billing/refund-amount.contract.test.ts
  *
  * Invariants:
@@ -44,7 +44,7 @@ const repoRoot = join(here, "../../../../..");
 // Processor: no blind cancel retry after ambiguity
 {
   const processor = readFileSync(
-    join(repoRoot, "packages/tbc-checkout/src/process-tbc-refund.ts"),
+    join(repoRoot, "packages/legacygateway-checkout/src/process-legacygateway-refund.ts"),
     "utf8",
   );
   assert.match(processor, /getPaymentDetails/);
@@ -53,10 +53,10 @@ const repoRoot = join(here, "../../../../..");
   assert.match(processor, /ambiguous/);
 }
 
-// TBC cancel path builder
+// LEGACYGATEWAY cancel path builder
 {
   const paths = readFileSync(
-    join(repoRoot, "packages/tbc-checkout/src/tbc-paths.ts"),
+    join(repoRoot, "packages/legacygateway-checkout/src/legacygateway-paths.ts"),
     "utf8",
   );
   assert.match(paths, /cancel/);
@@ -101,8 +101,8 @@ function createRefundAmountDb(options: {
       currency: "GEL",
       priceAmount: 29,
       status: "credited",
-      provider: "tbc",
-      providerPaymentId: "tbc-pay-1",
+      provider: "legacygateway",
+      providerPaymentId: "legacygateway-pay-1",
     },
     alreadyRefundedAmount: 0,
   });
@@ -125,8 +125,8 @@ function createRefundAmountDb(options: {
       currency: "GEL",
       priceAmount: 29,
       status: "partial_refunded",
-      provider: "tbc",
-      providerPaymentId: "tbc-pay-2",
+      provider: "legacygateway",
+      providerPaymentId: "legacygateway-pay-2",
     },
     alreadyRefundedAmount: 10,
   });
@@ -153,8 +153,8 @@ function createRefundAmountDb(options: {
       currency: "GEL",
       priceAmount: 29,
       status: "refunded",
-      provider: "tbc",
-      providerPaymentId: "tbc-pay-3",
+      provider: "legacygateway",
+      providerPaymentId: "legacygateway-pay-3",
     },
     alreadyRefundedAmount: 29,
   });
@@ -177,8 +177,8 @@ function createRefundAmountDb(options: {
       currency: "GEL",
       priceAmount: 29,
       status: "refunded",
-      provider: "tbc",
-      providerPaymentId: "tbc-pay-4",
+      provider: "legacygateway",
+      providerPaymentId: "legacygateway-pay-4",
     },
     alreadyRefundedAmount: 29,
   });
@@ -202,8 +202,8 @@ function createRefundAmountDb(options: {
       currency: "GEL",
       priceAmount: 29,
       status: "partial_refunded",
-      provider: "tbc",
-      providerPaymentId: "tbc-pay-5",
+      provider: "legacygateway",
+      providerPaymentId: "legacygateway-pay-5",
     },
     alreadyRefundedAmount: 29,
   });

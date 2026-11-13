@@ -3,7 +3,7 @@ import type { ResolvedLyricsLanguageCode } from "./lyrics-language.js";
 
 /**
  * Compact first-person grammar samples for lyrics gender hints.
- * Kept short for Suno `/lyrics` 200-char budget.
+ * Kept short for Legacyengine `/lyrics` 200-char budget.
  */
 const GENDER_GRAMMAR_EXAMPLES: Record<
   Exclude<ResolvedLyricsLanguageCode, "multi">,

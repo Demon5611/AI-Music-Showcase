@@ -11,7 +11,7 @@ export interface MusicGenerateJobPayload {
   recordId: string;
   songInputJson: string;
   spendReason: string;
-  /** Task id accepted by Suno but not yet persisted to DB — persist-only on retry. */
+  /** Task id accepted by Legacyengine but not yet persisted to DB — persist-only on retry. */
   recoveredProviderTaskId?: string;
   /** HTTP x-request-id when enqueued from API. */
   requestId?: string;

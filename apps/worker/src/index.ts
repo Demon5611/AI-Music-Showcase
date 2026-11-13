@@ -6,13 +6,13 @@ import {
   startMetricsHttpServer,
 } from "@ai-music/observability";
 import {
-  canListenMurekaProviderJobs,
+  canListenAudioengineProviderJobs,
 } from "@ai-music/ai-providers";
 import {
   logLoadControl,
-  MUREKA_PROVIDER_JOB_QUEUE_NAME,
-  resolveMurekaFeatureFlags,
-  type MurekaProviderJobPayload,
+  AUDIOENGINE_PROVIDER_JOB_QUEUE_NAME,
+  resolveAudioengineFeatureFlags,
+  type AudioengineProviderJobPayload,
 } from "@ai-music/shared";
 import type { Worker } from "bullmq";
 import { closeGenerationWorker, createGenerationWorker } from "./generation.worker.js";
@@ -39,66 +39,66 @@ import {
 } from "./provider-data-deletion.worker.js";
 import { closeProviderDataDeletionQueue } from "./provider-data-deletion-queue.js";
 import {
-  closeTbcRefundWorker,
-  createTbcRefundWorker,
-} from "./tbc-refund.worker.js";
-import { closeTbcRefundQueue } from "./tbc-refund-queue.js";
+  closeLegacygatewayRefundWorker,
+  createLegacygatewayRefundWorker,
+} from "./legacygateway-refund.worker.js";
+import { closeLegacygatewayRefundQueue } from "./legacygateway-refund-queue.js";
 import {
-  closeFlittRefundWorker,
-  createFlittRefundWorker,
-} from "./flitt-refund.worker.js";
-import { closeFlittRefundQueue } from "./flitt-refund-queue.js";
+  closeCheckoutgatewayRefundWorker,
+  createCheckoutgatewayRefundWorker,
+} from "./checkoutgateway-refund.worker.js";
+import { closeCheckoutgatewayRefundQueue } from "./checkoutgateway-refund-queue.js";
 import { getWorkerEnv } from "./config/env.js";
 import {
-  closeMurekaProviderJobWorker,
-  createMurekaProviderJobWorker,
-} from "./mureka-provider-job.worker.js";
-import { startMurekaWorkerListenHeartbeat } from "./mureka-worker-listen-heartbeat.js";
+  closeAudioengineProviderJobWorker,
+  createAudioengineProviderJobWorker,
+} from "./audioengine-provider-job.worker.js";
+import { startAudioengineWorkerListenHeartbeat } from "./audioengine-worker-listen-heartbeat.js";
 import {
-  closeMurekaProviderJobQueue,
-  getMurekaProviderJobQueue,
-} from "./mureka-provider-job-queue.js";
-import { startMurekaProviderJobReconciler } from "./mureka-provider-job-reconciler.js";
+  closeAudioengineProviderJobQueue,
+  getAudioengineProviderJobQueue,
+} from "./audioengine-provider-job-queue.js";
+import { startAudioengineProviderJobReconciler } from "./audioengine-provider-job-reconciler.js";
 
 const QUEUE_METRICS_INTERVAL_MS = 60_000;
 
 async function refreshWorkerQueueDepthGauges(): Promise<void> {
-  const [providerCounts, murekaCounts, persistCounts] = await Promise.all([
+  const [providerCounts, audioengineCounts, persistCounts] = await Promise.all([
     getProviderJobQueue().getJobCounts("waiting", "delayed"),
-    getMurekaProviderJobQueue().getJobCounts("waiting", "delayed"),
+    getAudioengineProviderJobQueue().getJobCounts("waiting", "delayed"),
     getMusicTrackPersistenceQueue().getJobCounts("waiting", "delayed"),
   ]);
   musicGenerationQueueDepth.set(
     (providerCounts.waiting ?? 0) +
       (providerCounts.delayed ?? 0) +
-      (murekaCounts.waiting ?? 0) +
-      (murekaCounts.delayed ?? 0),
+      (audioengineCounts.waiting ?? 0) +
+      (audioengineCounts.delayed ?? 0),
   );
   musicPersistenceQueueDepth.set((persistCounts.waiting ?? 0) + (persistCounts.delayed ?? 0));
 }
 
-/** Startup snapshot of the Mureka wiring — presence only, never secret values. */
-function logMurekaWorkerConfig(
+/** Startup snapshot of the Audioengine wiring — presence only, never secret values. */
+function logAudioengineWorkerConfig(
   env: ReturnType<typeof getWorkerEnv>,
   listenEnabled: boolean,
 ): void {
-  const flags = resolveMurekaFeatureFlags(process.env);
-  logLoadControl("mureka_worker_config", {
-    provider: "mureka",
-    queue: MUREKA_PROVIDER_JOB_QUEUE_NAME,
-    enabled: env.MUREKA_ENABLED,
-    personalVoiceEnabled: env.MUREKA_PERSONAL_VOICE_ENABLED,
+  const flags = resolveAudioengineFeatureFlags(process.env);
+  logLoadControl("audioengine_worker_config", {
+    provider: "audioengine",
+    queue: AUDIOENGINE_PROVIDER_JOB_QUEUE_NAME,
+    enabled: env.AUDIOENGINE_ENABLED,
+    personalVoiceEnabled: env.AUDIOENGINE_PERSONAL_VOICE_ENABLED,
     productionRolloutEnabled: flags.productionRolloutEnabled,
-    hasApiKey: Boolean(env.MUREKA_API_KEY),
+    hasApiKey: Boolean(env.AUDIOENGINE_API_KEY),
     baseUrlConfigured: flags.baseUrlConfigured,
     baseUrlValid: flags.baseUrlValid,
     protocol: flags.baseUrlProtocol,
     hostname: flags.baseUrlHostname,
-    model: env.MUREKA_MODEL,
-    concurrency: env.MUREKA_WORKER_CONCURRENCY,
+    model: env.AUDIOENGINE_MODEL,
+    concurrency: env.AUDIOENGINE_WORKER_CONCURRENCY,
     defaultMusicProvider: env.MUSIC_DEFAULT_PROVIDER ?? env.MUSIC_PROVIDER,
     reconcilerEnabled: env.WORKER_PROVIDER_RECONCILER_ENABLED,
-    murekaQueueListenEnabled: listenEnabled,
+    audioengineQueueListenEnabled: listenEnabled,
   });
 }
 
@@ -122,19 +122,19 @@ async function main() {
 
   logStorageConfig();
 
-  const murekaListenEnabled = canListenMurekaProviderJobs(process.env);
-  logMurekaWorkerConfig(env, murekaListenEnabled);
+  const audioengineListenEnabled = canListenAudioengineProviderJobs(process.env);
+  logAudioengineWorkerConfig(env, audioengineListenEnabled);
 
-  if (env.MUREKA_ENABLED && !murekaListenEnabled) {
+  if (env.AUDIOENGINE_ENABLED && !audioengineListenEnabled) {
     logLoadControl(
-      "mureka_worker_config",
+      "audioengine_worker_config",
       {
-        provider: "mureka",
-        queue: MUREKA_PROVIDER_JOB_QUEUE_NAME,
-        murekaQueueListenEnabled: false,
+        provider: "audioengine",
+        queue: AUDIOENGINE_PROVIDER_JOB_QUEUE_NAME,
+        audioengineQueueListenEnabled: false,
         reason: "invalid_base_url_or_missing_api_key",
-        baseUrlValid: resolveMurekaFeatureFlags(process.env).baseUrlValid,
-        hasApiKey: Boolean(env.MUREKA_API_KEY),
+        baseUrlValid: resolveAudioengineFeatureFlags(process.env).baseUrlValid,
+        hasApiKey: Boolean(env.AUDIOENGINE_API_KEY),
       },
       "error",
     );
@@ -142,16 +142,16 @@ async function main() {
 
   const generationWorker = createGenerationWorker();
   const providerJobWorker = createProviderJobWorker();
-  const murekaProviderJobWorker: Worker<MurekaProviderJobPayload> | null =
-    murekaListenEnabled ? createMurekaProviderJobWorker() : null;
-  const murekaHeartbeat = murekaListenEnabled
-    ? await startMurekaWorkerListenHeartbeat()
+  const audioengineProviderJobWorker: Worker<AudioengineProviderJobPayload> | null =
+    audioengineListenEnabled ? createAudioengineProviderJobWorker() : null;
+  const audioengineHeartbeat = audioengineListenEnabled
+    ? await startAudioengineWorkerListenHeartbeat()
     : null;
   const trackPersistWorker = createMusicTrackPersistenceWorker();
   const providerDataDeletionWorker = createProviderDataDeletionWorker();
-  // Legacy TBC refund handler — historical CreditPackPurchase.provider=tbc only.
-  const tbcRefundWorker = createTbcRefundWorker();
-  const flittRefundWorker = createFlittRefundWorker();
+  // Legacy LEGACYGATEWAY refund handler — historical CreditPackPurchase.provider=legacygateway only.
+  const legacygatewayRefundWorker = createLegacygatewayRefundWorker();
+  const checkoutgatewayRefundWorker = createCheckoutgatewayRefundWorker();
 
   generationWorker.on("completed", (job) => {
     console.log(`Generation job completed: ${job.id}`);
@@ -169,20 +169,20 @@ async function main() {
     console.error(`Provider job failed: ${job?.id ?? "unknown"}`, error);
   });
 
-  if (murekaProviderJobWorker) {
-    murekaProviderJobWorker.on("completed", (job, result) => {
+  if (audioengineProviderJobWorker) {
+    audioengineProviderJobWorker.on("completed", (job, result) => {
       const outcome =
         result && typeof result === "object" && "outcome" in result
           ? String((result as { outcome: string }).outcome)
           : "unknown";
       console.log(
-        `Mureka provider job finished: ${job.id} outcome=${outcome}`,
+        `Audioengine provider job finished: ${job.id} outcome=${outcome}`,
       );
     });
 
-    murekaProviderJobWorker.on("failed", (job, error) => {
+    audioengineProviderJobWorker.on("failed", (job, error) => {
       console.error(
-        `Mureka provider job retry/failed: ${job?.id ?? "unknown"}`,
+        `Audioengine provider job retry/failed: ${job?.id ?? "unknown"}`,
         error,
       );
     });
@@ -207,26 +207,26 @@ async function main() {
     );
   });
 
-  tbcRefundWorker.on("completed", (job) => {
-    console.log(`TBC refund job completed: ${job.id}`);
+  legacygatewayRefundWorker.on("completed", (job) => {
+    console.log(`LEGACYGATEWAY refund job completed: ${job.id}`);
   });
 
-  tbcRefundWorker.on("failed", (job, error) => {
-    console.error(`TBC refund job failed: ${job?.id ?? "unknown"}`, error);
+  legacygatewayRefundWorker.on("failed", (job, error) => {
+    console.error(`LEGACYGATEWAY refund job failed: ${job?.id ?? "unknown"}`, error);
   });
 
-  flittRefundWorker.on("completed", (job) => {
-    console.log(`Flitt refund job completed: ${job.id}`);
+  checkoutgatewayRefundWorker.on("completed", (job) => {
+    console.log(`Checkoutgateway refund job completed: ${job.id}`);
   });
 
-  flittRefundWorker.on("failed", (job, error) => {
-    console.error(`Flitt refund job failed: ${job?.id ?? "unknown"}`, error);
+  checkoutgatewayRefundWorker.on("failed", (job, error) => {
+    console.error(`Checkoutgateway refund job failed: ${job?.id ?? "unknown"}`, error);
   });
 
   console.log(
-    murekaListenEnabled
-      ? "Worker started (generation + provider-jobs + mureka-provider-jobs + music-track-persistence + provider-data-deletion + tbc-refund + flitt-refund)"
-      : "Worker started (generation + provider-jobs + music-track-persistence + provider-data-deletion + tbc-refund + flitt-refund; mureka queue disabled)",
+    audioengineListenEnabled
+      ? "Worker started (generation + provider-jobs + audioengine-provider-jobs + music-track-persistence + provider-data-deletion + legacygateway-refund + checkoutgateway-refund)"
+      : "Worker started (generation + provider-jobs + music-track-persistence + provider-data-deletion + legacygateway-refund + checkoutgateway-refund; audioengine queue disabled)",
   );
 
   const tickMetrics = () => {
@@ -237,8 +237,8 @@ async function main() {
   tickMetrics();
   const metricsTimer = setInterval(tickMetrics, QUEUE_METRICS_INTERVAL_MS);
   const reconcilerTimer = startProviderJobReconciler();
-  const murekaReconcilerTimer = murekaListenEnabled
-    ? startMurekaProviderJobReconciler()
+  const audioengineReconcilerTimer = audioengineListenEnabled
+    ? startAudioengineProviderJobReconciler()
     : null;
   const trackPersistReconcilerTimer = startMusicTrackPersistenceReconciler();
 
@@ -247,8 +247,8 @@ async function main() {
     if (reconcilerTimer) {
       clearInterval(reconcilerTimer);
     }
-    if (murekaReconcilerTimer) {
-      clearInterval(murekaReconcilerTimer);
+    if (audioengineReconcilerTimer) {
+      clearInterval(audioengineReconcilerTimer);
     }
     if (trackPersistReconcilerTimer) {
       clearInterval(trackPersistReconcilerTimer);
@@ -257,22 +257,22 @@ async function main() {
     // Stop workers/queues before metrics HTTP so scrapes don't hit a half-dead process.
     await closeGenerationWorker(generationWorker);
     await closeProviderJobWorker(providerJobWorker);
-    if (murekaProviderJobWorker) {
-      await closeMurekaProviderJobWorker(murekaProviderJobWorker);
+    if (audioengineProviderJobWorker) {
+      await closeAudioengineProviderJobWorker(audioengineProviderJobWorker);
     }
-    if (murekaHeartbeat) {
-      await murekaHeartbeat.stop();
+    if (audioengineHeartbeat) {
+      await audioengineHeartbeat.stop();
     }
     await closeMusicTrackPersistenceWorker(trackPersistWorker);
     await closeProviderDataDeletionWorker(providerDataDeletionWorker);
-    await closeTbcRefundWorker(tbcRefundWorker);
-    await closeFlittRefundWorker(flittRefundWorker);
+    await closeLegacygatewayRefundWorker(legacygatewayRefundWorker);
+    await closeCheckoutgatewayRefundWorker(checkoutgatewayRefundWorker);
     await closeProviderJobQueue();
-    await closeMurekaProviderJobQueue();
+    await closeAudioengineProviderJobQueue();
     await closeMusicTrackPersistenceQueue();
     await closeProviderDataDeletionQueue();
-    await closeTbcRefundQueue();
-    await closeFlittRefundQueue();
+    await closeLegacygatewayRefundQueue();
+    await closeCheckoutgatewayRefundQueue();
     await closeProviderQueueMetrics();
 
     if (metricsServer) {

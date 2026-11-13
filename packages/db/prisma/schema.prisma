@@ -50,15 +50,15 @@ model VoiceSample {
   durationSec            Int       @map("duration_sec")
   status                 String    @default("pending")
   consentConfirmed       Boolean   @default(false) @map("consent_confirmed")
-  /** Suno /voice/validate language (en, ru, zh, es, fr, pt, de, ja, ko, hi). */
+  /** Legacyengine /voice/validate language (en, ru, zh, es, fr, pt, de, ja, ko, hi). */
   voiceLanguage          String    @default("ru") @map("voice_language")
-  sunoVoiceId            String?   @map("suno_voice_id")
-  sunoVoiceTaskId        String?   @map("suno_voice_task_id")
-  sunoValidatePhrase     String?   @map("suno_validate_phrase")
+  legacyengineVoiceId            String?   @map("legacyengine_voice_id")
+  legacyengineVoiceTaskId        String?   @map("legacyengine_voice_task_id")
+  legacyengineValidatePhrase     String?   @map("legacyengine_validate_phrase")
   voiceCloneStatus       String    @default("pending") @map("voice_clone_status")
   voiceCloneError        String?   @map("voice_clone_error")
   voiceCloneStartedAt    DateTime? @map("voice_clone_started_at")
-  sunoValidateRegenCount Int       @default(0) @map("suno_validate_regen_count")
+  legacyengineValidateRegenCount Int       @default(0) @map("legacyengine_validate_regen_count")
   createdAt              DateTime  @default(now()) @map("created_at")
 
   user           User            @relation(fields: [userId], references: [id], onDelete: Cascade)
@@ -69,8 +69,8 @@ model VoiceSample {
 }
 
 /**
- * Provider-neutral personal voice profile (e.g. Mureka vocal_id).
- * Suno persona IDs remain on VoiceSample — do not reuse those fields for Mureka.
+ * Provider-neutral personal voice profile (e.g. Audioengine vocal_id).
+ * Legacyengine persona IDs remain on VoiceSample — do not reuse those fields for Audioengine.
  */
 model VoiceProfile {
   id                  String    @id @default(cuid())
@@ -94,7 +94,7 @@ model VoiceProfile {
 }
 
 /**
- * Provider-side data deletion ledger (no public Mureka delete API).
+ * Provider-side data deletion ledger (no public Audioengine delete API).
  * Email submit is automated via BullMQ; physical deletion confirmed by ops later.
  * Status machine: pending → submitting → submitted_to_provider → confirmed
  *   | submit_failed (email exhausted) | failed | cancelled
@@ -204,7 +204,7 @@ model MusicGeneration {
   userId                String                @map("user_id")
   type                  String
   /** Persisted provider id — worker/status must use this, not current env. */
-  provider              String                @default("sunoapi")
+  provider              String                @default("legacyengineapi")
   providerTaskId        String                @unique @map("provider_task_id")
   clientRequestId       String?               @map("client_request_id")
   clientRequestHash     String?               @map("client_request_hash")
@@ -214,7 +214,7 @@ model MusicGeneration {
   title                 String?
   customMode            Boolean               @default(false) @map("custom_mode")
   instrumental          Boolean               @default(false)
-  /** Optional Mureka (or other) voice profile used for this generation. */
+  /** Optional Audioengine (or other) voice profile used for this generation. */
   voiceProfileId        String?               @map("voice_profile_id")
   status                String                @default("pending")
   submissionState       MusicSubmissionState  @default(queued) @map("submission_state")
@@ -284,7 +284,7 @@ model Song {
   id                   String   @id @default(cuid())
   userId               String   @map("user_id")
   sourceTrackId        String   @unique @map("source_track_id")
-  provider             String   @default("sunoapi")
+  provider             String   @default("legacyengineapi")
   providerTaskId       String   @map("provider_task_id")
   providerTrackId      String   @map("provider_track_id")
   prompt               String
@@ -508,22 +508,22 @@ model Subscription {
 }
 
 /**
- * One-time prepaid credit pack purchase (TBC Checkout Stage 1).
+ * One-time prepaid credit pack purchase (LEGACYGATEWAY Checkout Stage 1).
  * Snapshots packageId/price/currency/credits at create time — never re-read SoT on grant.
- * Prepaid credit packs via TBC. Not an entitlement plan row.
+ * Prepaid credit packs via LEGACYGATEWAY. Not an entitlement plan row.
  */
 model CreditPackPurchase {
   id                String    @id @default(cuid())
   userId            String    @map("user_id")
-  provider          String    @default("tbc")
+  provider          String    @default("legacygateway")
   packageId         String    @map("package_id")
   /**
-   * Charged major units at checkout (Flitt: GEL after USD→GEL snapshot).
+   * Charged major units at checkout (Checkoutgateway: GEL after USD→GEL snapshot).
    * Never re-quoted; refunds/verify use this row, not live FX.
    */
   priceAmount       Decimal   @map("price_amount") @db.Decimal(12, 2)
   currency          String
-  /** Commercial SoT amount (USD) captured at checkout. Null on legacy TBC rows. */
+  /** Commercial SoT amount (USD) captured at checkout. Null on legacy LEGACYGATEWAY rows. */
   basePriceAmount   Decimal?  @map("base_price_amount") @db.Decimal(12, 2)
   baseCurrency      String?   @map("base_currency")
   /** USD→GEL rate used to compute priceAmount. Null on legacy rows. */
@@ -538,7 +538,7 @@ model CreditPackPurchase {
    * failed | expired | cancelled | refunded | partial_refunded | verification_failed
    */
   status            String    @default("created")
-  /** Raw provider status string when known (TBC or Flitt). */
+  /** Raw provider status string when known (LEGACYGATEWAY or Checkoutgateway). */
   providerStatus    String?   @map("provider_status")
   approvalUrl       String?   @map("approval_url") @db.Text
   /** Client checkout idempotency key (repeat purchase allowed with a new key). */
@@ -563,7 +563,7 @@ model CreditPackPurchase {
 }
 
 /**
- * Monetary refund request for a CreditPackPurchase (Flitt/TBC).
+ * Monetary refund request for a CreditPackPurchase (Checkoutgateway/LEGACYGATEWAY).
  * Separate from ledger credit refunds (AI failure / timeout).
  * amount is set by admin on approve from credit-provenance entitlement.
  */
@@ -593,7 +593,7 @@ model RefundRequest {
   reviewedAt               DateTime? @map("reviewed_at")
   reviewedBy               String?   @map("reviewed_by")
   rejectReason             String?   @map("reject_reason") @db.Text
-  provider                 String    @default("tbc")
+  provider                 String    @default("legacygateway")
   providerRefundId         String?   @map("provider_refund_id")
   providerReference        String?   @map("provider_reference")
   /** Sanitized provider error / result code — never tokens or secrets. */

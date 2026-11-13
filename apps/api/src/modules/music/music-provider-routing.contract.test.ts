@@ -5,7 +5,7 @@
 import assert from "node:assert/strict";
 import { resolveMusicProviderForGeneration } from "@ai-music/ai-providers";
 import {
-  MUREKA_CREDIT_COST_UNITS,
+  AUDIOENGINE_CREDIT_COST_UNITS,
   OPERATION_COST_UNITS,
   musicGenerateBodySchema,
   resolveMusicGenerateCostUnits,
@@ -15,18 +15,18 @@ import { normalizeMusicGenerateBody } from "./music-generate-body.js";
 import { resolveTimedLyricsStrategy } from "./timed-lyrics-strategy.js";
 
 const stagingEnv = {
-  MUREKA_ENABLED: "true",
-  MUREKA_PERSONAL_VOICE_ENABLED: "true",
-  MUSIC_DEFAULT_PROVIDER: "mureka",
+  AUDIOENGINE_ENABLED: "true",
+  AUDIOENGINE_PERSONAL_VOICE_ENABLED: "true",
+  MUSIC_DEFAULT_PROVIDER: "audioengine",
 };
 
-function assertReadyProfileOffIsSuno(): void {
+function assertReadyProfileOffIsLegacyengine(): void {
   const routed = resolveMusicProviderForGeneration({
-    hasPersonalMurekaVoice: false,
-    explicitProvider: "mureka",
+    hasPersonalAudioengineVoice: false,
+    explicitProvider: "audioengine",
     env: stagingEnv,
   });
-  assert.equal("providerId" in routed && routed.providerId, "sunoapi");
+  assert.equal("providerId" in routed && routed.providerId, "legacyengineapi");
 
   const body = normalizeMusicGenerateBody(
     musicGenerateBodySchema.parse({
@@ -35,12 +35,12 @@ function assertReadyProfileOffIsSuno(): void {
       instrumental: false,
       voiceProfileId: "vp-ready",
       usePersonalVoice: false,
-      providerOptions: { providerId: "mureka", options: {} },
+      providerOptions: { providerId: "audioengine", options: {} },
     }),
   );
   assert.equal(body.usePersonalVoice, false);
   assert.equal(body.voiceProfileId, undefined);
-  assert.equal(body.input.providerOptions?.providerId, "sunoapi");
+  assert.equal(body.input.providerOptions?.providerId, "legacyengineapi");
   assert.equal(
     resolveMusicGenerateCostUnits({ usePersonalVoice: false }),
     OPERATION_COST_UNITS.generateTrack,
@@ -48,12 +48,12 @@ function assertReadyProfileOffIsSuno(): void {
   assert.equal(OPERATION_COST_UNITS.generateTrack, 15_000);
 }
 
-function assertReadyProfileOnIsMureka(): void {
+function assertReadyProfileOnIsAudioengine(): void {
   const routed = resolveMusicProviderForGeneration({
-    hasPersonalMurekaVoice: true,
+    hasPersonalAudioengineVoice: true,
     env: stagingEnv,
   });
-  assert.equal("providerId" in routed && routed.providerId, "mureka");
+  assert.equal("providerId" in routed && routed.providerId, "audioengine");
 
   const body = normalizeMusicGenerateBody(
     musicGenerateBodySchema.parse({
@@ -61,67 +61,67 @@ function assertReadyProfileOnIsMureka(): void {
       voiceProfileId: "vp-ready",
       usePersonalVoice: true,
       providerOptions: {
-        providerId: "mureka",
+        providerId: "audioengine",
         options: { voiceProfileId: "vp-ready" },
       },
     }),
   );
   assert.equal(body.usePersonalVoice, true);
   assert.equal(body.voiceProfileId, "vp-ready");
-  assert.equal(body.input.providerOptions?.providerId, "mureka");
+  assert.equal(body.input.providerOptions?.providerId, "audioengine");
   assert.equal(
     resolveMusicGenerateCostUnits({ usePersonalVoice: true }),
-    MUREKA_CREDIT_COST_UNITS.generateSongs,
+    AUDIOENGINE_CREDIT_COST_UNITS.generateSongs,
   );
-  assert.equal(MUREKA_CREDIT_COST_UNITS.generateSongs, 24_000);
+  assert.equal(AUDIOENGINE_CREDIT_COST_UNITS.generateSongs, 24_000);
 }
 
-function assertNoProfileIsSuno(): void {
+function assertNoProfileIsLegacyengine(): void {
   const routed = resolveMusicProviderForGeneration({
-    hasPersonalMurekaVoice: false,
+    hasPersonalAudioengineVoice: false,
     env: stagingEnv,
   });
-  assert.equal("providerId" in routed && routed.providerId, "sunoapi");
+  assert.equal("providerId" in routed && routed.providerId, "legacyengineapi");
 }
 
 function assertCoverNeverMixesTaskIds(): void {
-  const mureka = resolveAlbumCoverStrategy({
-    musicProvider: "mureka",
-    providerTaskId: "mureka-task-1",
+  const audioengine = resolveAlbumCoverStrategy({
+    musicProvider: "audioengine",
+    providerTaskId: "audioengine-task-1",
   });
-  assert.equal(mureka.kind, "unavailable");
-  assert.equal("sunoMusicTaskId" in mureka, false);
+  assert.equal(audioengine.kind, "unavailable");
+  assert.equal("legacyengineMusicTaskId" in audioengine, false);
 
-  const suno = resolveAlbumCoverStrategy({
-    musicProvider: "sunoapi",
-    providerTaskId: "suno-task-1",
+  const legacyengine = resolveAlbumCoverStrategy({
+    musicProvider: "legacyengineapi",
+    providerTaskId: "legacyengine-task-1",
   });
-  assert.equal(suno.kind, "suno_music_task");
-  if (suno.kind === "suno_music_task") {
-    assert.equal(suno.sunoMusicTaskId, "suno-task-1");
+  assert.equal(legacyengine.kind, "legacyengine_music_task");
+  if (legacyengine.kind === "legacyengine_music_task") {
+    assert.equal(legacyengine.legacyengineMusicTaskId, "legacyengine-task-1");
   }
 }
 
 function assertTimedLyricsUsesTrackProviderNotDefault(): void {
-  const sunoUnderMurekaDefault = resolveTimedLyricsStrategy({
-    musicProvider: "sunoapi",
-    providerTaskId: "suno-task-1",
-    providerAudioId: "suno-audio-1",
+  const legacyengineUnderAudioengineDefault = resolveTimedLyricsStrategy({
+    musicProvider: "legacyengineapi",
+    providerTaskId: "legacyengine-task-1",
+    providerAudioId: "legacyengine-audio-1",
   });
-  assert.equal(sunoUnderMurekaDefault.kind, "suno_timestamped");
+  assert.equal(legacyengineUnderAudioengineDefault.kind, "legacyengine_timestamped");
 
-  const murekaTrack = resolveTimedLyricsStrategy({
-    musicProvider: "mureka",
-    providerTaskId: "mureka-task-1",
-    providerAudioId: "mureka-choice-1",
+  const audioengineTrack = resolveTimedLyricsStrategy({
+    musicProvider: "audioengine",
+    providerTaskId: "audioengine-task-1",
+    providerAudioId: "audioengine-choice-1",
   });
-  assert.equal(murekaTrack.kind, "unavailable");
-  assert.equal("sunoTaskId" in murekaTrack, false);
+  assert.equal(audioengineTrack.kind, "unavailable");
+  assert.equal("legacyengineTaskId" in audioengineTrack, false);
 }
 
-assertReadyProfileOffIsSuno();
-assertReadyProfileOnIsMureka();
-assertNoProfileIsSuno();
+assertReadyProfileOffIsLegacyengine();
+assertReadyProfileOnIsAudioengine();
+assertNoProfileIsLegacyengine();
 assertCoverNeverMixesTaskIds();
 assertTimedLyricsUsesTrackProviderNotDefault();
 console.log("music-provider-routing.contract.test.ts: ok");

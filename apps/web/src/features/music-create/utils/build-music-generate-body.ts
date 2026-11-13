@@ -14,9 +14,9 @@ export type MusicGenerateFormInput = {
 /**
  * Builds POST /api/music/generate body.
  *
- * Personal Voice ON → Mureka (+ voiceProfileId; backend resolves vocal_id).
- * Personal Voice OFF → SunoAPI (standard AI vocal). Ready profile alone does not
- * select Mureka.
+ * Personal Voice ON → Audioengine (+ voiceProfileId; backend resolves vocal_id).
+ * Personal Voice OFF → LegacyengineAPI (standard AI vocal). Ready profile alone does not
+ * select Audioengine.
  */
 export function buildMusicGenerateBody(input: MusicGenerateFormInput): MusicGenerateBody {
   const prompt = input.prompt.trim();
@@ -42,7 +42,7 @@ export function buildMusicGenerateBody(input: MusicGenerateFormInput): MusicGene
       lyricsLanguage,
       musicBrief: style ? { additionalInstructions: style } : undefined,
       providerOptions: {
-        providerId: "mureka",
+        providerId: "audioengine",
         options: {
           voiceProfileId,
         },

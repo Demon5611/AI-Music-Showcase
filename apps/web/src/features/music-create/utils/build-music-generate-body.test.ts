@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import { buildMusicGenerateBody } from "./build-music-generate-body";
 
 function run() {
-  const murekaBody = buildMusicGenerateBody({
+  const audioengineBody = buildMusicGenerateBody({
     prompt: "lyrics here",
     style: "pop, upbeat",
     title: "Song",
@@ -13,23 +13,23 @@ function run() {
     lyricsLanguage: "ru",
   });
 
-  assert.equal(murekaBody.voiceProfileId, "vp-ready");
-  assert.equal(murekaBody.usePersonalVoice, true);
-  assert.equal(murekaBody.providerOptions?.providerId, "mureka");
+  assert.equal(audioengineBody.voiceProfileId, "vp-ready");
+  assert.equal(audioengineBody.usePersonalVoice, true);
+  assert.equal(audioengineBody.providerOptions?.providerId, "audioengine");
   assert.equal(
-    murekaBody.providerOptions?.providerId === "mureka"
-      ? murekaBody.providerOptions.options?.voiceProfileId
+    audioengineBody.providerOptions?.providerId === "audioengine"
+      ? audioengineBody.providerOptions.options?.voiceProfileId
       : undefined,
     "vp-ready",
   );
-  assert.equal(murekaBody.musicBrief?.additionalInstructions, "pop, upbeat");
-  assert.equal(murekaBody.customMode, undefined);
-  assert.equal(murekaBody.instrumental, undefined);
-  assert.equal(murekaBody.vocalGender, undefined);
-  assert.equal(murekaBody.referenceAudioUrl, undefined);
-  assert.equal(murekaBody.voiceSampleId, undefined);
+  assert.equal(audioengineBody.musicBrief?.additionalInstructions, "pop, upbeat");
+  assert.equal(audioengineBody.customMode, undefined);
+  assert.equal(audioengineBody.instrumental, undefined);
+  assert.equal(audioengineBody.vocalGender, undefined);
+  assert.equal(audioengineBody.referenceAudioUrl, undefined);
+  assert.equal(audioengineBody.voiceSampleId, undefined);
 
-  // Ready profile + OFF → SunoAPI (never Mureka without personal voice).
+  // Ready profile + OFF → LegacyengineAPI (never Audioengine without personal voice).
   const offWithReadyProfile = buildMusicGenerateBody({
     prompt: "lyrics",
     style: "dreamy pop",
@@ -47,7 +47,7 @@ function run() {
   assert.equal(offWithReadyProfile.customMode, true);
   assert.equal(offWithReadyProfile.instrumental, false);
 
-  // No profile → SunoAPI.
+  // No profile → LegacyengineAPI.
   const noProfile = buildMusicGenerateBody({
     prompt: "lyrics",
     style: "jazz",

@@ -53,23 +53,23 @@ export type {
 } from "./voice/voice-deletion.types.js";
 export { createVoiceProvider } from "./voice/create-voice-provider.js";
 export {
-  MurekaVoiceProvider,
-  createMurekaVoiceProvider,
-} from "./voice/providers/mureka/mureka-voice-provider.js";
+  AudioengineVoiceProvider,
+  createAudioengineVoiceProvider,
+} from "./voice/providers/audioengine/audioengine-voice-provider.js";
 export {
-  createSunoVoiceClients,
-  isSunoVoiceTaskFailed,
-  isSunoVoiceTaskPending,
-  resolveSunoVoiceConfig,
-  SunoFileUploadClient,
-  SunoVoiceClient,
-} from "./suno-voice/create-suno-voice-clients.js";
+  createLegacyengineVoiceClients,
+  isLegacyengineVoiceTaskFailed,
+  isLegacyengineVoiceTaskPending,
+  resolveLegacyengineVoiceConfig,
+  LegacyengineFileUploadClient,
+  LegacyengineVoiceClient,
+} from "./legacyengine-voice/create-legacyengine-voice-clients.js";
 export type {
-  SunoFileUploadResult,
-  SunoVoiceConfig,
-  SunoVoiceGenerateRequest,
-  SunoVoiceRecordInfo,
-  SunoVoiceTaskStatus,
-  SunoVoiceValidateInfo,
-  SunoVoiceValidateRequest,
-} from "./suno-voice/suno-voice.types.js";
+  LegacyengineFileUploadResult,
+  LegacyengineVoiceConfig,
+  LegacyengineVoiceGenerateRequest,
+  LegacyengineVoiceRecordInfo,
+  LegacyengineVoiceTaskStatus,
+  LegacyengineVoiceValidateInfo,
+  LegacyengineVoiceValidateRequest,
+} from "./legacyengine-voice/legacyengine-voice.types.js";

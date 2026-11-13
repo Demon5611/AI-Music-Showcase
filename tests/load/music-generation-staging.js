@@ -1,5 +1,5 @@
 /**
- * Staging music-generation load harness (fake Suno via SUNO_MUSIC_API_BASE_URL).
+ * Staging music-generation load harness (fake Legacyengine via LEGACYENGINE_MUSIC_API_BASE_URL).
  *
  * Env (never print secrets):
  *   LOAD_API_URL

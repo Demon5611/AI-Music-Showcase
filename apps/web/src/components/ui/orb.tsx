@@ -3,7 +3,7 @@
 import { Component, type ErrorInfo, type ReactNode, useEffect, useMemo, useRef, useState } from "react"
 import { Canvas, useFrame, useThree } from "@react-three/fiber"
 import * as THREE from "three"
-import type { AgentState } from "@/shared/ui/elevenlabs/agent-state"
+import type { AgentState } from "@/shared/ui/voiceengine/agent-state"
 import { createNoiseTexture } from "@/shared/lib/create-noise-texture"
 
 export type { AgentState }

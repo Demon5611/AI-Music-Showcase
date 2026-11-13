@@ -2,7 +2,7 @@ import { createHash } from "node:crypto";
 import { config } from "dotenv";
 import { resolve } from "node:path";
 import { prisma } from "@ai-music/db";
-import { createMusicService, createSunoApiClient } from "@ai-music/ai-providers";
+import { createMusicService, createLegacyengineApiClient } from "@ai-music/ai-providers";
 import { getStorageService } from "../src/modules/storage/storage.service.js";
 
 config({ path: resolve(import.meta.dirname, "../../../.env") });
@@ -38,14 +38,14 @@ async function main() {
   );
 
   if (song.stemSeparationTaskId) {
-    const client = createSunoApiClient();
+    const client = createLegacyengineApiClient();
     const raw = await client.getVocalRemovalDetails(song.stemSeparationTaskId);
-    console.log("SUNO_RAW", JSON.stringify(raw, null, 2));
+    console.log("LEGACYENGINE_RAW", JSON.stringify(raw, null, 2));
 
     const music = createMusicService();
     const mapped = await music.getStemSeparationStatus(
       song.stemSeparationTaskId,
-      song.provider === "mureka" ? "mureka" : "sunoapi",
+      song.provider === "audioengine" ? "audioengine" : "legacyengineapi",
     );
     console.log("MAPPED", JSON.stringify(mapped, null, 2));
   }

@@ -5,7 +5,7 @@ import {
   resolvePersonaVoiceId,
   isReadyForMusicGeneration,
 } from "../src/modules/voice-samples/persona-voice-id.service.js";
-import { syncVoiceSampleListEntry } from "../src/modules/voice-samples/suno-voice.service.js";
+import { syncVoiceSampleListEntry } from "../src/modules/voice-samples/legacyengine-voice.service.js";
 
 config({ path: resolve(import.meta.dirname, "../../../.env") });
 
@@ -36,8 +36,8 @@ async function main() {
       {
         id: sample.id,
         voiceCloneStatus: sample.voiceCloneStatus,
-        sunoVoiceId: sample.sunoVoiceId,
-        sunoVoiceTaskId: sample.sunoVoiceTaskId,
+        legacyengineVoiceId: sample.legacyengineVoiceId,
+        legacyengineVoiceTaskId: sample.legacyengineVoiceTaskId,
         voiceCloneError: sample.voiceCloneError,
         personaId,
         readyForMusicGeneration: isReadyForMusicGeneration(sample, personaId),

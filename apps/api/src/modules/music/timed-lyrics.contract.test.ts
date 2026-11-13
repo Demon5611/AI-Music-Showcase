@@ -14,10 +14,10 @@ function testKaraokeCostIsOneProductCredit(): void {
   assert.equal(OPERATION_COST_UNITS.karaokeLyrics, 1_000);
 }
 
-function testMurekaUnavailableCode(): void {
+function testAudioengineUnavailableCode(): void {
   const strategy = resolveTimedLyricsStrategy({
-    musicProvider: "mureka",
-    providerTaskId: "mureka-1",
+    musicProvider: "audioengine",
+    providerTaskId: "audioengine-1",
     providerAudioId: "choice-1",
   });
   assert.equal(strategy.kind, "unavailable");
@@ -31,8 +31,8 @@ function testMurekaUnavailableCode(): void {
 
 function testMissingAudioIdCode(): void {
   const strategy = resolveTimedLyricsStrategy({
-    musicProvider: "sunoapi",
-    providerTaskId: "suno-task",
+    musicProvider: "legacyengineapi",
+    providerTaskId: "legacyengine-task",
     providerAudioId: "  ",
   });
   assert.equal(strategy.kind, "unavailable");
@@ -41,16 +41,16 @@ function testMissingAudioIdCode(): void {
   }
 }
 
-function testSunoReadyIds(): void {
+function testLegacyengineReadyIds(): void {
   const strategy = resolveTimedLyricsStrategy({
-    musicProvider: "sunoapi",
-    providerTaskId: "suno-task-1",
-    providerAudioId: "suno-audio-1",
+    musicProvider: "legacyengineapi",
+    providerTaskId: "legacyengine-task-1",
+    providerAudioId: "legacyengine-audio-1",
   });
-  assert.equal(strategy.kind, "suno_timestamped");
-  if (strategy.kind === "suno_timestamped") {
-    assert.equal(strategy.sunoTaskId, "suno-task-1");
-    assert.equal(strategy.sunoAudioId, "suno-audio-1");
+  assert.equal(strategy.kind, "legacyengine_timestamped");
+  if (strategy.kind === "legacyengine_timestamped") {
+    assert.equal(strategy.legacyengineTaskId, "legacyengine-task-1");
+    assert.equal(strategy.legacyengineAudioId, "legacyengine-audio-1");
   }
 }
 
@@ -61,8 +61,8 @@ function testRefundUsesOriginalSpendUnits(): void {
 }
 
 testKaraokeCostIsOneProductCredit();
-testMurekaUnavailableCode();
+testAudioengineUnavailableCode();
 testMissingAudioIdCode();
-testSunoReadyIds();
+testLegacyengineReadyIds();
 testRefundUsesOriginalSpendUnits();
 console.log("timed-lyrics.contract.test.ts: ok");

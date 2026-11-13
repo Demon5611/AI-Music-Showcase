@@ -16,8 +16,8 @@ const repoRoot = join(here, "../../../../..");
 const refundService = readFileSync(join(here, "refund.service.ts"), "utf8");
 const ledger = readFileSync(join(repoRoot, "packages/db/src/credits-ledger.ts"), "utf8");
 const lots = readFileSync(join(repoRoot, "packages/db/src/credit-grant-lots.ts"), "utf8");
-const flittProcessor = readFileSync(
-  join(repoRoot, "packages/flitt-checkout/src/process-flitt-refund.ts"),
+const checkoutgatewayProcessor = readFileSync(
+  join(repoRoot, "packages/checkoutgateway-checkout/src/process-checkoutgateway-refund.ts"),
   "utf8",
 );
 
@@ -50,16 +50,16 @@ assert.match(
   readFileSync(join(repoRoot, "apps/worker/src/provider-job-reconciler.ts"), "utf8"),
   /sourceSpendIdempotencyKey:\s*spendKey\(recordId\)/,
 );
-assert.match(flittProcessor, /releasePurchaseLotReservation/);
-assert.match(flittProcessor, /finalizeUserCashRefundLocalEffects/);
-assert.match(flittProcessor, /CreditClawbackInvariantError/);
-assert.doesNotMatch(flittProcessor, /finalizeCreditPackRefundClawback/);
-assert.doesNotMatch(flittProcessor, /amountUnits:\s*creditsToUnits/);
+assert.match(checkoutgatewayProcessor, /releasePurchaseLotReservation/);
+assert.match(checkoutgatewayProcessor, /finalizeUserCashRefundLocalEffects/);
+assert.match(checkoutgatewayProcessor, /CreditClawbackInvariantError/);
+assert.doesNotMatch(checkoutgatewayProcessor, /finalizeCreditPackRefundClawback/);
+assert.doesNotMatch(checkoutgatewayProcessor, /amountUnits:\s*creditsToUnits/);
 assert.equal(
   CREDIT_PACK_REFUND_REVIEW_REASONS.clawbackInvariant,
   "CREDIT_CLAWBACK_INVARIANT_VIOLATION",
 );
-assert.doesNotMatch(flittProcessor, /nbg\.gov\.ge/);
+assert.doesNotMatch(checkoutgatewayProcessor, /nbg\.gov\.ge/);
 assert.equal(
   CREDIT_PACK_REFUND_REVIEW_REASONS.partialRequiresReview,
   "PARTIAL_CREDIT_PACK_REFUND_REQUIRES_REVIEW",

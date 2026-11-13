@@ -1,0 +1,31 @@
+{
+  "name": "@ai-music/checkoutgateway-checkout",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./config": {
+      "types": "./dist/checkoutgateway-config.d.ts",
+      "import": "./dist/checkoutgateway-config.js"
+    }
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test": "tsx src/checkoutgateway-signature.unit.test.ts && tsx src/checkoutgateway-amount.unit.test.ts && tsx src/checkoutgateway-status.unit.test.ts && tsx src/checkoutgateway-checkout-url.unit.test.ts && tsx src/checkoutgateway-verify.unit.test.ts && tsx src/checkoutgateway-config.unit.test.ts && tsx src/process-checkoutgateway-refund.unit.test.ts"
+  },
+  "dependencies": {
+    "@ai-music/db": "workspace:*",
+    "@ai-music/shared": "workspace:*"
+  },
+  "devDependencies": {
+    "@ai-music/config": "workspace:*",
+    "@types/node": "^25.9.1",
+    "tsx": "^4.19.4",
+    "typescript": "^5.8.3"
+  }
+}

@@ -1,7 +1,7 @@
 import { FREE_TIER_DEFAULT_DURATION_SEC } from "./music-combo-styles.js";
 import { resolveEffectiveDurationSecForPlan } from "./music-duration.js";
 import type { PlanId } from "./plans.js";
-import { SUNO_LYRICS_PROMPT_MAX_LENGTH, type VocalGender } from "./vocal-gender.js";
+import { LEGACYENGINE_LYRICS_PROMPT_MAX_LENGTH, type VocalGender } from "./vocal-gender.js";
 import {
   buildLyricsLanguageInstruction,
   buildLyricsGenerationProviderPrompt,
@@ -9,21 +9,21 @@ import {
   type ResolvedLyricsLanguage,
 } from "../lyrics-language/index.js";
 
-/** Matches Suno custom-mode lyrics truncation in ai-providers. */
-export const SUNO_LYRICS_CHARS_PER_SEC = 12;
+/** Matches Legacyengine custom-mode lyrics truncation in ai-providers. */
+export const LEGACYENGINE_LYRICS_CHARS_PER_SEC = 12;
 
-export const SUNO_LYRICS_MIN_CHARS = 80;
+export const LEGACYENGINE_LYRICS_MIN_CHARS = 80;
 
-export const SUNO_LYRICS_MANUAL_MAX_LENGTH = 3000;
+export const LEGACYENGINE_LYRICS_MANUAL_MAX_LENGTH = 3000;
 
 export function resolveLyricsMaxLengthForDurationSec(durationSec: number): number {
   if (durationSec <= 0) {
-    return SUNO_LYRICS_MANUAL_MAX_LENGTH;
+    return LEGACYENGINE_LYRICS_MANUAL_MAX_LENGTH;
   }
 
   return Math.max(
-    SUNO_LYRICS_MIN_CHARS,
-    Math.floor(durationSec * SUNO_LYRICS_CHARS_PER_SEC),
+    LEGACYENGINE_LYRICS_MIN_CHARS,
+    Math.floor(durationSec * LEGACYENGINE_LYRICS_CHARS_PER_SEC),
   );
 }
 
@@ -75,7 +75,7 @@ export function resolveLyricsBriefMaxLength(
     languageCode,
   );
 
-  return Math.max(32, SUNO_LYRICS_PROMPT_MAX_LENGTH - overhead);
+  return Math.max(32, LEGACYENGINE_LYRICS_PROMPT_MAX_LENGTH - overhead);
 }
 
 /**

@@ -20,7 +20,7 @@ function baseInput(overrides: Partial<GenerateSongInput> = {}): GenerateSongInpu
     mode: "song",
     durationSec: 60,
     providerOptions: {
-      providerId: "sunoapi",
+      providerId: "legacyengineapi",
       options: {
         customMode: true,
         vocalGender: "m",
@@ -39,12 +39,12 @@ function baseInput(overrides: Partial<GenerateSongInput> = {}): GenerateSongInpu
   };
 }
 
-function withSunoPatch(
-  patch: Partial<NonNullable<Extract<GenerateSongInput["providerOptions"], { providerId: "sunoapi" }>["options"]>>,
+function withLegacyenginePatch(
+  patch: Partial<NonNullable<Extract<GenerateSongInput["providerOptions"], { providerId: "legacyengineapi" }>["options"]>>,
 ): GenerateSongInput {
   return baseInput({
     providerOptions: {
-      providerId: "sunoapi",
+      providerId: "legacyengineapi",
       options: {
         customMode: true,
         vocalGender: "m",
@@ -85,7 +85,7 @@ function runCanonicalRequestChecks(): void {
     "instrumental/mode affects hash",
   );
   assert(
-    hashOf(baseInput()) !== hashOf(withSunoPatch({ customMode: false })),
+    hashOf(baseInput()) !== hashOf(withLegacyenginePatch({ customMode: false })),
     "customMode affects hash",
   );
   assert(
@@ -93,7 +93,7 @@ function runCanonicalRequestChecks(): void {
     "durationSec affects hash",
   );
   assert(
-    hashOf(baseInput()) !== hashOf(withSunoPatch({ vocalGender: "f" })),
+    hashOf(baseInput()) !== hashOf(withLegacyenginePatch({ vocalGender: "f" })),
     "vocalGender affects hash",
   );
   assert(
@@ -119,7 +119,7 @@ function runCanonicalRequestChecks(): void {
 
   const withVoiceProfile = baseInput({
     providerOptions: {
-      providerId: "mureka",
+      providerId: "audioengine",
       options: {
         voiceProfileId: "vp1",
         vocalId: "secret-vocal-a",
@@ -130,7 +130,7 @@ function runCanonicalRequestChecks(): void {
   });
   const withOtherVocal = baseInput({
     providerOptions: {
-      providerId: "mureka",
+      providerId: "audioengine",
       options: {
         voiceProfileId: "vp1",
         vocalId: "secret-vocal-b",

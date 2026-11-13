@@ -1,4 +1,4 @@
-export type VideoProviderId = "mock" | "cometapi" | "seedance";
+export type VideoProviderId = "mock" | "videogateway" | "motionengine";
 
 export type VideoAspectRatio = "9:16" | "16:9" | "1:1";
 

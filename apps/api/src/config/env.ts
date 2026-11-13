@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { FlittCheckoutError, resolveFlittCheckoutConfig } from "@ai-music/flitt-checkout/config";
+import { CheckoutgatewayCheckoutError, resolveCheckoutgatewayCheckoutConfig } from "@ai-music/checkoutgateway-checkout/config";
 import {
   ResendInboundEnvError,
   resolveResendInboundFromEnv,
@@ -80,46 +80,46 @@ const baseSchema = z.object({
     .optional()
     .transform((value) => value !== "false"),
   METRICS_BEARER_TOKEN: optionalString,
-  MUSIC_PROVIDER: z.string().default("sunoapi"),
+  MUSIC_PROVIDER: z.string().default("legacyengineapi"),
   MUSIC_DEFAULT_PROVIDER: z.string().optional(),
-  MUREKA_API_KEY: optionalString,
-  MUREKA_BASE_URL: optionalUrl,
-  MUREKA_ENABLED: z
+  AUDIOENGINE_API_KEY: optionalString,
+  AUDIOENGINE_BASE_URL: optionalUrl,
+  AUDIOENGINE_ENABLED: z
     .string()
     .optional()
     .transform((value) => value === "true"),
-  MUREKA_PERSONAL_VOICE_ENABLED: z
+  AUDIOENGINE_PERSONAL_VOICE_ENABLED: z
     .string()
     .optional()
     .transform((value) => value === "true"),
   /** Explicit production rollout gate. Default false — zero prod behavior change until set. */
-  MUREKA_PRODUCTION_ROLLOUT_ENABLED: z
+  AUDIOENGINE_PRODUCTION_ROLLOUT_ENABLED: z
     .string()
     .optional()
     .transform((value) => value === "true"),
-  MUREKA_VOICE_DELETION_ENABLED: z
+  AUDIOENGINE_VOICE_DELETION_ENABLED: z
     .string()
     .optional()
     .transform((value) => value === "true"),
-  MUREKA_MODEL: z.string().default("mureka-9"),
+  AUDIOENGINE_MODEL: z.string().default("audioengine-9"),
   // Deprecated: ignored at runtime (product always sends n=1). Kept for deploy compat.
-  MUREKA_SONG_COUNT: z.coerce.number().int().min(1).max(3).default(1),
-  MUREKA_WORKER_CONCURRENCY: z.coerce.number().int().positive().default(1),
-  MUREKA_PROVIDER_CONCURRENCY: z.coerce.number().int().positive().default(1),
-  MUREKA_VOCAL_CLONE_CONCURRENCY: z.coerce.number().int().positive().default(1),
-  MUREKA_MP3_PERSIST_ENABLED: z
+  AUDIOENGINE_SONG_COUNT: z.coerce.number().int().min(1).max(3).default(1),
+  AUDIOENGINE_WORKER_CONCURRENCY: z.coerce.number().int().positive().default(1),
+  AUDIOENGINE_PROVIDER_CONCURRENCY: z.coerce.number().int().positive().default(1),
+  AUDIOENGINE_VOCAL_CLONE_CONCURRENCY: z.coerce.number().int().positive().default(1),
+  AUDIOENGINE_MP3_PERSIST_ENABLED: z
     .string()
     .optional()
     .transform((value) => value !== "false"),
-  MUREKA_WAV_PERSIST_ENABLED: z
+  AUDIOENGINE_WAV_PERSIST_ENABLED: z
     .string()
     .optional()
     .transform((value) => value === "true"),
-  MUREKA_FLAC_PERSIST_ENABLED: z
+  AUDIOENGINE_FLAC_PERSIST_ENABLED: z
     .string()
     .optional()
     .transform((value) => value === "true"),
-  SUNO_FALLBACK_ENABLED: z
+  LEGACYENGINE_FALLBACK_ENABLED: z
     .string()
     .optional()
     .transform((value) => value === "true"),
@@ -127,44 +127,44 @@ const baseSchema = z.object({
     .string()
     .optional()
     .transform((value) => value === "true"),
-  SUNO_CALLBACK_LEGACY_CUTOFF_AT: optionalString,
-  /** Explicit opt-in for unauthenticated legacy Suno callback. Default off (fail-closed). */
-  SUNO_CALLBACK_LEGACY_ENABLED: z
+  LEGACYENGINE_CALLBACK_LEGACY_CUTOFF_AT: optionalString,
+  /** Explicit opt-in for unauthenticated legacy Legacyengine callback. Default off (fail-closed). */
+  LEGACYENGINE_CALLBACK_LEGACY_ENABLED: z
     .string()
     .optional()
     .transform((value) => value === "true"),
-  /** @deprecated Prefer SUNO_CALLBACK_LEGACY_ENABLED. */
-  SUNO_CALLBACK_LEGACY_DISABLED: z
+  /** @deprecated Prefer LEGACYENGINE_CALLBACK_LEGACY_ENABLED. */
+  LEGACYENGINE_CALLBACK_LEGACY_DISABLED: z
     .string()
     .optional()
     .transform((value) => value === "true"),
-  SUNO_CALLBACK_TOKEN_TTL_SEC: z.coerce.number().int().positive().default(86_400),
-  SUNO_API_BASE_URL: optionalUrl,
-  SUNO_MUSIC_API_BASE_URL: optionalUrl,
-  SUNO_API_KEY: optionalString,
+  LEGACYENGINE_CALLBACK_TOKEN_TTL_SEC: z.coerce.number().int().positive().default(86_400),
+  LEGACYENGINE_API_BASE_URL: optionalUrl,
+  LEGACYENGINE_MUSIC_API_BASE_URL: optionalUrl,
+  LEGACYENGINE_API_KEY: optionalString,
   KITS_API_BASE_URL: optionalUrl,
   KITS_API_KEY: optionalString,
   /**
-   * Legacy TBC callback/refund only. Does not enable new checkout.
+   * Legacy LEGACYGATEWAY callback/refund only. Does not enable new checkout.
    * Default off; never enable without full config.
    */
-  TBC_CHECKOUT_ENABLED: z
+  LEGACYGATEWAY_CHECKOUT_ENABLED: z
     .string()
     .optional()
     .transform((value) => value === "true"),
-  TBC_API_BASE_URL: optionalString,
-  TBC_CHECKOUT_API_VERSION: optionalString,
-  TBC_API_KEY: optionalString,
-  TBC_CLIENT_ID: optionalString,
-  TBC_CLIENT_SECRET: optionalString,
-  TBC_CHECKOUT_CURRENCY: optionalString,
-  TBC_CALLBACK_URL: optionalString,
-  TBC_RETURN_URL: optionalString,
+  LEGACYGATEWAY_API_BASE_URL: optionalString,
+  LEGACYGATEWAY_CHECKOUT_API_VERSION: optionalString,
+  LEGACYGATEWAY_API_KEY: optionalString,
+  LEGACYGATEWAY_CLIENT_ID: optionalString,
+  LEGACYGATEWAY_CLIENT_SECRET: optionalString,
+  LEGACYGATEWAY_CHECKOUT_CURRENCY: optionalString,
+  LEGACYGATEWAY_CALLBACK_URL: optionalString,
+  LEGACYGATEWAY_RETURN_URL: optionalString,
   /** real (default) | mock — mock forbidden in production. */
-  TBC_REFUND_PROVIDER_MODE: optionalString,
+  LEGACYGATEWAY_REFUND_PROVIDER_MODE: optionalString,
   /**
-   * Optional checkout selector. `flitt` or unset may enable checkout when Flitt is ready.
-   * `tbc` and any other value fail closed (checkout disabled). Never auto-fallback.
+   * Optional checkout selector. `checkoutgateway` or unset may enable checkout when Checkoutgateway is ready.
+   * `legacygateway` and any other value fail closed (checkout disabled). Never auto-fallback.
    */
   PAYMENT_PROVIDER: z.preprocess((value) => {
     if (typeof value !== "string") {
@@ -174,21 +174,21 @@ const baseSchema = z.object({
     return trimmed.length > 0 ? trimmed : undefined;
   }, z.string().optional()),
   /**
-   * USD→GEL quote source for Flitt checkout. `nbg` = official NBG JSON.
+   * USD→GEL quote source for Checkoutgateway checkout. `nbg` = official NBG JSON.
    * Missing / unknown / `unconfigured` fail closed. Never a fake/static env provider.
    */
   FX_USD_GEL_PROVIDER: optionalString,
-  /** Flitt hosted checkout — default off. Never NEXT_PUBLIC_*. Production stays disabled until explicitly enabled with approved GEL prices. */
-  FLITT_ENABLED: z
+  /** Checkoutgateway hosted checkout — default off. Never NEXT_PUBLIC_*. Production stays disabled until explicitly enabled with approved GEL prices. */
+  CHECKOUTGATEWAY_ENABLED: z
     .string()
     .optional()
     .transform((value) => value === "true"),
-  FLITT_API_BASE_URL: optionalString,
-  FLITT_MERCHANT_ID: optionalString,
-  FLITT_PAYMENT_KEY: optionalString,
-  FLITT_CURRENCY: optionalString,
-  FLITT_CALLBACK_URL: optionalString,
-  FLITT_RETURN_URL: optionalString,
+  CHECKOUTGATEWAY_API_BASE_URL: optionalString,
+  CHECKOUTGATEWAY_MERCHANT_ID: optionalString,
+  CHECKOUTGATEWAY_PAYMENT_KEY: optionalString,
+  CHECKOUTGATEWAY_CURRENCY: optionalString,
+  CHECKOUTGATEWAY_CALLBACK_URL: optionalString,
+  CHECKOUTGATEWAY_RETURN_URL: optionalString,
 });
 
 export type ApiEnv = z.infer<typeof baseSchema> & {
@@ -218,21 +218,21 @@ function collectR2Missing(env: z.infer<typeof baseSchema>): string[] {
   return missing;
 }
 
-/** Legacy TBC callback/refund credentials. Does not enable new checkout. */
-function validateTbcCheckoutEnv(env: z.infer<typeof baseSchema>): void {
-  if (!env.TBC_CHECKOUT_ENABLED) {
+/** Legacy LEGACYGATEWAY callback/refund credentials. Does not enable new checkout. */
+function validateLegacygatewayCheckoutEnv(env: z.infer<typeof baseSchema>): void {
+  if (!env.LEGACYGATEWAY_CHECKOUT_ENABLED) {
     return;
   }
 
   const missing: string[] = [];
   for (const key of [
-    "TBC_API_BASE_URL",
-    "TBC_CHECKOUT_API_VERSION",
-    "TBC_API_KEY",
-    "TBC_CLIENT_ID",
-    "TBC_CLIENT_SECRET",
-    "TBC_CALLBACK_URL",
-    "TBC_RETURN_URL",
+    "LEGACYGATEWAY_API_BASE_URL",
+    "LEGACYGATEWAY_CHECKOUT_API_VERSION",
+    "LEGACYGATEWAY_API_KEY",
+    "LEGACYGATEWAY_CLIENT_ID",
+    "LEGACYGATEWAY_CLIENT_SECRET",
+    "LEGACYGATEWAY_CALLBACK_URL",
+    "LEGACYGATEWAY_RETURN_URL",
   ] as const) {
     if (!requireTrimmed(env[key])) {
       missing.push(key);
@@ -240,10 +240,10 @@ function validateTbcCheckoutEnv(env: z.infer<typeof baseSchema>): void {
   }
 
   if (missing.length > 0) {
-    throw new Error(`TBC_CHECKOUT_ENABLED=true but missing: ${missing.join(", ")}`);
+    throw new Error(`LEGACYGATEWAY_CHECKOUT_ENABLED=true but missing: ${missing.join(", ")}`);
   }
 
-  for (const key of ["TBC_API_BASE_URL", "TBC_CALLBACK_URL", "TBC_RETURN_URL"] as const) {
+  for (const key of ["LEGACYGATEWAY_API_BASE_URL", "LEGACYGATEWAY_CALLBACK_URL", "LEGACYGATEWAY_RETURN_URL"] as const) {
     const value = requireTrimmed(env[key])!;
     let parsed: URL;
     try {
@@ -256,9 +256,9 @@ function validateTbcCheckoutEnv(env: z.infer<typeof baseSchema>): void {
     }
   }
 
-  const currency = (requireTrimmed(env.TBC_CHECKOUT_CURRENCY) ?? "USD").toUpperCase();
+  const currency = (requireTrimmed(env.LEGACYGATEWAY_CHECKOUT_CURRENCY) ?? "USD").toUpperCase();
   if (currency !== "USD" && currency !== "GEL" && currency !== "EUR") {
-    throw new Error(`Unsupported TBC_CHECKOUT_CURRENCY: ${currency}`);
+    throw new Error(`Unsupported LEGACYGATEWAY_CHECKOUT_CURRENCY: ${currency}`);
   }
 }
 
@@ -278,7 +278,7 @@ function validateDeployedEnv(env: z.infer<typeof baseSchema>): void {
     "CLERK_WEBHOOK_SECRET",
     "API_PROVIDER_REFERENCE_SECRET",
     "OPS_ADMIN_TOKEN",
-    "SUNO_API_KEY",
+    "LEGACYENGINE_API_KEY",
   ] as const) {
     if (!requireTrimmed(env[key])) {
       missing.push(key);
@@ -297,73 +297,73 @@ function validateDeployedEnv(env: z.infer<typeof baseSchema>): void {
     throw new Error(`Missing required ${env.APP_ENV} env: ${[...new Set(missing)].join(", ")}`);
   }
 
-  validateMurekaProductionRollout(env);
+  validateAudioengineProductionRollout(env);
 }
 
-function validateMurekaProductionRollout(env: z.infer<typeof baseSchema>): void {
-  if (env.APP_ENV !== "production" || !env.MUREKA_PRODUCTION_ROLLOUT_ENABLED) {
+function validateAudioengineProductionRollout(env: z.infer<typeof baseSchema>): void {
+  if (env.APP_ENV !== "production" || !env.AUDIOENGINE_PRODUCTION_ROLLOUT_ENABLED) {
     return;
   }
 
   const missing: string[] = [];
-  if (!env.MUREKA_ENABLED) {
-    missing.push("MUREKA_ENABLED=true");
+  if (!env.AUDIOENGINE_ENABLED) {
+    missing.push("AUDIOENGINE_ENABLED=true");
   }
-  if (!env.MUREKA_PERSONAL_VOICE_ENABLED) {
-    missing.push("MUREKA_PERSONAL_VOICE_ENABLED=true");
+  if (!env.AUDIOENGINE_PERSONAL_VOICE_ENABLED) {
+    missing.push("AUDIOENGINE_PERSONAL_VOICE_ENABLED=true");
   }
-  if (!requireTrimmed(env.MUREKA_API_KEY)) {
-    missing.push("MUREKA_API_KEY");
+  if (!requireTrimmed(env.AUDIOENGINE_API_KEY)) {
+    missing.push("AUDIOENGINE_API_KEY");
   }
 
-  const baseUrl = requireTrimmed(env.MUREKA_BASE_URL);
+  const baseUrl = requireTrimmed(env.AUDIOENGINE_BASE_URL);
   if (!baseUrl) {
-    missing.push("MUREKA_BASE_URL");
+    missing.push("AUDIOENGINE_BASE_URL");
   } else {
     try {
       const parsed = new URL(baseUrl);
       if (parsed.protocol !== "https:") {
-        missing.push("MUREKA_BASE_URL(https)");
+        missing.push("AUDIOENGINE_BASE_URL(https)");
       }
     } catch {
-      missing.push("MUREKA_BASE_URL");
+      missing.push("AUDIOENGINE_BASE_URL");
     }
   }
 
   if (missing.length > 0) {
     throw new Error(
-      `MUREKA_PRODUCTION_ROLLOUT_ENABLED requires: ${[...new Set(missing)].join(", ")}`,
+      `AUDIOENGINE_PRODUCTION_ROLLOUT_ENABLED requires: ${[...new Set(missing)].join(", ")}`,
     );
   }
 }
 
-function validateFlittCheckoutEnv(env: z.infer<typeof baseSchema>): void {
+function validateCheckoutgatewayCheckoutEnv(env: z.infer<typeof baseSchema>): void {
   try {
-    resolveFlittCheckoutConfig({
+    resolveCheckoutgatewayCheckoutConfig({
       APP_ENV: env.APP_ENV,
-      FLITT_ENABLED: env.FLITT_ENABLED,
-      FLITT_API_BASE_URL: env.FLITT_API_BASE_URL,
-      FLITT_MERCHANT_ID: env.FLITT_MERCHANT_ID,
-      FLITT_PAYMENT_KEY: env.FLITT_PAYMENT_KEY,
-      FLITT_CURRENCY: env.FLITT_CURRENCY,
-      FLITT_CALLBACK_URL: env.FLITT_CALLBACK_URL,
-      FLITT_RETURN_URL: env.FLITT_RETURN_URL,
+      CHECKOUTGATEWAY_ENABLED: env.CHECKOUTGATEWAY_ENABLED,
+      CHECKOUTGATEWAY_API_BASE_URL: env.CHECKOUTGATEWAY_API_BASE_URL,
+      CHECKOUTGATEWAY_MERCHANT_ID: env.CHECKOUTGATEWAY_MERCHANT_ID,
+      CHECKOUTGATEWAY_PAYMENT_KEY: env.CHECKOUTGATEWAY_PAYMENT_KEY,
+      CHECKOUTGATEWAY_CURRENCY: env.CHECKOUTGATEWAY_CURRENCY,
+      CHECKOUTGATEWAY_CALLBACK_URL: env.CHECKOUTGATEWAY_CALLBACK_URL,
+      CHECKOUTGATEWAY_RETURN_URL: env.CHECKOUTGATEWAY_RETURN_URL,
     });
   } catch (error) {
-    if (error instanceof FlittCheckoutError) {
+    if (error instanceof CheckoutgatewayCheckoutError) {
       throw new Error(error.message);
     }
     throw error;
   }
 }
 
-function validateTbcRefundProviderMode(env: z.infer<typeof baseSchema>): void {
-  const raw = (env.TBC_REFUND_PROVIDER_MODE ?? "real").trim().toLowerCase() || "real";
+function validateLegacygatewayRefundProviderMode(env: z.infer<typeof baseSchema>): void {
+  const raw = (env.LEGACYGATEWAY_REFUND_PROVIDER_MODE ?? "real").trim().toLowerCase() || "real";
   if (raw !== "real" && raw !== "mock") {
-    throw new Error(`Invalid TBC_REFUND_PROVIDER_MODE=${raw} (expected real|mock)`);
+    throw new Error(`Invalid LEGACYGATEWAY_REFUND_PROVIDER_MODE=${raw} (expected real|mock)`);
   }
   if (raw === "mock" && env.APP_ENV === "production") {
-    throw new Error("TBC_REFUND_PROVIDER_MODE=mock is forbidden when APP_ENV=production");
+    throw new Error("LEGACYGATEWAY_REFUND_PROVIDER_MODE=mock is forbidden when APP_ENV=production");
   }
 }
 
@@ -391,9 +391,9 @@ export function loadApiEnv(): ApiEnv {
   }
 
   validateDeployedEnv(parsed.data);
-  validateTbcCheckoutEnv(parsed.data);
-  validateFlittCheckoutEnv(parsed.data);
-  validateTbcRefundProviderMode(parsed.data);
+  validateLegacygatewayCheckoutEnv(parsed.data);
+  validateCheckoutgatewayCheckoutEnv(parsed.data);
+  validateLegacygatewayRefundProviderMode(parsed.data);
   validateResendInboundEnv(parsed.data.APP_ENV);
 
   return {

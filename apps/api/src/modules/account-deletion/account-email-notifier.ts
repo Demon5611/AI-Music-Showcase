@@ -1,12 +1,12 @@
 /**
  * Provider-neutral transactional email boundary.
  * Account-completion: Noop by default until a real provider is wired.
- * Mureka Vocal deletion: Resend via shared sendMurekaVocalDeletionEmail (worker path).
+ * Audioengine Vocal deletion: Resend via shared sendAudioengineVocalDeletionEmail (worker path).
  */
 
 import {
-  sendMurekaVocalDeletionEmail,
-  type SendMurekaVocalDeletionEmailResult,
+  sendAudioengineVocalDeletionEmail,
+  type SendAudioengineVocalDeletionEmailResult,
 } from "@ai-music/shared";
 
 export type AccountDeletionCompleteEmailInput = {
@@ -16,7 +16,7 @@ export type AccountDeletionCompleteEmailInput = {
   idempotencyKey: string;
 };
 
-export type MurekaVocalDataDeletionEmailInput = {
+export type AudioengineVocalDataDeletionEmailInput = {
   requestId: string;
   vocalIds: string[];
   idempotencyKey: string;
@@ -43,18 +43,18 @@ export interface AccountEmailNotifier {
   sendAccountDeletionComplete(
     input: AccountDeletionCompleteEmailInput,
   ): Promise<AccountEmailSendResult>;
-  sendMurekaVocalDataDeletion(
-    input: MurekaVocalDataDeletionEmailInput,
-  ): Promise<SendMurekaVocalDeletionEmailResult>;
+  sendAudioengineVocalDataDeletion(
+    input: AudioengineVocalDataDeletionEmailInput,
+  ): Promise<SendAudioengineVocalDeletionEmailResult>;
 }
 
 /**
  * Safe default for user-facing account emails: does not claim a real send.
- * Mureka deletion emails use the shared Resend path when env is configured.
+ * Audioengine deletion emails use the shared Resend path when env is configured.
  */
 export class NoopAccountEmailNotifier implements AccountEmailNotifier {
   readonly attempts: AccountDeletionCompleteEmailInput[] = [];
-  readonly murekaAttempts: MurekaVocalDataDeletionEmailInput[] = [];
+  readonly audioengineAttempts: AudioengineVocalDataDeletionEmailInput[] = [];
 
   /** @deprecated Use `attempts`. */
   get sent(): AccountDeletionCompleteEmailInput[] {
@@ -73,18 +73,18 @@ export class NoopAccountEmailNotifier implements AccountEmailNotifier {
     };
   }
 
-  async sendMurekaVocalDataDeletion(
-    input: MurekaVocalDataDeletionEmailInput,
-  ): Promise<SendMurekaVocalDeletionEmailResult> {
-    this.murekaAttempts.push(input);
-    return sendMurekaVocalDeletionEmail(input);
+  async sendAudioengineVocalDataDeletion(
+    input: AudioengineVocalDataDeletionEmailInput,
+  ): Promise<SendAudioengineVocalDeletionEmailResult> {
+    this.audioengineAttempts.push(input);
+    return sendAudioengineVocalDeletionEmail(input);
   }
 }
 
 /** Test double: simulates a real provider accept. */
 export class SuccessfulAccountEmailNotifier implements AccountEmailNotifier {
   readonly attempts: AccountDeletionCompleteEmailInput[] = [];
-  readonly murekaAttempts: MurekaVocalDataDeletionEmailInput[] = [];
+  readonly audioengineAttempts: AudioengineVocalDataDeletionEmailInput[] = [];
 
   async sendAccountDeletionComplete(
     input: AccountDeletionCompleteEmailInput,
@@ -107,10 +107,10 @@ export class SuccessfulAccountEmailNotifier implements AccountEmailNotifier {
     };
   }
 
-  async sendMurekaVocalDataDeletion(
-    input: MurekaVocalDataDeletionEmailInput,
-  ): Promise<SendMurekaVocalDeletionEmailResult> {
-    this.murekaAttempts.push(input);
+  async sendAudioengineVocalDataDeletion(
+    input: AudioengineVocalDataDeletionEmailInput,
+  ): Promise<SendAudioengineVocalDeletionEmailResult> {
+    this.audioengineAttempts.push(input);
     return { status: "sent", messageId: `test_${input.requestId}` };
   }
 }
@@ -126,7 +126,7 @@ export class FailingAccountEmailNotifier implements AccountEmailNotifier {
     };
   }
 
-  async sendMurekaVocalDataDeletion(): Promise<SendMurekaVocalDeletionEmailResult> {
+  async sendAudioengineVocalDataDeletion(): Promise<SendAudioengineVocalDeletionEmailResult> {
     return { status: "failed", reason: "provider_error", retryable: true };
   }
 }

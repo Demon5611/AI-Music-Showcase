@@ -1,11 +1,11 @@
 import type { MusicProviderId } from "./music-provider-id.js";
-import { parseMurekaVariantCount } from "@ai-music/shared";
+import { parseAudioengineVariantCount } from "@ai-music/shared";
 
 /**
- * Suno-specific generation knobs. Only Suno adapter + persona/remix builders
+ * Legacyengine-specific generation knobs. Only Legacyengine adapter + persona/remix builders
  * should construct these — not generic application progress/UI code.
  */
-export type SunoGenerationOptions = {
+export type LegacyengineGenerationOptions = {
   customMode?: boolean;
   referenceAudioUrl?: string;
   vocalGender?: "m" | "f";
@@ -13,8 +13,8 @@ export type SunoGenerationOptions = {
   personaModel?: "voice_persona" | "style_persona";
 };
 
-export type MurekaGenerationOptions = {
-  /** Mureka vocal_id from VoiceProfile.externalId */
+export type AudioengineGenerationOptions = {
+  /** Audioengine vocal_id from VoiceProfile.externalId */
   vocalId?: string;
   /** Internal VoiceProfile.id */
   voiceProfileId?: string;
@@ -23,19 +23,19 @@ export type MurekaGenerationOptions = {
   model?: string;
   /**
    * Lyrics-to-Song output count (`n`). Product invariant is always 1
-   * (`MUREKA_OUTPUT_COUNT`); prepareGeneration ignores other values.
+   * (`AUDIOENGINE_OUTPUT_COUNT`); prepareGeneration ignores other values.
    */
   n?: number;
 };
 
 export type ProviderGenerationOptions =
   | {
-      providerId: "sunoapi";
-      options: SunoGenerationOptions;
+      providerId: "legacyengineapi";
+      options: LegacyengineGenerationOptions;
     }
   | {
-      providerId: "mureka";
-      options: MurekaGenerationOptions;
+      providerId: "audioengine";
+      options: AudioengineGenerationOptions;
     }
   | {
       providerId: "mock";
@@ -77,7 +77,7 @@ export type PersistedSongInput = {
   lyricsLanguage?: string;
   /** Persisted provider id for multi-provider restore. */
   providerId?: MusicProviderId;
-  /** Mureka vocal_id */
+  /** Audioengine vocal_id */
   vocalId?: string;
   voiceProfileId?: string;
   musicPrompt?: string;
@@ -89,48 +89,48 @@ export function isInstrumentalMode(input: GenerateSongInput): boolean {
   return input.mode === "instrumental";
 }
 
-export function getSunoGenerationOptions(
+export function getLegacyengineGenerationOptions(
   input: GenerateSongInput,
-): SunoGenerationOptions | null {
+): LegacyengineGenerationOptions | null {
   const options = input.providerOptions;
 
   if (!options) {
     return {};
   }
 
-  if (options.providerId !== "sunoapi") {
+  if (options.providerId !== "legacyengineapi") {
     return null;
   }
 
   return options.options ?? {};
 }
 
-export function getMurekaGenerationOptions(
+export function getAudioengineGenerationOptions(
   input: GenerateSongInput,
-): MurekaGenerationOptions | null {
+): AudioengineGenerationOptions | null {
   const options = input.providerOptions;
 
   if (!options) {
     return {};
   }
 
-  if (options.providerId !== "mureka") {
+  if (options.providerId !== "audioengine") {
     return null;
   }
 
   return options.options ?? {};
 }
 
-export function withMurekaGenerationOptions(
+export function withAudioengineGenerationOptions(
   input: GenerateSongInput,
-  patch: Partial<MurekaGenerationOptions>,
+  patch: Partial<AudioengineGenerationOptions>,
 ): GenerateSongInput {
-  const current = getMurekaGenerationOptions(input) ?? {};
+  const current = getAudioengineGenerationOptions(input) ?? {};
 
   return {
     ...input,
     providerOptions: {
-      providerId: "mureka",
+      providerId: "audioengine",
       options: {
         ...current,
         ...patch,
@@ -139,10 +139,10 @@ export function withMurekaGenerationOptions(
   };
 }
 
-export function requireSunoGenerationOptions(
+export function requireLegacyengineGenerationOptions(
   input: GenerateSongInput,
-  providerId: MusicProviderId = "sunoapi",
-): SunoGenerationOptions {
+  providerId: MusicProviderId = "legacyengineapi",
+): LegacyengineGenerationOptions {
   const options = input.providerOptions;
 
   if (!options) {
@@ -155,23 +155,23 @@ export function requireSunoGenerationOptions(
     );
   }
 
-  if (options.providerId !== "sunoapi") {
-    throw new Error(`Suno adapter cannot use providerOptions for ${options.providerId}`);
+  if (options.providerId !== "legacyengineapi") {
+    throw new Error(`Legacyengine adapter cannot use providerOptions for ${options.providerId}`);
   }
 
   return options.options ?? {};
 }
 
-export function withSunoGenerationOptions(
+export function withLegacyengineGenerationOptions(
   input: GenerateSongInput,
-  patch: Partial<SunoGenerationOptions>,
+  patch: Partial<LegacyengineGenerationOptions>,
 ): GenerateSongInput {
-  const current = getSunoGenerationOptions(input) ?? {};
+  const current = getLegacyengineGenerationOptions(input) ?? {};
 
   return {
     ...input,
     providerOptions: {
-      providerId: "sunoapi",
+      providerId: "legacyengineapi",
       options: {
         ...current,
         ...patch,
@@ -182,8 +182,8 @@ export function withSunoGenerationOptions(
 
 export function toPersistedSongInput(input: GenerateSongInput): PersistedSongInput {
   const providerId = input.providerOptions?.providerId;
-  const suno = getSunoGenerationOptions(input) ?? {};
-  const mureka = getMurekaGenerationOptions(input) ?? {};
+  const legacyengine = getLegacyengineGenerationOptions(input) ?? {};
+  const audioengine = getAudioengineGenerationOptions(input) ?? {};
 
   const persisted: PersistedSongInput = {
     prompt: input.prompt,
@@ -191,17 +191,17 @@ export function toPersistedSongInput(input: GenerateSongInput): PersistedSongInp
     title: input.title,
     durationSec: input.durationSec,
     instrumental: isInstrumentalMode(input),
-    customMode: suno.customMode,
-    referenceAudioUrl: suno.referenceAudioUrl,
-    personaId: suno.personaId,
-    personaModel: suno.personaModel,
-    vocalGender: suno.vocalGender,
+    customMode: legacyengine.customMode,
+    referenceAudioUrl: legacyengine.referenceAudioUrl,
+    personaId: legacyengine.personaId,
+    personaModel: legacyengine.personaModel,
+    vocalGender: legacyengine.vocalGender,
     providerId,
-    vocalId: mureka.vocalId,
-    voiceProfileId: mureka.voiceProfileId,
-    musicPrompt: mureka.musicPrompt,
-    model: mureka.model,
-    n: mureka.n,
+    vocalId: audioengine.vocalId,
+    voiceProfileId: audioengine.voiceProfileId,
+    musicPrompt: audioengine.musicPrompt,
+    model: audioengine.model,
+    n: audioengine.n,
   };
 
   if (input.lyricsLanguage?.trim()) {
@@ -236,12 +236,12 @@ export function fromPersistedSongInput(raw: unknown): GenerateSongInput {
   }
 
   const providerId =
-    raw.providerId === "mureka" || raw.providerId === "sunoapi" || raw.providerId === "mock"
+    raw.providerId === "audioengine" || raw.providerId === "legacyengineapi" || raw.providerId === "mock"
       ? raw.providerId
       : undefined;
 
-  if (providerId === "mureka") {
-    const parsedN = parseMurekaVariantCount(raw.n);
+  if (providerId === "audioengine") {
+    const parsedN = parseAudioengineVariantCount(raw.n);
     return {
       prompt: raw.prompt,
       style: typeof raw.style === "string" ? raw.style : undefined,
@@ -250,7 +250,7 @@ export function fromPersistedSongInput(raw: unknown): GenerateSongInput {
       mode: raw.instrumental === true ? "instrumental" : "song",
       lyricsLanguage: typeof raw.lyricsLanguage === "string" ? raw.lyricsLanguage : undefined,
       providerOptions: {
-        providerId: "mureka",
+        providerId: "audioengine",
         options: {
           vocalId: typeof raw.vocalId === "string" ? raw.vocalId : undefined,
           voiceProfileId:
@@ -284,7 +284,7 @@ export function fromPersistedSongInput(raw: unknown): GenerateSongInput {
     mode: instrumental ? "instrumental" : "song",
     lyricsLanguage: typeof raw.lyricsLanguage === "string" ? raw.lyricsLanguage : undefined,
     providerOptions: {
-      providerId: "sunoapi",
+      providerId: "legacyengineapi",
       options: {
         customMode: typeof raw.customMode === "boolean" ? raw.customMode : undefined,
         referenceAudioUrl:

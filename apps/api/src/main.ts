@@ -29,8 +29,8 @@ import { registerHealthRoutes } from "./modules/health/routes.js";
 import { getApiEnv } from "./config/env.js";
 import { closeGenerationQueue } from "./modules/queue/generation-queue.js";
 import { closeProviderJobQueue } from "./modules/queue/provider-job-queue.js";
-import { closeMurekaProviderJobQueue } from "./modules/queue/mureka-provider-job-queue.js";
-import { closeTbcRefundQueue } from "./modules/queue/tbc-refund-queue.js";
+import { closeAudioengineProviderJobQueue } from "./modules/queue/audioengine-provider-job-queue.js";
+import { closeLegacygatewayRefundQueue } from "./modules/queue/legacygateway-refund-queue.js";
 import {
   startLoadControlMetricsPolling,
   stopLoadControlMetricsPolling,
@@ -107,8 +107,8 @@ async function main() {
     stopLoadControlMetricsPolling();
     await closeGenerationQueue();
     await closeProviderJobQueue();
-    await closeMurekaProviderJobQueue();
-    await closeTbcRefundQueue();
+    await closeAudioengineProviderJobQueue();
+    await closeLegacygatewayRefundQueue();
     await app.close();
     process.exit(0);
   };

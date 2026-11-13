@@ -18,7 +18,7 @@ import type {
 } from "./music.types.js";
 
 /**
- * Music generation contract shared by Suno, ElevenLabs Music, Udio, etc.
+ * Music generation contract shared by Legacyengine, Voiceengine Music, alternateengine, etc.
  *
  * Abstraction layer keeps API/worker/UI independent from a single vendor so we
  * can switch providers via MUSIC_PROVIDER without rewriting business logic.
@@ -44,7 +44,7 @@ export interface MusicProvider {
 
   getTimestampedLyrics?(input: TimestampedLyricsInput): Promise<TimestampedLyricsResult>;
 
-  generateAlbumCover?(sunoMusicTaskId: string): Promise<{ taskId: string }>;
+  generateAlbumCover?(legacyengineMusicTaskId: string): Promise<{ taskId: string }>;
 
   getAlbumCoverStatus?(taskId: string): Promise<AlbumCoverStatusResult>;
 

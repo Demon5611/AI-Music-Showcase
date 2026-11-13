@@ -12,8 +12,8 @@ assert.equal(PLANS.pro.monthlyCredits, 500);
 assert.equal(PLANS.studio.monthlyCredits, 2000);
 
 assert.equal(PLANS.free.priceUsd, 0);
-assert.equal(PLANS.pro.priceUsd, 19);
-assert.equal(PLANS.studio.priceUsd, 49);
+assert.equal(PLANS.pro.priceUsd, 38);
+assert.equal(PLANS.studio.priceUsd, 98);
 
 assert.equal(PLANS.free.id, "free");
 assert.equal(PLANS.pro.id, "pro");

@@ -1,5 +1,5 @@
 /**
- * Official NBG USD→GEL quote for Flitt checkout.
+ * Official NBG USD→GEL quote for Checkoutgateway checkout.
  * Host is fixed (SSRF-safe). Rate math stays on decimal strings / bigint.
  */
 

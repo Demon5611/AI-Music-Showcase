@@ -1,8 +1,8 @@
 import type { FastifyInstance } from "fastify";
 import {
   createCreditPackCheckoutSchema,
-  flittCallbackBodySchema,
-  tbcCallbackBodySchema,
+  checkoutgatewayCallbackBodySchema,
+  legacygatewayCallbackBodySchema,
 } from "@ai-music/shared";
 import { RATE_LIMITS, userRateLimitRouteConfig } from "../../common/rate-limit.js";
 import { requireAuth } from "../../common/require-auth.js";
@@ -13,8 +13,8 @@ import {
   getCreditPackCheckoutStatus,
   getCreditPackPricingFxQuote,
   getCreditPackPurchaseStatusOnly,
-  handleFlittCallback,
-  handleTbcCallback,
+  handleCheckoutgatewayCallback,
+  handleLegacygatewayCallback,
   normalizeBillingError,
 } from "./credit-pack-checkout.service.js";
 import { getUserSubscriptionSummary } from "./entitlements.service.js";
@@ -31,8 +31,8 @@ export async function registerBillingRoutes(app: FastifyInstance) {
 
   /**
    * Public CTA readiness. Boolean only — no credentials, merchant ids, or URLs.
-   * checkoutEnabled=true only when Flitt is enabled and configured.
-   * TBC env never enables the CTA. Unknown PAYMENT_PROVIDER fails closed.
+   * checkoutEnabled=true only when Checkoutgateway is enabled and configured.
+   * LEGACYGATEWAY env never enables the CTA. Unknown PAYMENT_PROVIDER fails closed.
    */
   app.get("/api/billing/credit-packs/checkout-status", async (_request, reply) => {
     return reply.send(getCreditPackCheckoutStatus());
@@ -56,7 +56,7 @@ export async function registerBillingRoutes(app: FastifyInstance) {
     },
   );
   /**
-   * One-time prepaid credit packs. New purchases are Flitt-only (`provider=flitt`).
+   * One-time prepaid credit packs. New purchases are Checkoutgateway-only (`provider=checkoutgateway`).
    * Client may send packageId (+ optional clientRequestId) only.
    */
   app.post(
@@ -106,15 +106,15 @@ export async function registerBillingRoutes(app: FastifyInstance) {
   );
 
   /**
-   * LEGACY ONLY. No new TBC purchases are created.
-   * Kept for historical CreditPackPurchase.provider=tbc rows.
-   * Looks up by provider=tbc + providerPaymentId; never attaches or grants
-   * to a non-TBC purchase. Body alone is not payment proof —
+   * LEGACY ONLY. No new LEGACYGATEWAY purchases are created.
+   * Kept for historical CreditPackPurchase.provider=legacygateway rows.
+   * Looks up by provider=legacygateway + providerPaymentId; never attaches or grants
+   * to a non-LEGACYGATEWAY purchase. Body alone is not payment proof —
    * handler always GETs payment details before any grant.
    * @deprecated
    */
-  app.post("/api/billing/tbc/callback", async (request, reply) => {
-    const parsed = tbcCallbackBodySchema.safeParse(request.body);
+  app.post("/api/billing/legacygateway/callback", async (request, reply) => {
+    const parsed = legacygatewayCallbackBodySchema.safeParse(request.body);
 
     if (!parsed.success) {
       return reply.status(400).send({ error: parsed.error.flatten() });
@@ -126,7 +126,7 @@ export async function registerBillingRoutes(app: FastifyInstance) {
           ? request.headers["x-forwarded-for"].split(",")[0]?.trim()
           : request.ip;
 
-      const result = await handleTbcCallback(parsed.data.PaymentId, { sourceIp });
+      const result = await handleLegacygatewayCallback(parsed.data.PaymentId, { sourceIp });
       return reply.status(200).send(result);
     } catch (error) {
       return sendAppError(reply, normalizeBillingError(error));
@@ -134,11 +134,11 @@ export async function registerBillingRoutes(app: FastifyInstance) {
   });
 
   /**
-   * Flitt host-to-host callback. Signature is verified before any field is trusted.
-   * Browser return URL is never payment proof. HTTP 200 stops Flitt retries.
+   * Checkoutgateway host-to-host callback. Signature is verified before any field is trusted.
+   * Browser return URL is never payment proof. HTTP 200 stops Checkoutgateway retries.
    */
-  app.post("/api/billing/flitt/callback", async (request, reply) => {
-    const parsed = flittCallbackBodySchema.safeParse(request.body);
+  app.post("/api/billing/checkoutgateway/callback", async (request, reply) => {
+    const parsed = checkoutgatewayCallbackBodySchema.safeParse(request.body);
 
     if (!parsed.success) {
       return reply.status(400).send({ error: parsed.error.flatten() });
@@ -150,7 +150,7 @@ export async function registerBillingRoutes(app: FastifyInstance) {
           ? request.headers["x-forwarded-for"].split(",")[0]?.trim()
           : request.ip;
 
-      const result = await handleFlittCallback(parsed.data, { sourceIp });
+      const result = await handleCheckoutgatewayCallback(parsed.data, { sourceIp });
       return reply.status(200).send(result);
     } catch (error) {
       return sendAppError(reply, normalizeBillingError(error));

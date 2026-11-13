@@ -10,6 +10,7 @@ const eslintConfig = defineConfig([
       "no-restricted-imports": [
         "error",
         {
+          patterns: [{ group: ["@ai-music/db", "@ai-music/db/**", "@ai-music/storage", "@ai-music/storage/**", "@ai-music/ai-providers/**", "**/apps/worker/**", "**/apps/api/**"], message: "Use browser-safe contracts and the API client." }],
           paths: [
             {
               name: "@ai-music/ai-providers",

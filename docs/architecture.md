@@ -1,102 +1,43 @@
-# Architecture
+# Architecture: keep the creative flow simple, make failure explicit
 
-AI Music is a multi-service SaaS platform for AI-assisted song creation, optional personal-voice workflows, asynchronous generation, in-browser audio editing, and short-form share-video generation.
+The system separates interaction, authorization and execution. Web renders the experience; API owns access and domain rules; workers handle long-running work. PostgreSQL records domain truth. Queue delivery is a scheduling mechanism, not proof that an operation finished.
 
-This document intentionally describes application architecture rather than production provider recipes.
+## Dependency direction
 
-## High-level flow
+| Layer | Depends on | Must not depend on |
+| --- | --- | --- |
+| Web features | API client, browser-safe contracts | Database, worker, integration adapters |
+| API | Contracts, persistence, queue and adapter ports | Web implementation |
+| Worker | Contracts, persistence, media and adapter ports | Web implementation |
+| Shared contracts | Schemas and pure helpers | Application entry points |
+| Adapters | External transport and a domain contract | Frontend feature state |
 
-```text
-Browser (Next.js)
-   → Fastify API
-      → PostgreSQL (domain state + credit ledger)
-      → Redis / BullMQ (async jobs)
-      → Payment boundary
-   → Worker
-      → Music / voice provider boundary
-      → Video provider boundary
-      → FFmpeg / ffprobe composition + validation
-      → Storage abstraction
+Package-level ESLint restrictions enforce selected imports. They are not a proof of all transitive dependencies or dynamic runtime behavior.
+
+## Model external work as a lifecycle
+
+```mermaid
+stateDiagram-v2
+    [*] --> Requested
+    Requested --> Submitted: persist external identity
+    Submitted --> AssetsStored: reconcile and persist
+    AssetsStored --> Composing
+    Composing --> Ready: validate output
+    Composing --> AssetsStored: retry local stage
+    Submitted --> Failed: terminal outcome
+    Failed --> Compensated: eligible credit restoration
 ```
 
-## Process boundaries
+This is a conceptual model, not a literal enumeration shared by every entity. Keeping submission, persistence and composition distinct prevents a local rendering retry from automatically becoming another external purchase.
 
-| Process | Responsibility |
-| --- | --- |
-| `apps/web` | Product UI, auth-session UX, polling, editor, Share Video UX |
-| `apps/api` | Authorization, validation, billing state, enqueue, server-side gates, media access |
-| `apps/worker` | Long-running provider work, polling, retries, persistence, reconciliation, media composition |
+## Important consistency limits
 
-## Core packages
+A database write and a queue enqueue are separate systems. Do not describe them as atomic without a transactional outbox or equivalent implementation. Use durable intent, idempotent consumers and reconciliation for interrupted hand-offs. Likewise, callbacks may repeat or arrive out of order; domain transitions must establish whether an event is still applicable.
 
-| Package | Role |
-| --- | --- |
-| `@ai-music/shared` | Shared contracts, schemas, constants, storage-key builders |
-| `@ai-music/db` | Prisma models + append-only credits ledger + durable generation state |
-| `@ai-music/ai-providers` | Public provider contracts and safe/demo implementations |
-| payment packages | Payment-boundary examples retained from the sanitized showcase snapshot |
-| `@ai-music/storage` | Storage abstraction |
-| `@ai-music/api-client` | Typed HTTP client for the web app |
-| `@ai-music/observability` | Metrics / health helpers |
+## Browser and server separation
 
-## Video-generation boundary
+Client-safe schemas belong in the shared contract surface. Node-only networking and filesystem code require explicit server entry points; never export them through a browser barrel. A signed media URL is an access capability, not permission to attach an application Bearer token to that origin.
 
-The private production system has a dedicated video-provider layer. Business code depends on a stable `VideoProvider` contract rather than vendor-specific HTTP APIs.
+## Public boundary
 
-The public repository demonstrates only the application-facing contract and deterministic mock behavior needed to understand the architecture.
-
-```text
-Application / Worker
-        ↓
-VideoProvider contract
-        ↓
-Public mock implementation
-        ↓
-Production adapters live privately
-```
-
-Provider-specific payload mapping, exact model/version selection, prompts, routing, fallback policy, account configuration, and commercial logic are intentionally excluded.
-
-## Share Video / AI Story pipeline
-
-```text
-Track + source media + selected template
-        ↓
-Server-side validation / template resolution
-        ↓
-Persist application-level video state
-        ↓
-Background generation through provider boundary
-        ↓
-Persist external task identity and durable media
-        ↓
-Application-owned edit/composition stage
-        ↓
-FFmpeg composition
-        ↓
-ffprobe validation
-        ↓
-Final media persistence
-```
-
-The public diagram intentionally omits production creative-planning logic and provider assignment rules.
-
-## Reliability rule
-
-A local render/composition failure must not automatically trigger another external generation request for media that already exists.
-
-Persisted task identity and durable generated assets allow recovery to distinguish external-generation work from local rendering work.
-
-## Design constraints
-
-1. Browser code does not call commercial AI or payment providers directly.
-2. Monetary state transitions are ledger/state-machine based and designed for idempotency.
-3. In-flight external work keeps persisted task affinity.
-4. Worker jobs resume from durable state rather than process memory.
-5. Generated media is copied into application-controlled storage.
-6. External-task retries reconcile known work before creating replacement work.
-7. Final media is validated before being marked ready.
-8. Product/template availability is enforced server-side.
-9. Production provider details remain outside the public showcase.
-
-See also: [engineering-highlights.md](./engineering-highlights.md), [share-video.md](./share-video.md), [public-showcase-boundary.md](./public-showcase-boundary.md), [security-design.md](./security-design.md).
+Neutral integration identifiers are demo labels, not hints about production vendor selection. Adapter payloads and retained state-machine examples are illustrative. Production routing, creative planning, prompt compilation and commercial policy stay private.

@@ -1,7 +1,7 @@
 import {
-  createSunoVoiceClients,
+  createLegacyengineVoiceClients,
   MusicProviderUnavailableError,
-  resolveSunoVoiceConfig,
+  resolveLegacyengineVoiceConfig,
 } from "@ai-music/ai-providers";
 import { BadRequestError, ForbiddenError } from "../../common/errors.js";
 import { getStorageService } from "../storage/storage.service.js";
@@ -59,8 +59,8 @@ async function uploadRemixAudioWithRetry(
   data: Uint8Array,
   filename: string,
 ): Promise<string> {
-  const config = resolveSunoVoiceConfig();
-  const { fileUpload } = createSunoVoiceClients(config);
+  const config = resolveLegacyengineVoiceConfig();
+  const { fileUpload } = createLegacyengineVoiceClients(config);
   let lastError: unknown;
 
   for (let attempt = 1; attempt <= MAX_UPLOAD_ATTEMPTS; attempt += 1) {
@@ -78,19 +78,19 @@ async function uploadRemixAudioWithRetry(
     }
   }
 
-  throw new MusicProviderUnavailableError("sunoapi", REMIX_UPLOAD_UNAVAILABLE_RU, lastError);
+  throw new MusicProviderUnavailableError("legacyengineapi", REMIX_UPLOAD_UNAVAILABLE_RU, lastError);
 }
 
 /**
- * Suno upload-cover needs a fetchable URL.
+ * Legacyengine upload-cover needs a fetchable URL.
  * Trust boundary: load bytes only from internal R2 storage key for sourceTrackId,
- * then upload via Suno File API. Never accept client-supplied audio URLs.
+ * then upload via Legacyengine File API. Never accept client-supplied audio URLs.
  */
 export async function uploadRemixReferenceAudioUrl(track: TrackAudioSource): Promise<string> {
-  const config = resolveSunoVoiceConfig();
+  const config = resolveLegacyengineVoiceConfig();
 
   if (!config.apiKey.trim()) {
-    throw new ForbiddenError("SUNO_API_KEY не настроен");
+    throw new ForbiddenError("LEGACYENGINE_API_KEY не настроен");
   }
 
   const buffer = await loadTrackAudioBuffer(track);

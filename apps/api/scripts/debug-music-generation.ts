@@ -1,7 +1,7 @@
 import { config } from "dotenv";
 import { resolve } from "node:path";
 import { prisma } from "@ai-music/db";
-import { createSunoVoiceClients } from "@ai-music/ai-providers";
+import { createLegacyengineVoiceClients } from "@ai-music/ai-providers";
 
 config({ path: resolve(import.meta.dirname, "../../../.env") });
 
@@ -26,16 +26,16 @@ async function main() {
     orderBy: { createdAt: "desc" },
   });
 
-  const { voice } = createSunoVoiceClients();
+  const { voice } = createLegacyengineVoiceClients();
   const personaChecks = await Promise.all(
     samples
-      .filter((sample) => sample.sunoVoiceId || sample.sunoVoiceTaskId)
+      .filter((sample) => sample.legacyengineVoiceId || sample.legacyengineVoiceTaskId)
       .map(async (sample) => {
-        const id = sample.sunoVoiceId?.trim() || sample.sunoVoiceTaskId!.trim();
+        const id = sample.legacyengineVoiceId?.trim() || sample.legacyengineVoiceTaskId!.trim();
         return {
           id: sample.id,
-          sunoVoiceId: sample.sunoVoiceId,
-          sunoVoiceTaskId: sample.sunoVoiceTaskId,
+          legacyengineVoiceId: sample.legacyengineVoiceId,
+          legacyengineVoiceTaskId: sample.legacyengineVoiceTaskId,
           voiceCloneStatus: sample.voiceCloneStatus,
           checkPersonaVoiceAvailability: await voice.checkPersonaVoiceAvailability(id),
         };

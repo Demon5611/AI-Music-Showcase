@@ -25,11 +25,11 @@ export function resolveAlbumCoverProductCostUnits(): CreditUnits {
   return OPERATION_COST_UNITS.albumCover;
 }
 
-/** Cover variants CTA only for completed Suno music generations. */
+/** Cover variants CTA only for completed Legacyengine music generations. */
 export function canRequestAlbumCoverVariants(
   musicProvider: string | null | undefined,
 ): boolean {
-  return (musicProvider ?? "").trim().toLowerCase() === "sunoapi";
+  return (musicProvider ?? "").trim().toLowerCase() === "legacyengineapi";
 }
 
 export type AlbumCoverGenerationReadyInput = {

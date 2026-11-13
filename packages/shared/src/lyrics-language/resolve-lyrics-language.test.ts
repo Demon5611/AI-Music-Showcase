@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { SUNO_LYRICS_PROMPT_MAX_LENGTH } from "../constants/vocal-gender.js";
+import { LEGACYENGINE_LYRICS_PROMPT_MAX_LENGTH } from "../constants/vocal-gender.js";
 import { buildLyricsLanguageInstruction } from "./build-lyrics-language-instruction.js";
 import { buildLyricsGenerationProviderPrompt } from "./build-lyrics-generation-prompt.js";
 import { resolveLyricsLanguage } from "./resolve-lyrics-language.js";
@@ -141,7 +141,7 @@ import { lyricsLanguageSchema } from "./lyrics-language.js";
   assert.doesNotMatch(multi, /Generate all lyrics in/);
 }
 
-// Ordered provider prompt stays within Suno 200-char hard limit
+// Ordered provider prompt stays within Legacyengine 200-char hard limit
 {
   const prompt = buildLyricsGenerationProviderPrompt({
     brief: "песня про двух друзей любовь и дружбу",
@@ -154,7 +154,7 @@ import { lyricsLanguageSchema } from "./lyrics-language.js";
     lyricsDurationSec: 180,
   });
 
-  assert.ok(prompt.length <= SUNO_LYRICS_PROMPT_MAX_LENGTH, `len=${prompt.length}`);
+  assert.ok(prompt.length <= LEGACYENGINE_LYRICS_PROMPT_MAX_LENGTH, `len=${prompt.length}`);
   assert.match(prompt, /French/);
   assert.match(prompt, /песня про двух друзей/);
   assert.match(prompt, /je suis allé, j'étais/);
@@ -176,7 +176,7 @@ import { lyricsLanguageSchema } from "./lyrics-language.js";
     lyricsDurationSec: 120,
   });
 
-  assert.ok(prompt.length <= SUNO_LYRICS_PROMPT_MAX_LENGTH);
+  assert.ok(prompt.length <= LEGACYENGINE_LYRICS_PROMPT_MAX_LENGTH);
   assert.match(prompt, /я пошла, я была/);
 }
 
@@ -189,7 +189,7 @@ import { lyricsLanguageSchema } from "./lyrics-language.js";
     lyricsDurationSec: 60,
   });
   assert.match(en, /I went, I was/);
-  assert.ok(en.length <= SUNO_LYRICS_PROMPT_MAX_LENGTH);
+  assert.ok(en.length <= LEGACYENGINE_LYRICS_PROMPT_MAX_LENGTH);
 
   const zh = buildLyricsGenerationProviderPrompt({
     brief: "夏天的歌",
@@ -198,7 +198,7 @@ import { lyricsLanguageSchema } from "./lyrics-language.js";
     lyricsDurationSec: 60,
   });
   assert.match(zh, /我走了，我爱过/);
-  assert.ok(zh.length <= SUNO_LYRICS_PROMPT_MAX_LENGTH);
+  assert.ok(zh.length <= LEGACYENGINE_LYRICS_PROMPT_MAX_LENGTH);
 }
 
 // Long brief is clipped; language requirement preserved
@@ -215,7 +215,7 @@ import { lyricsLanguageSchema } from "./lyrics-language.js";
     lyricsDurationSec: 120,
   });
 
-  assert.ok(prompt.length <= SUNO_LYRICS_PROMPT_MAX_LENGTH);
+  assert.ok(prompt.length <= LEGACYENGINE_LYRICS_PROMPT_MAX_LENGTH);
   assert.match(prompt, /^Generate all lyrics in English/);
   assert.match(prompt, /I went, I was/);
 }

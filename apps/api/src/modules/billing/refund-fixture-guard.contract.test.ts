@@ -25,7 +25,7 @@ const result = spawnSync(
     env: {
       ...process.env,
       APP_ENV: "production",
-      TBC_REFUND_PROVIDER_MODE: "mock",
+      LEGACYGATEWAY_REFUND_PROVIDER_MODE: "mock",
       DATABASE_URL: process.env.DATABASE_URL ?? "postgresql://invalid",
     },
     encoding: "utf8",

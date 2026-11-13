@@ -7,8 +7,8 @@ import {
 
 describe("provider-data-deletion-queue", () => {
   it("builds deterministic job id without colons", () => {
-    const jobId = providerDataDeletionSubmitJobId("mureka", "req_abc");
-    assert.equal(jobId, "provider-data-deletion-submit-mureka-req_abc");
+    const jobId = providerDataDeletionSubmitJobId("audioengine", "req_abc");
+    assert.equal(jobId, "provider-data-deletion-submit-audioengine-req_abc");
     assert.equal(jobId.includes(":"), false);
     assert.equal(PROVIDER_DATA_DELETION_SUBMIT_JOB_NAME, "provider-data-deletion-submit");
   });

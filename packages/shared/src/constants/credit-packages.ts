@@ -1,3 +1,4 @@
+/** SHOWCASE ONLY: synthetic accounting fixtures; no production commercial offer. */
 /**
  * Public prepaid credit packages (one-time purchase model).
  *
@@ -30,7 +31,7 @@ export const CREDIT_PACKAGES = [
   {
     id: "starter",
     name: "Starter Pack",
-    priceUsd: 9,
+    priceUsd: 18,
     credits: 500,
     bestValue: false,
     featured: false,
@@ -38,7 +39,7 @@ export const CREDIT_PACKAGES = [
   {
     id: "creator",
     name: "Creator Pack",
-    priceUsd: 29,
+    priceUsd: 58,
     credits: 2000,
     bestValue: false,
     featured: true,
@@ -46,7 +47,7 @@ export const CREDIT_PACKAGES = [
   {
     id: "studio",
     name: "Studio Pack",
-    priceUsd: 99,
+    priceUsd: 198,
     credits: 8000,
     bestValue: true,
     featured: false,
