@@ -29,7 +29,7 @@ import {
   resolveCheckoutgatewayCheckoutConfig,
   toCheckoutgatewayMinorUnits,
   verifyCheckoutgatewaySignature,
-} from "./providers/integration.example.invalid";
+} from "./providers/checkoutgateway.js";
 import { loadApiEnv } from "../../config/env.js";
 
 const here = dirname(fileURLToPath(import.meta.url));

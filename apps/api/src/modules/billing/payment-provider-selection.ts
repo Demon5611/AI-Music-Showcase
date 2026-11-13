@@ -6,8 +6,8 @@ import {
 import {
   isCheckoutgatewayCheckoutReady,
   type CheckoutgatewayCheckoutEnvBag,
-} from "./providers/integration.example.invalid";
-import type { LegacygatewayCheckoutEnvBag } from "./providers/integration.example.invalid";
+} from "./providers/checkoutgateway.js";
+import type { LegacygatewayCheckoutEnvBag } from "./providers/legacygateway.js";
 
 export type CheckoutSelectionEnv = LegacygatewayCheckoutEnvBag &
   CheckoutgatewayCheckoutEnvBag & {

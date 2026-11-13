@@ -8,7 +8,7 @@ import {
   resolveLegacygatewayCheckoutConfig,
   LegacygatewayCheckoutError,
   toSafeLegacygatewayUserMessage,
-} from "./providers/integration.example.invalid";
+} from "./providers/legacygateway.js";
 import { getCreditPackCheckoutStatus } from "./credit-pack-checkout.service.js";
 
 const LEGACYGATEWAY_ENV_KEYS = [

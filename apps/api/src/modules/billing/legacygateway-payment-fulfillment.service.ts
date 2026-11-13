@@ -15,7 +15,7 @@ import {
   mapLegacygatewayProviderStatus,
   verifyLegacygatewayPaymentAgainstPurchase,
   type LegacygatewayPaymentDetails,
-} from "./providers/integration.example.invalid";
+} from "./providers/legacygateway.js";
 
 export type LegacygatewayCallbackResult = {
   ok: true;

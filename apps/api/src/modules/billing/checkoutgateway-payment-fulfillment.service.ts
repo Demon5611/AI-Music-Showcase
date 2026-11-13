@@ -19,7 +19,7 @@ import {
   verifyCheckoutgatewayPaymentAgainstPurchase,
   verifyCheckoutgatewaySignature,
   type CheckoutgatewayCheckoutRuntimeConfig,
-} from "./providers/integration.example.invalid";
+} from "./providers/checkoutgateway.js";
 
 export type CheckoutgatewayCallbackResult = {
   ok: true;

@@ -32,11 +32,11 @@ import {
   toSafeCheckoutgatewayUserMessage,
   type CheckoutgatewayCheckoutRuntimeConfig,
   type PaymentProvider,
-} from "./providers/integration.example.invalid";
+} from "./providers/checkoutgateway.js";
 import {
   LegacygatewayCheckoutError,
   toSafeLegacygatewayUserMessage,
-} from "./providers/integration.example.invalid";
+} from "./providers/legacygateway.js";
 import {
   isConfiguredCheckoutEnabled,
   type CheckoutSelectionEnv,
