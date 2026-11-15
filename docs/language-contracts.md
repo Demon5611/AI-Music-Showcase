@@ -70,4 +70,4 @@ Legacyengine `POST /api/v1/lyrics` **не имеет** поля `language`. Ко
 | Lyrics generate | `apps/api/src/modules/music/service.ts` |
 | Voice UI select | `apps/web/src/features/voice/voice-language-select.tsx` |
 | Lyrics UI select | `apps/web/src/features/music-create/components/lyrics-language-select.tsx` |
-| Voice flow | [.cursor/skills/music-provider-integration/references/legacyengine-voice-flow.md](../.cursor/skills/music-provider-integration/references/legacyengine-voice-flow.md) |
+| Voice flow | .cursor/skills/music-provider-integration/references/legacyengine-voice-flow.md (reference not included in this public snapshot) |
