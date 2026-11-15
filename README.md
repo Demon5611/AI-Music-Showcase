@@ -17,20 +17,101 @@ This public snapshot uses demo adapters and illustrative configuration. Producti
 | Credit accounting | Append-only ledger and idempotent transitions | Repeated event delivery does not duplicate eligible mutations |
 | Media readiness | Output validation before publication | Readiness depends on a validated artifact |
 
-## System architecture
+## System design
+
+Logical product architecture. External services are represented by neutral ports; the public snapshot supplies demo implementations where available.
 
 ```mermaid
 flowchart TD
-    Web["Web · creation and editing"] --> API["API · identity and product rules"]
-    API --> DB[("Database · durable state and ledger")]
-    API --> Queue["Queue · asynchronous delivery"]
-    Queue --> Worker["Worker · execution and recovery"]
-    Worker --> DB
-    Worker --> Adapters["Ports and demo adapters"]
-    Worker --> Media["Media composition and validation"]
-    Media --> Storage[("Application-owned media")]
-    API --> Storage
+    Web["Web · creation, history, editor and export"]
+    Identity["Identity boundary"]
+    API["API · authentication, ownership and validation"]
+    Billing["Billing · entitlements and credit accounting"]
+    Payment["Payment boundary"]
+    Jobs["Generation and editing services"]
+    DB[("PostgreSQL · jobs, assets and ledger")]
+    Queue["Redis / BullMQ · asynchronous jobs"]
+    Worker["Worker · execution and reconciliation"]
+    AI["Music, voice and video adapter ports"]
+    Render["FFmpeg / ffprobe · composition and validation"]
+    Storage[("Media storage · local or object-backed")]
+    Access["API · authorized media delivery"]
+    Ops["Health, readiness and metrics"]
+
+    Web -->|"session"| Identity
+    Web -->|"typed requests"| API
+    API -->|"verify identity"| Identity
+    API --> Billing
+    Billing -->|"checkout"| Payment
+    Payment -->|"verified payment events"| Billing
+    Billing -->|"idempotent credit entries"| DB
+    API --> Jobs
+    Jobs -->|"persist intent and state"| DB
+    Jobs -->|"schedule work"| Queue
+    Queue --> Worker
+    Worker -->|"submit or reconcile tasks"| AI
+    AI -->|"callback events"| API
+    Worker -->|"persist progress and task identity"| DB
+    Worker -->|"persist source assets"| Storage
+    Worker --> Render
+    Render -->|"validated outputs"| Storage
+    Web -->|"poll status and history"| API
+    API -->|"read domain state"| DB
+    Web -->|"playback and download"| Access
+    Access -->|"ownership and asset lookup"| DB
+    Access -->|"read media"| Storage
+    API -.-> Ops
+    Worker -.-> Ops
 ```
+
+| Boundary | Responsibility |
+| --- | --- |
+| Web | Creation forms, optional voice onboarding, progress, history, timeline editing and downloads |
+| API | Identity verification, ownership, validation, entitlements, job submission and media access |
+| Worker | External task execution, reconciliation, asset persistence and media processing |
+| Database | Durable domain state, task references, asset metadata and credit transactions |
+| Queue | Delivery and retry scheduling; domain completion is recorded in the database |
+| Storage | Voice references, generated audio, intermediate assets and validated exports |
+| External ports | Generation, identity and payment integrations behind application-facing contracts |
+
+Payment events are verified server-side before accounting changes. Provider callbacks enter the API boundary and require validation; external success alone does not make an export ready. Database writes, queue delivery and external submissions are separate operations.
+
+### Generation, editing and recovery
+
+Conceptual lifecycle; individual entities use their own state models.
+
+```mermaid
+flowchart TD
+    Request["Creation request · lyrics, optional voice or source media"]
+    Gate["Validate ownership, capabilities and credit eligibility"]
+    Intent["Persist job identity and operation state"]
+    Execute["Asynchronous generation or task reconciliation"]
+    Assets["Persist generated assets"]
+    Choice{"Requested output"}
+    Edit["Audio editing and export"]
+    Video["Video composition"]
+    Validate["Validate final media"]
+    Ready["Ready state and controlled download"]
+    Recovery["Retry or reconcile from durable state"]
+    Failed["Terminal failure · eligible compensation"]
+
+    Request --> Gate
+    Gate --> Intent
+    Intent --> Execute
+    Execute --> Assets
+    Assets --> Choice
+    Choice -->|"audio"| Edit
+    Choice -->|"video"| Video
+    Edit --> Validate
+    Video --> Validate
+    Validate --> Ready
+    Execute -->|"uncertain or retryable outcome"| Recovery
+    Recovery -->|"reuse task identity"| Execute
+    Video -->|"local render failure"| Assets
+    Execute -->|"terminal outcome"| Failed
+```
+
+Persisted assets separate external generation from local composition. Composition retries can reuse existing inputs. Recovery reconciles known external work before a replacement submission; delivery is not assumed to be globally exactly-once.
 
 ## Architectural patterns
 
