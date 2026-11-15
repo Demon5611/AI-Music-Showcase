@@ -3,12 +3,12 @@ import {
   RECOMMENDED_VOICE_SAMPLE_DURATION_MIN_SEC,
 } from "@ai-music/shared";
 
-/** Kits training docs — basis for short reference sample tips. */
-export const KITS_RECORDING_DOCS_URL =
-  "https://docs.kits.ai/train/high-quality-datasets";
+/** Generic recording guidance for the local showcase. */
+export const VOICEADAPTER_RECORDING_DOCS_URL =
+  "https://example.com/voice-recording-guide";
 
-export const KITS_VOICE_CONVERSION_DOCS_URL =
-  "https://docs.kits.ai/api-reference/api-endpoints/voice-conversion-api/create-new-voice-conversion-job";
+export const VOICEADAPTER_VOICE_CONVERSION_DOCS_URL =
+  "https://example.com/voice-workflow-guide";
 
 /** Plain numeric range for {duration} interpolation — unit word lives in the translated message. */
 export const VOICE_RECORDING_TIP_DURATION_LABEL = `${RECOMMENDED_VOICE_SAMPLE_DURATION_MIN_SEC}–${RECOMMENDED_VOICE_SAMPLE_DURATION_MAX_SEC}`;
