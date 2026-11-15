@@ -12,7 +12,7 @@ This document remains the **verified contract** for the historical Legacyengine 
 (`personaId`) path if that code is touched. Do not use it as the target MVP voice flow.
 Do not mix Legacyengine `personaId` with Audioengine `vocal_id`.
 
-Cursor rule: [.cursor/rules/legacyengine-voice-persona-contract.mdc](../.cursor/rules/legacyengine-voice-persona-contract.mdc).
+Cursor rule: .cursor/rules/legacyengine-voice-persona-contract.mdc (reference not included in this public snapshot).
 
 Документ фиксирует **проверенный контракт** (prod-like прогон 2026-06-21) для подмены
 вокала (`personaId`), `readyForMusicGeneration` и music generate.
