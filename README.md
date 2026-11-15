@@ -1,29 +1,23 @@
-# AI Music · From a fleeting idea to something worth sharing
+# AI Music — Technical Showcase
 
-**A creative product on the surface. A distributed systems problem underneath.**
+TypeScript monorepo for asynchronous music generation, personal-voice workflows, browser-based audio editing, and short-form video composition.
 
-A line of lyrics. A voice recording. A photo with a story behind it. AI Music brings those fragments into a single creative journey: make a song, shape it in an audio editor, and turn it into a shareable video.
+The application separates the web client, HTTP API, and background workers. PostgreSQL stores domain state and credit transactions; Redis/BullMQ schedules asynchronous work; FFmpeg handles media composition and validation.
 
-The interesting engineering begins when the user presses **Create**. External work takes time. A callback may arrive twice. A worker can restart after an external operation succeeds. A render can fail after the expensive part is already complete. The product must make all of that feel like one coherent experience.
+This public snapshot uses demo adapters and illustrative configuration. Production credentials, commercial integration identities, proprietary prompts, routing policies, negotiated pricing, and infrastructure identifiers are excluded.
 
-This public repository is an independently sanitized **architecture showcase** of a privately maintained SaaS. It contains demo adapters and illustrative policies, not production integration recipes. Vendor identities, negotiated terms, production credentials, prompts, operational thresholds and private infrastructure are outside its public contract.
+## Responsibilities and failure handling
 
-## The story behind the architecture
-
-The first challenge is creative: help someone reach a result without making them understand the machinery. The second is operational: make a slow, failure-prone workflow recoverable. The third is commercial: retries should not silently become repeated spending or duplicate credit deductions.
-
-That led to three process boundaries, durable state, explicit side-effect identities, and adapters that keep external systems replaceable. These are design choices with product consequences—not a list of frameworks.
-
-| Product moment | Engineering decision | Why it matters |
+| Concern | Implementation approach | Intended property |
 | --- | --- | --- |
-| A user starts a creation | API validates ownership and records intent | The browser cannot authorize its own resources |
-| The result takes time | Queue-backed worker outside the HTTP lifecycle | Navigation and processing have separate lifetimes |
-| A provider response is uncertain | Persist task identity and reconcile before resubmitting | Recovery does not blindly repeat expensive work |
-| A render fails | Keep source assets separate from composed output | Retry local composition without recreating assets |
-| A payment callback repeats | Verified, idempotent ledger transitions | Repeated delivery must not grant credits twice |
-| A video looks finished | Validate media before publishing readiness | “Ready” describes an artifact, not just a successful request |
+| Authorization | API-side identity and resource ownership checks | Client input cannot establish ownership |
+| Long-running operations | Queue-backed background workers | Processing is independent of the HTTP request lifecycle |
+| External task recovery | Persisted task identity and reconciliation | Known work can be recovered before resubmission |
+| Composition retries | Separate source assets and render state | Local retries can reuse persisted assets |
+| Credit accounting | Append-only ledger and idempotent transitions | Repeated event delivery does not duplicate eligible mutations |
+| Media readiness | Output validation before publication | Readiness depends on a validated artifact |
 
-## System at a glance
+## System architecture
 
 ```mermaid
 flowchart TD
@@ -38,9 +32,7 @@ flowchart TD
     API --> Storage
 ```
 
-**3 process roles. 1 durable source of domain truth. Explicit boundaries around external side effects.** These are architecture facts, not traffic or revenue claims.
-
-## Patterns worth inspecting
+## Architectural patterns
 
 - **Ports and adapters:** domain-facing contracts separate product policy from integration mechanics.
 - **Durable workflow state:** retries resume from recorded progress instead of process memory.
@@ -49,9 +41,9 @@ flowchart TD
 - **Application-owned media:** generated assets become durable inputs to composition instead of relying on expiring external links.
 - **Defense in depth:** ownership checks, server-side entitlements, local demo defaults and public-content checks address different trust boundaries.
 
-Read the [architecture](docs/architecture.md), [engineering decisions](docs/engineering-highlights.md), [product story](docs/product-overview.md), and [security design](docs/security-design.md).
+Read the [architecture](docs/architecture.md), [engineering decisions](docs/engineering-highlights.md), [functional scope](docs/product-overview.md), and [security design](docs/security-design.md).
 
-## Explore the showcase
+## Local setup
 
 The source uses Next.js / React / TypeScript, Fastify, PostgreSQL / Prisma, Redis / BullMQ and FFmpeg. These are implementation technologies; commercial AI and payment integrations are represented by neutral demo boundaries.
 
@@ -72,7 +64,7 @@ pnpm test
 pnpm build
 ```
 
-## Scope and honesty
+## Scope and limitations
 
 This repository demonstrates application architecture, not a foundation model. The private product and this snapshot evolve separately. Security patterns described for the private system are not automatically guarantees of this demo: see the [implementation status](docs/security-design.md).
 
@@ -80,6 +72,6 @@ Commercial-looking fixture values are illustrative demo data. They do not disclo
 
 ## Authorship
 
-Designed and developed by **Dmitriy Sedov**, spanning frontend experience, API contracts, asynchronous orchestration, media processing and delivery concerns.
+**Dmitriy Sedov** — application design and implementation across frontend, API, asynchronous processing, and media pipelines.
 
 Copyright © 2026 Dmitriy Sedov. Published for portfolio review and technical evaluation. See [NOTICE](NOTICE) for usage restrictions.
