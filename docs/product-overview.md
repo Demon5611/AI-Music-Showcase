@@ -1,23 +1,28 @@
-# A small creative moment, supported by a complete product
+# Functional scope
 
-Someone arrives with an idea rather than an audio production workflow. The product lets them start with words, optionally bring a personal voice, refine the result, and leave with a piece of media they can share.
+AI Music combines asynchronous media generation, audio editing, and video composition within a single application.
 
-## Three acts
+## Workflows
 
-**Create.** Turn intent into a generation request. Clear progress and a durable history make waiting understandable, and optional voice onboarding avoids forcing every user through the longest path.
+| Workflow | Input | Processing | Output |
+| --- | --- | --- | --- |
+| Music generation | Prompt or lyrics; optional voice reference | Validation, asynchronous submission, status reconciliation, persistence | Stored track and generation status |
+| Audio editing | Stored track and edit operations | Timeline operations and audio rendering | Exported audio |
+| Share video | Track, source media, template selection | Asynchronous asset generation, composition, output validation | Stored video artifact |
+| Credits and checkout | Authorized purchase or operation request | Payment verification, ledger mutation, eligible compensation | Durable accounting state |
 
-**Shape.** Bring the result into a timeline. Editing and export turn a generated output into something the user can make their own.
+## Application responsibilities
 
-**Share.** Combine a track with visual material. Generation and composition have separate lifecycles; a finished asset is validated before it becomes available.
+- Server-side authorization, resource ownership and entitlement checks.
+- Durable job state, external task identity, retries and reconciliation.
+- Credit accounting and payment/refund lifecycle handling.
+- Media persistence, composition, validation and controlled delivery.
+- Typed API contracts and feature-oriented frontend modules.
 
-## The business thinking in the engineering
+External generation and payment systems are accessed through adapters. The public snapshot contains neutral integration labels, demo implementations and illustrative policies. Exact capabilities depend on the supplied adapter; this repository does not provide the private production integrations.
 
-| Constraint | Product response | Architectural support |
-| --- | --- | --- |
-| External work has real cost | Make consumption explicit | Credit ledger and authorized operations |
-| Failures should not feel like lost purchases | Recover or compensate eligible failures | Durable state and idempotent compensation |
-| More than one creative workflow | Keep one coherent experience | Stable contracts behind feature-oriented UI |
-| Suppliers and capabilities evolve | Preserve application-owned history | Adapter boundaries and stored task identity |
-| A result must remain useful later | Own the output lifecycle | Durable storage, controlled delivery and export |
+## Operational constraints
 
-These explain tradeoffs rather than claim measured business outcomes. Demo balances, fixture prices and limits are synthetic; they are not commercial offers.
+Queue delivery can repeat. External responses can be uncertain. Database persistence and queue delivery are separate operations. Idempotent transitions and reconciliation address these failure modes; the system does not assume global exactly-once execution.
+
+Demo prices, balances and limits are fixture data rather than commercial offers. Deployment and security limitations are documented in [security-design.md](security-design.md).
