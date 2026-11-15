@@ -194,5 +194,5 @@ Metrics (`scope=load-control`): `music_track_persist`, `music_track_persist_enqu
 
 ## Related docs
 
-- [legacyengineapi.md](../.cursor/skills/music-provider-integration/references/legacyengineapi.md) — Legacyengine API constraints
+- legacyengineapi.md (reference not included in this public snapshot) — Legacyengine API constraints
 - Queue acceleration plan (historical) — `.cursor/plans/queue_throughput_acceleration_*.plan.md`
