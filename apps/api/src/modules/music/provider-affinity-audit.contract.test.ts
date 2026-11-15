@@ -21,17 +21,17 @@ const AUDIT: AffinityExpectation[] = [
     existingAsset: true,
     usesProviderSpecificId: true,
     shouldUseAffinity: true,
-    note: "Suno taskId+audioId; Mureka unavailable",
+    note: "Legacyengine taskId+audioId; Audioengine unavailable",
   },
   {
     operation: "album-cover",
     existingAsset: true,
     usesProviderSpecificId: true,
     shouldUseAffinity: true,
-    note: "Suno music taskId only",
+    note: "Legacyengine music taskId only",
   },
   {
-    operation: "stem-separation (Suno vocal-removal)",
+    operation: "stem-separation (Legacyengine vocal-removal)",
     existingAsset: true,
     usesProviderSpecificId: true,
     shouldUseAffinity: true,
@@ -49,7 +49,7 @@ const AUDIT: AffinityExpectation[] = [
     existingAsset: true,
     usesProviderSpecificId: false,
     shouldUseAffinity: false,
-    note: "Creates NEW Suno asset from reference audio URL",
+    note: "Creates NEW Legacyengine asset from reference audio URL",
   },
   {
     operation: "generateSong / lyrics",
@@ -83,22 +83,22 @@ function testAuditTableShape(): void {
   assert.ok(AUDIT.some((row) => row.operation.includes("local editor") && !row.shouldUseAffinity));
 }
 
-function testSunoTrackOpsIgnoreDefaultMureka(): void {
+function testLegacyengineTrackOpsIgnoreDefaultAudioengine(): void {
   const previous = process.env.MUSIC_DEFAULT_PROVIDER;
-  process.env.MUSIC_DEFAULT_PROVIDER = "mureka";
+  process.env.MUSIC_DEFAULT_PROVIDER = "audioengine";
   try {
     const timed = resolveTimedLyricsStrategy({
-      musicProvider: "sunoapi",
-      providerTaskId: "suno-task",
-      providerAudioId: "suno-audio",
+      musicProvider: "legacyengineapi",
+      providerTaskId: "legacyengine-task",
+      providerAudioId: "legacyengine-audio",
     });
-    assert.equal(timed.kind, "suno_timestamped");
+    assert.equal(timed.kind, "legacyengine_timestamped");
 
     const cover = resolveAlbumCoverStrategy({
-      musicProvider: "sunoapi",
-      providerTaskId: "suno-task",
+      musicProvider: "legacyengineapi",
+      providerTaskId: "legacyengine-task",
     });
-    assert.equal(cover.kind, "suno_music_task");
+    assert.equal(cover.kind, "legacyengine_music_task");
   } finally {
     if (previous === undefined) {
       delete process.env.MUSIC_DEFAULT_PROVIDER;
@@ -108,20 +108,20 @@ function testSunoTrackOpsIgnoreDefaultMureka(): void {
   }
 }
 
-function testMurekaNeverSilentSunoFallback(): void {
+function testAudioengineNeverSilentLegacyengineFallback(): void {
   const previous = process.env.MUSIC_DEFAULT_PROVIDER;
-  process.env.MUSIC_DEFAULT_PROVIDER = "sunoapi";
+  process.env.MUSIC_DEFAULT_PROVIDER = "legacyengineapi";
   try {
     const timed = resolveTimedLyricsStrategy({
-      musicProvider: "mureka",
-      providerTaskId: "mureka-task",
-      providerAudioId: "mureka-choice",
+      musicProvider: "audioengine",
+      providerTaskId: "audioengine-task",
+      providerAudioId: "audioengine-choice",
     });
     assert.equal(timed.kind, "unavailable");
 
     const cover = resolveAlbumCoverStrategy({
-      musicProvider: "mureka",
-      providerTaskId: "mureka-task",
+      musicProvider: "audioengine",
+      providerTaskId: "audioengine-task",
     });
     assert.equal(cover.kind, "unavailable");
   } finally {
@@ -135,8 +135,8 @@ function testMurekaNeverSilentSunoFallback(): void {
 
 function testMismatchNoProviderGuess(): void {
   const affinity = resolveExistingMusicAssetProvider({
-    trackProvider: "sunoapi",
-    generationProvider: "mureka",
+    trackProvider: "legacyengineapi",
+    generationProvider: "audioengine",
   });
   assert.equal(affinity.ok, false);
   if (!affinity.ok) {
@@ -145,7 +145,7 @@ function testMismatchNoProviderGuess(): void {
 }
 
 testAuditTableShape();
-testSunoTrackOpsIgnoreDefaultMureka();
-testMurekaNeverSilentSunoFallback();
+testLegacyengineTrackOpsIgnoreDefaultAudioengine();
+testAudioengineNeverSilentLegacyengineFallback();
 testMismatchNoProviderGuess();
 console.log("provider-affinity-audit.contract.test.ts: ok");

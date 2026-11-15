@@ -1,8 +1,8 @@
 import {
   createLyricsEngine,
   createMusicGenerationProvider,
-  getMurekaGenerationOptions,
-  getSunoGenerationOptions,
+  getAudioengineGenerationOptions,
+  getLegacyengineGenerationOptions,
   isInstrumentalMode,
   resolveMusicProviderConfig,
   resolveMusicProviderId,
@@ -14,8 +14,8 @@ import type { GenerateSongInput } from "@ai-music/ai-providers";
 import {
   musicGenerationStartedTotal,
   musicProviderPollDurationSeconds,
-  murekaGenerationStartedTotal,
-  murekaEstimatedCostUsdTotal,
+  audioengineGenerationStartedTotal,
+  audioengineEstimatedCostUsdTotal,
   observeDuration,
 } from "@ai-music/observability";
 import {
@@ -34,13 +34,13 @@ import {
   type MusicGenerateLogger,
 } from "./music-persona.js";
 import {
-  assertMurekaGenerateAllowed,
-  buildMurekaSongInput,
-  loadReadyMurekaVoiceProfile,
-  murekaSpendAmountUnits,
-  murekaSpendIdempotencyKey,
+  assertAudioengineGenerateAllowed,
+  buildAudioengineSongInput,
+  loadReadyAudioengineVoiceProfile,
+  audioengineSpendAmountUnits,
+  audioengineSpendIdempotencyKey,
   resolveProviderOrThrow,
-} from "./music-generate-mureka.js";
+} from "./music-generate-audioengine.js";
 import {
   BadRequestError,
   ConflictError,
@@ -51,7 +51,7 @@ import {
 } from "../../common/errors.js";
 import { getApiEnv } from "../../config/env.js";
 import { refundOriginalSpend, spendCredits } from "../credits/service.js";
-import { isMurekaWorkerListenHeartbeatFresh } from "./mureka-worker-heartbeat.js";
+import { isAudioengineWorkerListenHeartbeatFresh } from "./audioengine-worker-heartbeat.js";
 import {
   assertMaxDuration,
   assertMusicGenerationMode,
@@ -59,7 +59,7 @@ import {
   getUserEntitlements,
 } from "../billing/entitlements.service.js";
 import { enqueueProviderJob } from "../queue/provider-job-queue.js";
-import { enqueueMurekaProviderJob } from "../queue/mureka-provider-job-queue.js";
+import { enqueueAudioengineProviderJob } from "../queue/audioengine-provider-job-queue.js";
 import {
   assertProviderQueueCapacity,
   getProviderQueueMetrics,
@@ -71,12 +71,12 @@ import {
   CONTENT_MODERATION_ERROR_RU,
   isVocalGender,
   logLoadControl,
-  MUREKA_ECONOMICS,
-  MUREKA_PROVIDER_JOB_QUEUE_NAME,
+  AUDIOENGINE_ECONOMICS,
+  AUDIOENGINE_PROVIDER_JOB_QUEUE_NAME,
   buildLyricsRefundKey,
   buildLyricsSpendKey,
-  buildMurekaMusicRefundKey,
-  buildMurekaMusicSpendKey,
+  buildAudioengineMusicRefundKey,
+  buildAudioengineMusicSpendKey,
   normalizeLyricsLanguage,
   OPERATION_COST_UNITS,
   PROVIDER_JOB_QUEUE_NAME,
@@ -85,13 +85,13 @@ import {
   resolveLyricsDurationSecForPlan,
   resolveLyricsLanguage,
   resolveManualLyricsMaxLength,
-  resolveMurekaFeatureFlags,
-  resolveMurekaPersonalVoiceAvailability,
-  estimateMurekaLyricsToSongUsdMicros,
+  resolveAudioengineFeatureFlags,
+  resolveAudioenginePersonalVoiceAvailability,
+  estimateAudioengineLyricsToSongUsdMicros,
   formatUsdFromMicros,
-  MUREKA_OUTPUT_COUNT,
+  AUDIOENGINE_OUTPUT_COUNT,
   usdMicrosToNumber,
-  SUNO_LYRICS_PROMPT_MAX_LENGTH,
+  LEGACYENGINE_LYRICS_PROMPT_MAX_LENGTH,
   truncateLyricsForDuration,
   type LyricsLanguage,
   type MusicBrief,
@@ -117,7 +117,7 @@ import {
   hashCanonicalRequest,
 } from "./music-generate-idempotency.js";
 
-/** Lyrics always use Suno lyrics engine — independent of song MUSIC_DEFAULT_PROVIDER. */
+/** Lyrics always use Legacyengine lyrics engine — independent of song MUSIC_DEFAULT_PROVIDER. */
 const lyricsEngine = createLyricsEngine();
 const CONTENT_MODERATION_ERROR_CODE = "CONTENT_MODERATION";
 
@@ -148,20 +148,20 @@ export async function getMusicTestStatus() {
   const config = resolveMusicProviderConfig();
   const provider = resolveMusicProviderId();
   const env = getApiEnv();
-  const personalVoice = resolveMurekaPersonalVoiceAvailability({
+  const personalVoice = resolveAudioenginePersonalVoiceAvailability({
     appEnv: env.APP_ENV,
   });
   const workerHeartbeatFresh =
     personalVoice.available && personalVoice.workerListenReady
-      ? await isMurekaWorkerListenHeartbeatFresh()
+      ? await isAudioengineWorkerListenHeartbeatFresh()
       : false;
 
   return {
     provider,
     configured:
-      provider === "mureka"
-        ? Boolean(process.env.MUREKA_API_KEY?.trim())
-        : Boolean(config.sunoApiKey.trim()),
+      provider === "audioengine"
+        ? Boolean(process.env.AUDIOENGINE_API_KEY?.trim())
+        : Boolean(config.legacyengineApiKey.trim()),
     personalVoice: {
       available: personalVoice.available,
       reason: personalVoice.reason,
@@ -184,8 +184,8 @@ export async function generateMusicForUser(
   } = {},
   log?: MusicGenerateLogger,
 ) {
-  // Product contract: Mureka only when Personal Voice toggle is ON.
-  // Ready VoiceProfile alone must not select Mureka or load vocal_id.
+  // Product contract: Audioengine only when Personal Voice toggle is ON.
+  // Ready VoiceProfile alone must not select Audioengine or load vocal_id.
   const wantsPersonalVoice = options.usePersonalVoice === true;
 
   // "auto" is product UI mode — resolve before any provider language matrix check.
@@ -201,7 +201,7 @@ export async function generateMusicForUser(
   };
 
   const voiceProfile = wantsPersonalVoice
-    ? await loadReadyMurekaVoiceProfile(userId, options.voiceProfileId)
+    ? await loadReadyAudioengineVoiceProfile(userId, options.voiceProfileId)
     : null;
 
   if (wantsPersonalVoice && !voiceProfile) {
@@ -210,22 +210,22 @@ export async function generateMusicForUser(
     );
   }
 
-  const flags = resolveMurekaFeatureFlags();
+  const flags = resolveAudioengineFeatureFlags();
   const defaultProvider = resolveMusicProviderId();
   const providerId = resolveProviderOrThrow({
     explicitProvider:
-      inputWithResolvedLanguage.providerOptions?.providerId === "mureka" ||
-      inputWithResolvedLanguage.providerOptions?.providerId === "sunoapi"
+      inputWithResolvedLanguage.providerOptions?.providerId === "audioengine" ||
+      inputWithResolvedLanguage.providerOptions?.providerId === "legacyengineapi"
         ? inputWithResolvedLanguage.providerOptions.providerId
         : undefined,
-    hasPersonalMurekaVoice: wantsPersonalVoice && Boolean(voiceProfile),
+    hasPersonalAudioengineVoice: wantsPersonalVoice && Boolean(voiceProfile),
     lyricsLanguage: resolvedLanguage.code,
   });
 
   logLoadControl("music_provider_resolved", {
     provider: providerId,
     defaultProvider,
-    murekaEnabled: flags.enabled,
+    audioengineEnabled: flags.enabled,
     personalVoiceEnabled: flags.personalVoiceEnabled,
     productionRolloutEnabled: flags.productionRolloutEnabled,
     wantsPersonalVoice,
@@ -237,14 +237,14 @@ export async function generateMusicForUser(
     status: "resolved",
   });
 
-  if (providerId === "mureka") {
+  if (providerId === "audioengine") {
     if (!voiceProfile) {
       throw new ForbiddenError(
         "Персональный AI-голос ещё не готов. Создайте его в разделе голоса.",
       );
     }
 
-    return generateMurekaMusicForUser(
+    return generateAudioengineMusicForUser(
       userId,
       inputWithResolvedLanguage,
       {
@@ -256,8 +256,8 @@ export async function generateMusicForUser(
     );
   }
 
-  // OFF / non-personal: Suno standard AI vocal — never require VoiceProfile / Suno persona.
-  return generateSunoMusicForUser(
+  // OFF / non-personal: Legacyengine standard AI vocal — never require VoiceProfile / Legacyengine persona.
+  return generateLegacyengineMusicForUser(
     userId,
     inputWithResolvedLanguage,
     {
@@ -269,19 +269,19 @@ export async function generateMusicForUser(
   );
 }
 
-async function generateMurekaMusicForUser(
+async function generateAudioengineMusicForUser(
   userId: string,
   input: GenerateSongInput,
   options: {
-    voiceProfile: NonNullable<Awaited<ReturnType<typeof loadReadyMurekaVoiceProfile>>>;
+    voiceProfile: NonNullable<Awaited<ReturnType<typeof loadReadyAudioengineVoiceProfile>>>;
     musicBrief?: MusicBrief;
     clientRequestId?: string;
   },
   log?: MusicGenerateLogger,
 ) {
-  await assertMurekaGenerateAllowed();
+  await assertAudioengineGenerateAllowed();
 
-  const songInput = buildMurekaSongInput({
+  const songInput = buildAudioengineSongInput({
     base: input,
     vocalId: options.voiceProfile.externalId,
     voiceProfileId: options.voiceProfile.id,
@@ -326,25 +326,25 @@ async function generateMurekaMusicForUser(
   log?.info(
     {
       userId,
-      provider: "mureka",
+      provider: "audioengine",
       voiceProfileId: options.voiceProfile?.id ?? null,
       hasPersonalVoice: Boolean(options.voiceProfile),
       resolvedLyricsLanguage: finalInput.lyricsLanguage,
     },
-    "Submitting Mureka music generation",
+    "Submitting Audioengine music generation",
   );
 
   const { record } = await commitMusicGeneration(
     {
       userId,
       songInput: finalInput,
-      provider: "mureka",
+      provider: "audioengine",
       voiceProfileId: options.voiceProfile?.id,
       clientRequestId: options.clientRequestId,
       clientRequestHash,
-      creditAmountUnits: murekaSpendAmountUnits(),
-      creditIdempotencyKeyBuilder: murekaSpendIdempotencyKey,
-      creditReason: "mureka_music_generate",
+      creditAmountUnits: audioengineSpendAmountUnits(),
+      creditIdempotencyKeyBuilder: audioengineSpendIdempotencyKey,
+      creditReason: "audioengine_music_generate",
       meta: {
         prompt: input.prompt,
         style: finalInput.style ?? null,
@@ -359,13 +359,13 @@ async function generateMurekaMusicForUser(
   return toMusicGenerateResponse(record);
 }
 
-async function generateSunoMusicForUser(
+async function generateLegacyengineMusicForUser(
   userId: string,
   input: GenerateSongInput,
   options: {
     voiceSampleId?: string;
     clientRequestId?: string;
-    /** When false, standard AI vocal is allowed without Suno voice persona. */
+    /** When false, standard AI vocal is allowed without Legacyengine voice persona. */
     requirePersona?: boolean;
   },
   log?: MusicGenerateLogger,
@@ -409,7 +409,7 @@ async function generateSunoMusicForUser(
   await assertMaxDuration(userId, effectiveDurationSec);
 
   await assertMusicGenerationMode(userId, {
-    customMode: getSunoGenerationOptions(input)?.customMode,
+    customMode: getLegacyengineGenerationOptions(input)?.customMode,
     instrumental: isInstrumentalMode(input),
     style: input.style,
     durationSec: input.durationSec ?? 0,
@@ -429,35 +429,35 @@ async function generateSunoMusicForUser(
         ...input,
         durationSec: effectiveDurationSec,
         providerOptions: {
-          providerId: "sunoapi" as const,
+          providerId: "legacyengineapi" as const,
           options: {
-            customMode: getSunoGenerationOptions(input)?.customMode ?? true,
+            customMode: getLegacyengineGenerationOptions(input)?.customMode ?? true,
             instrumental: isInstrumentalMode(input),
-            vocalGender: getSunoGenerationOptions(input)?.vocalGender,
-            referenceAudioUrl: getSunoGenerationOptions(input)?.referenceAudioUrl,
+            vocalGender: getLegacyengineGenerationOptions(input)?.vocalGender,
+            referenceAudioUrl: getLegacyengineGenerationOptions(input)?.referenceAudioUrl,
           },
         },
       };
-  const sunoOptions = getSunoGenerationOptions(songInput) ?? {};
+  const legacyengineOptions = getLegacyengineGenerationOptions(songInput) ?? {};
 
   log?.info(
     {
       userId,
-      provider: "sunoapi",
+      provider: "legacyengineapi",
       voiceSampleId: persona?.voiceSampleId ?? null,
-      personaId: sunoOptions.personaId ?? null,
-      sunoVoiceTaskId: persona?.sunoVoiceTaskId ?? null,
-      personaModel: sunoOptions.personaModel ?? null,
-      sunoVoiceModel: resolveMusicProviderConfig().sunoVoiceModel,
-      customMode: sunoOptions.customMode ?? null,
+      personaId: legacyengineOptions.personaId ?? null,
+      legacyengineVoiceTaskId: persona?.legacyengineVoiceTaskId ?? null,
+      personaModel: legacyengineOptions.personaModel ?? null,
+      legacyengineVoiceModel: resolveMusicProviderConfig().legacyengineVoiceModel,
+      customMode: legacyengineOptions.customMode ?? null,
       style: songInput.style ?? null,
       title: songInput.title ?? null,
       requirePersona,
       resolvedLyricsLanguage: input.lyricsLanguage ?? null,
     },
     persona
-      ? "Submitting Suno music generation with persona"
-      : "Submitting Suno music generation with standard AI vocal",
+      ? "Submitting Legacyengine music generation with persona"
+      : "Submitting Legacyengine music generation with standard AI vocal",
   );
 
   await assertProviderQueueCapacity();
@@ -466,14 +466,14 @@ async function generateSunoMusicForUser(
     {
       userId,
       songInput,
-      provider: "sunoapi",
+      provider: "legacyengineapi",
       clientRequestId: options.clientRequestId,
       clientRequestHash,
       meta: {
         prompt: input.prompt,
         style: input.style ?? null,
         title: input.title ?? null,
-        customMode: sunoOptions.customMode ?? false,
+        customMode: legacyengineOptions.customMode ?? false,
         instrumental: isInstrumentalMode(input),
       },
     },
@@ -515,7 +515,7 @@ export async function commitMusicGeneration(
   const {
     userId,
     songInput,
-    provider = "sunoapi",
+    provider = "legacyengineapi",
     voiceProfileId,
     clientRequestId,
     clientRequestHash,
@@ -625,16 +625,16 @@ export async function commitMusicGeneration(
   }
 
   if (txResult.created) {
-    const murekaObservability =
-      provider === "mureka" ? resolveMurekaGenerationObservability(songInput) : null;
+    const audioengineObservability =
+      provider === "audioengine" ? resolveAudioengineGenerationObservability(songInput) : null;
     logLoadControl("music_generation_persisted", {
       generationId: txResult.record.id,
       provider,
       hasVoiceProfile: Boolean(voiceProfileId),
-      model: murekaObservability?.model ?? null,
-      tariffModel: murekaObservability?.tariffModel ?? null,
-      variantCount: murekaObservability?.variantCount ?? null,
-      estimatedProviderCostUsd: murekaObservability?.estimatedProviderCostUsd ?? null,
+      model: audioengineObservability?.model ?? null,
+      tariffModel: audioengineObservability?.tariffModel ?? null,
+      variantCount: audioengineObservability?.variantCount ?? null,
+      estimatedProviderCostUsd: audioengineObservability?.estimatedProviderCostUsd ?? null,
       status: txResult.record.status,
     });
   }
@@ -643,10 +643,10 @@ export async function commitMusicGeneration(
 
   if (txResult.created) {
     musicGenerationStartedTotal.inc();
-    if (provider === "mureka") {
-      const observability = resolveMurekaGenerationObservability(songInput);
-      murekaGenerationStartedTotal.inc();
-      murekaEstimatedCostUsdTotal.inc(
+    if (provider === "audioengine") {
+      const observability = resolveAudioengineGenerationObservability(songInput);
+      audioengineGenerationStartedTotal.inc();
+      audioengineEstimatedCostUsdTotal.inc(
         { operation: "song" },
         usdMicrosToNumber(observability.estimatedProviderCostUsdMicros),
       );
@@ -691,20 +691,20 @@ async function resolveCommitMusicGenerationFailure(
   throw error;
 }
 
-function resolveMurekaGenerationObservability(songInput: GenerateSongInput): {
+function resolveAudioengineGenerationObservability(songInput: GenerateSongInput): {
   model: string;
   tariffModel: string;
   variantCount: number;
   estimatedProviderCostUsd: string;
   estimatedProviderCostUsdMicros: number;
 } {
-  const options = getMurekaGenerationOptions(songInput);
-  const variantCount = MUREKA_OUTPUT_COUNT;
-  const estimatedProviderCostUsdMicros = estimateMurekaLyricsToSongUsdMicros(variantCount);
+  const options = getAudioengineGenerationOptions(songInput);
+  const variantCount = AUDIOENGINE_OUTPUT_COUNT;
+  const estimatedProviderCostUsdMicros = estimateAudioengineLyricsToSongUsdMicros(variantCount);
 
   return {
-    model: options?.model?.trim() || resolveMurekaFeatureFlags().model,
-    tariffModel: MUREKA_ECONOMICS.tariffModel,
+    model: options?.model?.trim() || resolveAudioengineFeatureFlags().model,
+    tariffModel: AUDIOENGINE_ECONOMICS.tariffModel,
     variantCount,
     estimatedProviderCostUsd: formatUsdFromMicros(estimatedProviderCostUsdMicros),
     estimatedProviderCostUsdMicros,
@@ -760,23 +760,23 @@ async function retryEnqueueQueuedMusicGeneration(
     const priority = await getQueuePriorityForUser(record.userId);
     const songInputJson = JSON.stringify(record.providerRequestJson);
 
-    if (record.provider === "mureka") {
+    if (record.provider === "audioengine") {
       logLoadControl("music_queue_selected", {
         generationId: record.id,
-        provider: "mureka",
-        queueName: MUREKA_PROVIDER_JOB_QUEUE_NAME,
+        provider: "audioengine",
+        queueName: AUDIOENGINE_PROVIDER_JOB_QUEUE_NAME,
         hasVoiceProfile: Boolean(
           (record.providerRequestJson as { voiceProfileId?: unknown } | null)?.voiceProfileId,
         ),
         status: record.status,
       });
-      await enqueueMurekaProviderJob(
+      await enqueueAudioengineProviderJob(
         {
-          type: "mureka_music_generate",
+          type: "audioengine_music_generate",
           userId: record.userId,
           recordId: record.id,
           songInputJson,
-          spendReason: `mureka_music_generate:${record.id}`,
+          spendReason: `audioengine_music_generate:${record.id}`,
         },
         priority,
       );
@@ -819,17 +819,17 @@ async function retryEnqueueQueuedMusicGeneration(
       "Music generation enqueue failed; reconciler will retry",
     );
 
-    if (record.provider === "mureka" && isPermanentMurekaEnqueueError(message)) {
-      await failMurekaPreSubmitAndRefund(record, message, log);
+    if (record.provider === "audioengine" && isPermanentAudioengineEnqueueError(message)) {
+      await failAudioenginePreSubmitAndRefund(record, message, log);
     }
   }
 }
 
-function isPermanentMurekaEnqueueError(message: string): boolean {
+function isPermanentAudioengineEnqueueError(message: string): boolean {
   return /Custom Id cannot contain|jobId part must not contain|BullMQ jobId/i.test(message);
 }
 
-async function failMurekaPreSubmitAndRefund(
+async function failAudioenginePreSubmitAndRefund(
   record: QueueableMusicGeneration,
   enqueueError: string,
   log?: MusicGenerateLogger,
@@ -837,7 +837,7 @@ async function failMurekaPreSubmitAndRefund(
   await prisma.musicGeneration.updateMany({
     where: {
       id: record.id,
-      provider: "mureka",
+      provider: "audioengine",
       status: { in: ["pending", "processing"] },
       providerTaskId: { startsWith: "queue:" },
     },
@@ -845,18 +845,18 @@ async function failMurekaPreSubmitAndRefund(
       status: "failed",
       submissionState: "failed",
       submitCompletedAt: new Date(),
-      submitErrorCode: "MUREKA_PRE_SUBMIT_QUEUE_FAILED",
+      submitErrorCode: "AUDIOENGINE_PRE_SUBMIT_QUEUE_FAILED",
       submitErrorMessage: enqueueError.slice(0, 500),
       errorMessage: "Генерация не была отправлена провайдеру. Кредиты возвращены.",
-      rawStatus: "MUREKA_PRE_SUBMIT_QUEUE_FAILED",
+      rawStatus: "AUDIOENGINE_PRE_SUBMIT_QUEUE_FAILED",
     },
   });
 
   await refundOriginalSpend({
     userId: record.userId,
-    spendIdempotencyKey: buildMurekaMusicSpendKey(record.id),
-    refundIdempotencyKey: buildMurekaMusicRefundKey(record.id),
-    reason: "mureka_music_generate_refund",
+    spendIdempotencyKey: buildAudioengineMusicSpendKey(record.id),
+    refundIdempotencyKey: buildAudioengineMusicRefundKey(record.id),
+    reason: "audioengine_music_generate_refund",
     relatedEntityType: "music_generation",
     relatedEntityId: record.id,
   }).catch((refundError) => {
@@ -865,13 +865,13 @@ async function failMurekaPreSubmitAndRefund(
         recordId: record.id,
         error: refundError instanceof Error ? refundError.message : "unknown",
       },
-      "Mureka pre-submit refund failed; reconciler will retry",
+      "Audioengine pre-submit refund failed; reconciler will retry",
     );
   });
 }
 
 function resolveRecordProvider(record: Pick<MusicGeneration, "provider">): MusicProviderId {
-  return record.provider === "mureka" ? "mureka" : "sunoapi";
+  return record.provider === "audioengine" ? "audioengine" : "legacyengineapi";
 }
 
 function toMusicGenerateResponse(
@@ -950,12 +950,12 @@ export async function getMusicGenerationStatusForUser(taskOrRecordId: string, us
     });
   }
 
-  // Mureka progress is driven by delayed worker poll jobs — avoid env-provider mismatch.
-  if (record.provider === "mureka") {
+  // Audioengine progress is driven by delayed worker poll jobs — avoid env-provider mismatch.
+  if (record.provider === "audioengine") {
     const pendingStatus = {
       taskId: record.providerTaskId,
       status: "processing" as const,
-      provider: "mureka" as const,
+      provider: "audioengine" as const,
       rawStatus: record.rawStatus ?? "PROCESSING",
       tracks: [],
     };
@@ -1113,7 +1113,7 @@ export async function generateLyricsForUser(
     lyricsDurationSec,
   });
 
-  if (providerPrompt.length > SUNO_LYRICS_PROMPT_MAX_LENGTH) {
+  if (providerPrompt.length > LEGACYENGINE_LYRICS_PROMPT_MAX_LENGTH) {
     throw new BadRequestError(
       `Описание слишком длинное для AI Music — максимум ${briefMaxLength} символов.`,
     );

@@ -80,7 +80,7 @@ Metrics are created via `createMusicMetrics()` / `getMusicMetrics()` using `Regi
 ## Alert rules (PR9)
 
 > Load-test fake provider **отложен**; alert rules и metric остаются. Resume harness:
-> [load-testing.md](./load-testing.md) → `apps/suno-fake`.
+> [load-testing.md](./load-testing.md) → `apps/legacyengine-fake`.
 
 Executable Prometheus rules: `deploy/observability/alerts/music-generation.rules.yml`.
 

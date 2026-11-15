@@ -3,7 +3,7 @@ import { describe, it } from "node:test";
 import { readFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
-import { flittRefundJobId, tbcRefundJobId } from "@ai-music/shared";
+import { checkoutgatewayRefundJobId, legacygatewayRefundJobId } from "@ai-music/shared";
 import { evaluateRefundRequeue } from "./refund-enqueue.service.js";
 import {
   enqueueApprovedRefund,
@@ -14,12 +14,12 @@ import { RefundEnqueueFailedError } from "../../common/errors.js";
 const here = dirname(fileURLToPath(import.meta.url));
 const refundService = readFileSync(join(here, "refund.service.ts"), "utf8");
 const refundRoutes = readFileSync(join(here, "refund.routes.ts"), "utf8");
-const flittProcessor = readFileSync(
-  join(here, "../../../../../packages/flitt-checkout/src/process-flitt-refund.ts"),
+const checkoutgatewayProcessor = readFileSync(
+  join(here, "../../../../../packages/checkoutgateway-checkout/src/process-checkoutgateway-refund.ts"),
   "utf8",
 );
-const tbcProcessor = readFileSync(
-  join(here, "../../../../../packages/tbc-checkout/src/process-tbc-refund.ts"),
+const legacygatewayProcessor = readFileSync(
+  join(here, "../../../../../packages/legacygateway-checkout/src/process-legacygateway-refund.ts"),
   "utf8",
 );
 
@@ -80,9 +80,9 @@ describe("enqueueApprovedRefund", () => {
     await assert.rejects(
       () =>
         enqueueApprovedRefundOrThrow(
-          { id: "rr-1", provider: "flitt" },
+          { id: "rr-1", provider: "checkoutgateway" },
           {
-            enqueueFlitt: async () => {
+            enqueueCheckoutgateway: async () => {
               throw new Error("redis_down");
             },
           },
@@ -93,12 +93,12 @@ describe("enqueueApprovedRefund", () => {
   });
 
   it("uses the deterministic job id and does not reserve", async () => {
-    assert.equal(flittRefundJobId("rr-1"), "flitt-refund-rr-1");
-    assert.equal(tbcRefundJobId("rr-1"), "tbc-refund-rr-1");
+    assert.equal(checkoutgatewayRefundJobId("rr-1"), "checkoutgateway-refund-rr-1");
+    assert.equal(legacygatewayRefundJobId("rr-1"), "legacygateway-refund-rr-1");
     const outcome = await enqueueApprovedRefund(
-      { id: "rr-1", provider: "tbc" },
+      { id: "rr-1", provider: "legacygateway" },
       {
-        enqueueTbc: async (payload) => {
+        enqueueLegacygateway: async (payload) => {
           assert.equal(payload.refundRequestId, "rr-1");
           return "already_queued";
         },
@@ -142,9 +142,9 @@ describe("approve/requeue contracts", () => {
     assert.match(requeueFn, /providerReference: row\.providerReference/);
     assert.match(requeueFn, /providerError: row\.providerError/);
     assert.match(requeueFn, /evaluateRefundRequeue/);
-    assert.match(flittProcessor, /hasRefundProviderAttemptMarker/);
-    assert.match(tbcProcessor, /hasRefundProviderAttemptMarker/);
-    assert.match(flittProcessor, /refundRequestId: row.id/);
-    assert.match(tbcProcessor, /isCancelAlreadyAttempted/);
+    assert.match(checkoutgatewayProcessor, /hasRefundProviderAttemptMarker/);
+    assert.match(legacygatewayProcessor, /hasRefundProviderAttemptMarker/);
+    assert.match(checkoutgatewayProcessor, /refundRequestId: row.id/);
+    assert.match(legacygatewayProcessor, /isCancelAlreadyAttempted/);
   });
 });

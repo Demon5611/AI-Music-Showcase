@@ -1,8 +1,8 @@
 import {
-  FLITT_PAYMENT_PROVIDER,
-  flittRefundJobId,
+  CHECKOUTGATEWAY_PAYMENT_PROVIDER,
+  checkoutgatewayRefundJobId,
   hasRefundProviderAttemptMarker,
-  tbcRefundJobId,
+  legacygatewayRefundJobId,
 } from "@ai-music/shared";
 
 export type RefundRequeueOutcome = "queued" | "already_queued" | "not_requeueable";
@@ -32,8 +32,8 @@ export function evaluateRefundRequeue(input: {
 }
 
 export function refundJobIdForProvider(provider: string, refundRequestId: string): string {
-  if (provider === FLITT_PAYMENT_PROVIDER) {
-    return flittRefundJobId(refundRequestId);
+  if (provider === CHECKOUTGATEWAY_PAYMENT_PROVIDER) {
+    return checkoutgatewayRefundJobId(refundRequestId);
   }
-  return tbcRefundJobId(refundRequestId);
+  return legacygatewayRefundJobId(refundRequestId);
 }

@@ -4,7 +4,7 @@ import { getTranslations, setRequestLocale } from "next-intl/server";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
 import { PaymentReturnPanel } from "@/features/billing/payment-return-panel";
-import { LoadingPanel } from "@/shared/ui/elevenlabs";
+import { LoadingPanel } from "@/shared/ui/voiceengine";
 import { routing, type Locale } from "@/i18n/routing";
 
 type PaymentReturnPageProps = {

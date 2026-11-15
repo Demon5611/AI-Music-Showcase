@@ -2,7 +2,7 @@ import { z } from "zod";
 
 /**
  * Public API / UI allowlist for lyrics generation.
- * Wider than voice validate enum — language is injected into `/lyrics` prompt, not a Suno `language` field.
+ * Wider than voice validate enum — language is injected into `/lyrics` prompt, not a Legacyengine `language` field.
  * @see docs/language-contracts.md
  * `multi` is resolve-only — never accept from clients.
  */

@@ -95,51 +95,51 @@ export class MusicService {
   }
 
   /**
-   * Suno-only post-processing on an existing Suno track.
-   * Callers must gate on MusicGeneration.provider === "sunoapi" and pass the
-   * original Suno taskId + audioId — never MUSIC_DEFAULT_PROVIDER / active provider.
+   * Legacyengine-only post-processing on an existing Legacyengine track.
+   * Callers must gate on MusicGeneration.provider === "legacyengineapi" and pass the
+   * original Legacyengine taskId + audioId — never MUSIC_DEFAULT_PROVIDER / active provider.
    */
   getTimestampedLyrics(input: TimestampedLyricsInput): Promise<TimestampedLyricsResult> {
     const taskId = input.taskId.trim();
     const audioId = input.audioId.trim();
 
     if (!taskId || !audioId) {
-      throw new Error("Suno taskId and audioId are required for timestamped lyrics");
+      throw new Error("Legacyengine taskId and audioId are required for timestamped lyrics");
     }
 
-    const provider = this.providerFactory.getProvider("sunoapi");
+    const provider = this.providerFactory.getProvider("legacyengineapi");
 
     if (!provider.getTimestampedLyrics) {
-      throw new Error("Suno music provider does not support timestamped lyrics");
+      throw new Error("Legacyengine music provider does not support timestamped lyrics");
     }
 
     return provider.getTimestampedLyrics({ taskId, audioId });
   }
 
   /**
-   * @param sunoMusicTaskId — Suno *music* generation taskId only.
-   * Never pass a Mureka (or other vendor) task id here.
+   * @param legacyengineMusicTaskId — Legacyengine *music* generation taskId only.
+   * Never pass a Audioengine (or other vendor) task id here.
    */
-  generateAlbumCover(sunoMusicTaskId: string): Promise<{ taskId: string }> {
-    const taskId = sunoMusicTaskId.trim();
+  generateAlbumCover(legacyengineMusicTaskId: string): Promise<{ taskId: string }> {
+    const taskId = legacyengineMusicTaskId.trim();
     if (!taskId) {
-      throw new Error("Suno music taskId is required for album cover generation");
+      throw new Error("Legacyengine music taskId is required for album cover generation");
     }
 
-    const provider = this.providerFactory.getProvider("sunoapi");
+    const provider = this.providerFactory.getProvider("legacyengineapi");
 
     if (!provider.generateAlbumCover) {
-      throw new Error("Suno music provider does not support album cover generation");
+      throw new Error("Legacyengine music provider does not support album cover generation");
     }
 
     return provider.generateAlbumCover(taskId);
   }
 
   getAlbumCoverStatus(taskId: string): Promise<AlbumCoverStatusResult> {
-    const provider = this.providerFactory.getProvider("sunoapi");
+    const provider = this.providerFactory.getProvider("legacyengineapi");
 
     if (!provider.getAlbumCoverStatus) {
-      throw new Error("Suno music provider does not support album cover status");
+      throw new Error("Legacyengine music provider does not support album cover status");
     }
 
     return provider.getAlbumCoverStatus(taskId);

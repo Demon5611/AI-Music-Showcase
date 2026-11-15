@@ -81,7 +81,7 @@ function logPhase(
   fields: Record<string, string | number | boolean | null | undefined>,
 ): void {
   observeCallbackPhase(phase, startedAtMs);
-  logLoadControl("suno_callback_sync", {
+  logLoadControl("legacyengine_callback_sync", {
     phase,
     durationMs: Date.now() - startedAtMs,
     ...fields,

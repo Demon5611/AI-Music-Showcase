@@ -27,9 +27,9 @@ Server-side contract between vendor adapters and application orchestration.
 Core in-memory DTO (`GenerateSongInput`):
 
 - `prompt`, `title?`, `durationSec?`, `mode?: "song" | "instrumental"`, `style?: string`
-- `providerOptions?:` discriminated union (`sunoapi` | `mureka` | `mock`)
+- `providerOptions?:` discriminated union (`legacyengineapi` | `audioengine` | `mock`)
 
-Suno-only knobs live in `SunoGenerationOptions` inside `providerOptions`:
+Legacyengine-only knobs live in `LegacyengineGenerationOptions` inside `providerOptions`:
 
 - `customMode`, `referenceAudioUrl`, `vocalGender`, `personaId`, `personaModel`
 
@@ -37,7 +37,7 @@ HTTP adapter (strategy A) at `POST /api/music/generate`:
 
 - accepts legacy flat fields and/or typed `providerOptions`
 - conflicts between legacy and `providerOptions` → **HTTP 400**
-- always materializes `providerOptions.providerId = "sunoapi"` for Suno path
+- always materializes `providerOptions.providerId = "legacyengineapi"` for Legacyengine path
 
 Persistence (unchanged in PR8.3):
 
@@ -49,34 +49,34 @@ Persistence (unchanged in PR8.3):
 
 - Terminal state: domain `status` (+ `audioPersistence` for ready)
 - UX progress: computed `phaseHint` (`queued` | `generating` | `finalizing` | `persisting` | `ready`)
-- `rawStatus` is opaque diagnostic only — UI must not map Suno enums (`TEXT_SUCCESS`, …)
+- `rawStatus` is opaque diagnostic only — UI must not map Legacyengine enums (`TEXT_SUCCESS`, …)
 - `phaseHint` is **not** stored in DB
 
-## What stays Suno-specific (today)
+## What stays Legacyengine-specific (today)
 
 | Area | Location |
 |------|----------|
-| HTTP client / models / mappers | `packages/ai-providers/.../suno-api/` |
-| Rate limiter | `getSunoRateLimiter` (wired in Worker composition root) |
-| Signed callback URL builder | `apps/worker/.../suno-signed-callback-url.ts` |
-| Callback HTTP routes + HMAC | `/api/music/callback/suno/...` (app) |
-| Vendor callback Zod schema | `suno-api/suno-callback.schema.ts` (**private**, not in `music/index.ts`) |
-| Callback normalizer | `SunoMusicCallbackNormalizer` → `NormalizedProviderCallback` |
-| Voice persona | `suno-voice` package + API persona services → `SunoGenerationOptions` |
-| Env names | `SUNO_*` |
+| HTTP client / models / mappers | `packages/ai-providers/.../legacyengine-api/` |
+| Rate limiter | `getLegacyengineRateLimiter` (wired in Worker composition root) |
+| Signed callback URL builder | `apps/worker/.../legacyengine-signed-callback-url.ts` |
+| Callback HTTP routes + HMAC | `/api/music/callback/legacyengine/...` (app) |
+| Vendor callback Zod schema | `legacyengine-api/legacyengine-callback.schema.ts` (**private**, not in `music/index.ts`) |
+| Callback normalizer | `LegacyengineMusicCallbackNormalizer` → `NormalizedProviderCallback` |
+| Voice persona | `legacyengine-voice` package + API persona services → `LegacyengineGenerationOptions` |
+| Env names | `LEGACYENGINE_*` |
 
 ## PR8.1 status
 
 Worker `process-provider-job` depends only on `MusicGenerationProvider` + `acquireSubmitPermit`.  
-Suno wiring: `apps/worker/src/music-generate/default-submit-deps.ts`.
+Legacyengine wiring: `apps/worker/src/music-generate/default-submit-deps.ts`.
 
 ## PR8.2 status — Callback normalization
 
 - `MusicGenerationCallbackNormalizer.normalizeCallback(raw)` in `@ai-music/ai-providers`
-- Public exports: normalizer interface, `NormalizedProviderCallback`, `SunoMusicCallbackNormalizer` (+ mock)
-- Vendor schema stays private under `providers/suno-api/`
+- Public exports: normalizer interface, `NormalizedProviderCallback`, `LegacyengineMusicCallbackNormalizer` (+ mock)
+- Vendor schema stays private under `providers/legacyengine-api/`
 - App: route + HMAC + early bind/mismatch + FSM + refund + persistence + `resolveMusicGenerationErrorDisplay`
-- Composition root: `apps/api/.../callback/default-callback-normalizer.ts` (Suno-only)
+- Composition root: `apps/api/.../callback/default-callback-normalizer.ts` (Legacyengine-only)
 - Order inside normalizer: validate → extract `providerTaskId` → classify
 - `failed` = terminal 400/451 only (no `retryable`); transient 500 → `ignored.provider_transient`
 - `invalid_payload` → HTTP 400; `ignored` → HTTP 200
@@ -86,8 +86,8 @@ Suno wiring: `apps/worker/src/music-generate/default-submit-deps.ts`.
 - Neutral `GenerateSongInput` + typed `providerOptions`
 - Legacy HTTP adapter with conflict → 400
 - Flat `providerRequestJson` write preserved; dual-read via `fromPersistedSongInput`
-- UI progress via `phaseHint`; no Suno `TEXT_SUCCESS` / `FIRST_SUCCESS` in web
-- Persona remains Suno-specific capability inside `SunoGenerationOptions`
+- UI progress via `phaseHint`; no Legacyengine `TEXT_SUCCESS` / `FIRST_SUCCESS` in web
+- Persona remains Legacyengine-specific capability inside `LegacyengineGenerationOptions`
 
 ## Related
 

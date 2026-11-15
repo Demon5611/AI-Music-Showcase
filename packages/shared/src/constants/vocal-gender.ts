@@ -8,8 +8,8 @@ export const VOCAL_GENDER_LABELS: Record<VocalGender, string> = {
   f: "Female",
 };
 
-/** Hard limit enforced by Suno `/lyrics` (`MUSIC_INVALID_PROMPT` above 200). */
-export const SUNO_LYRICS_PROMPT_MAX_LENGTH = 200;
+/** Hard limit enforced by Legacyengine `/lyrics` (`MUSIC_INVALID_PROMPT` above 200). */
+export const LEGACYENGINE_LYRICS_PROMPT_MAX_LENGTH = 200;
 
 export function isVocalGender(value: unknown): value is VocalGender {
   return value === "m" || value === "f";
@@ -97,7 +97,7 @@ export function buildVoiceRecordingScriptPrompt(
   return VOICE_RECORDING_SCRIPT_GENERATION_PROMPTS[language];
 }
 
-/** Suno Voice `/voice/generate` metadata — gender for persona clone. */
-export function buildSunoVoiceCloneStyle(vocalGender: VocalGender): string {
+/** Legacyengine Voice `/voice/generate` metadata — gender for persona clone. */
+export function buildLegacyengineVoiceCloneStyle(vocalGender: VocalGender): string {
   return vocalGender === "f" ? "Female Vocal" : "Male Vocal";
 }

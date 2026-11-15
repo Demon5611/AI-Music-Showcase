@@ -1,8 +1,8 @@
 import assert from "node:assert/strict";
 import { describe, it } from "node:test";
-import { buildMurekaPrompt, buildSunoStyle, type MusicBrief } from "./music-brief.js";
+import { buildAudioenginePrompt, buildLegacyengineStyle, type MusicBrief } from "./music-brief.js";
 
-describe("buildMurekaPrompt", () => {
+describe("buildAudioenginePrompt", () => {
   it("builds prompt without mixing lyrics", () => {
     const brief: MusicBrief = {
       genre: "pop",
@@ -13,21 +13,21 @@ describe("buildMurekaPrompt", () => {
       chorusIntensity: "high",
     };
 
-    const prompt = buildMurekaPrompt(brief);
+    const prompt = buildAudioenginePrompt(brief);
     assert.match(prompt, /genre: pop/);
     assert.match(prompt, /instruments: guitar, piano/);
     assert.doesNotMatch(prompt, /lyrics/i);
   });
 
   it("returns empty string for empty brief", () => {
-    assert.equal(buildMurekaPrompt({}), "");
+    assert.equal(buildAudioenginePrompt({}), "");
   });
 });
 
-describe("buildSunoStyle", () => {
+describe("buildLegacyengineStyle", () => {
   it("joins tags with commas", () => {
     assert.equal(
-      buildSunoStyle({ genre: "rock", mood: "dark", instruments: ["drums"] }),
+      buildLegacyengineStyle({ genre: "rock", mood: "dark", instruments: ["drums"] }),
       "rock, dark, drums",
     );
   });

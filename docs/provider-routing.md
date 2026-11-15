@@ -10,34 +10,34 @@ Provider may follow current business policy / user intent:
 
 | Intent | Provider |
 |--------|----------|
-| My Voice OFF | SunoAPI |
-| My Voice ON + ready VoiceProfile | Mureka |
-| Lyrics | SunoAPI (lyrics engine) |
+| My Voice OFF | LegacyengineAPI |
+| My Voice ON + ready VoiceProfile | Audioengine |
+| Lyrics | LegacyengineAPI (lyrics engine) |
 
 `MUSIC_DEFAULT_PROVIDER` must **not** drive song creation when personal-voice routing exists; see `resolveMusicProviderForGeneration`.
 
-### Production Mureka rollout gate
+### Production Audioengine rollout gate
 
 Production Personal Voice is **off by default**. Enabling requires **all** of:
 
 ```txt
 APP_ENV=production
-MUREKA_PRODUCTION_ROLLOUT_ENABLED=true   # default false
-MUREKA_ENABLED=true
-MUREKA_PERSONAL_VOICE_ENABLED=true
-valid MUREKA_API_KEY
-valid https MUREKA_BASE_URL
+AUDIOENGINE_PRODUCTION_ROLLOUT_ENABLED=true   # default false
+AUDIOENGINE_ENABLED=true
+AUDIOENGINE_PERSONAL_VOICE_ENABLED=true
+valid AUDIOENGINE_API_KEY
+valid https AUDIOENGINE_BASE_URL
 ```
 
-SoT: `resolveMurekaPersonalVoiceAvailability` / `isMurekaGenerateRuntimeReady` in `@ai-music/shared`.
+SoT: `resolveAudioenginePersonalVoiceAvailability` / `isAudioengineGenerateRuntimeReady` in `@ai-music/shared`.
 
 With rollout=false (default), production behavior matches “feature disabled”:
-VoiceProfile create/get unavailable, My Voice UI hidden (via `GET /api/music/provider-status`), generate blocked before spend. No silent Suno fallback when Personal Voice was requested.
+VoiceProfile create/get unavailable, My Voice UI hidden (via `GET /api/music/provider-status`), generate blocked before spend. No silent Legacyengine fallback when Personal Voice was requested.
 
 Generate / vocal-clone enqueue additionally requires a **fresh worker Redis heartbeat**
-written only while `mureka-provider-jobs` is listening. Missing/stale heartbeat → 503 before spend.
+written only while `audioengine-provider-jobs` is listening. Missing/stale heartbeat → 503 before spend.
 
-Do **not** set `MUSIC_DEFAULT_PROVIDER=mureka` to “turn on” Mureka songs.
+Do **not** set `MUSIC_DEFAULT_PROVIDER=audioengine` to “turn on” Audioengine songs.
 
 ## B. Derived / post-processing (existing asset)
 
@@ -56,7 +56,7 @@ track.provider (if present)
 - `MUSIC_DEFAULT_PROVIDER` / `MUSIC_PROVIDER`
 - `providerFactory.getProvider()` without explicit id
 - current My Voice toggle
-- silent cross-provider fallback (`try Suno catch Mureka`)
+- silent cross-provider fallback (`try Legacyengine catch Audioengine`)
 
 Shared helper: `resolveExistingMusicAssetProvider` in `@ai-music/shared`.
 
@@ -66,8 +66,8 @@ On track vs generation conflict → `MUSIC_PROVIDER_AFFINITY_MISMATCH` (fail clo
 
 | Provider | IDs may only go to |
 |----------|--------------------|
-| Suno | Suno APIs (`taskId`, `audioId` / `providerTrackId`) |
-| Mureka | Mureka APIs (`taskId`, choice id, `vocal_id`) |
+| Legacyengine | Legacyengine APIs (`taskId`, `audioId` / `providerTrackId`) |
+| Audioengine | Audioengine APIs (`taskId`, choice id, `vocal_id`) |
 
 ## Capability after affinity
 
@@ -89,10 +89,10 @@ load asset → affinity → capability → IDs → spend → provider call
 
 | Operation | Affinity? | Notes |
 |-----------|-----------|--------|
-| Timed lyrics | **yes** | Suno only today; Mureka → unavailable |
-| Album cover variants | **yes** | Suno taskId only; Mureka → unavailable / UI fallback |
-| Stem separation (Suno vocal-removal) | **yes** | Uses taskId+audioId; non-Suno → no Suno call |
-| Remix (upload-cover from audio URL) | creation-like | New Suno asset from **server-resolved** source track audio; persist `provider=sunoapi`. **No** silent persona / vocal_id / My Voice (v1). |
+| Timed lyrics | **yes** | Legacyengine only today; Audioengine → unavailable |
+| Album cover variants | **yes** | Legacyengine taskId only; Audioengine → unavailable / UI fallback |
+| Stem separation (Legacyengine vocal-removal) | **yes** | Uses taskId+audioId; non-Legacyengine → no Legacyengine call |
+| Remix (upload-cover from audio URL) | creation-like | New Legacyengine asset from **server-resolved** source track audio; persist `provider=legacyengineapi`. **No** silent persona / vocal_id / My Voice (v1). |
 | Generation status poll | **yes** | `createMusicGenerationProvider(record.provider)` |
 | Local editor (split/trim/fade/render/WAV) | **no** | Provider-neutral |
 | Future URL-only stems | **no** | If API takes file/URL only |
@@ -100,5 +100,5 @@ load asset → affinity → capability → IDs → spend → provider call
 ## Anti-patterns
 
 1. Post-processing via active/default provider (timed-lyrics bug class).
-2. Hardcoding `Song.provider = "sunoapi"` while copying Mureka task ids.
-3. Returning `resolveMusicProviderId()` for a remix that always submits to Suno.
+2. Hardcoding `Song.provider = "legacyengineapi"` while copying Audioengine task ids.
+3. Returning `resolveMusicProviderId()` for a remix that always submits to Legacyengine.

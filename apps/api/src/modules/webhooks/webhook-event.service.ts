@@ -1,6 +1,6 @@
 import { Prisma, prisma } from "@ai-music/db";
 
-export type WebhookProvider = "clerk" | "tbc" | "stripe" | "resend";
+export type WebhookProvider = "clerk" | "legacygateway" | "stripe" | "resend";
 
 /**
  * Idempotent webhook processing.

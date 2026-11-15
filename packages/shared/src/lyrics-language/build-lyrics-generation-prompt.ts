@@ -1,5 +1,5 @@
 import type { VocalGender } from "../constants/vocal-gender.js";
-import { SUNO_LYRICS_PROMPT_MAX_LENGTH } from "../constants/vocal-gender.js";
+import { LEGACYENGINE_LYRICS_PROMPT_MAX_LENGTH } from "../constants/vocal-gender.js";
 import { buildLyricsLanguageInstruction } from "./build-lyrics-language-instruction.js";
 import {
   buildNarratorGenderLine,
@@ -8,7 +8,7 @@ import {
 import type { ResolvedLyricsLanguage, ResolvedLyricsLanguageCode } from "./lyrics-language.js";
 
 /**
- * Ordered provider prompt for POST /lyrics within Suno’s 200-char hard limit:
+ * Ordered provider prompt for POST /lyrics within Legacyengine’s 200-char hard limit:
  * language → user brief → narrator (with grammar samples) → structure.
  */
 export function buildNarratorGenderRequirement(
@@ -60,11 +60,11 @@ export function buildLyricsGenerationProviderPrompt(input: {
   const suffixParts = [narrativeBlock, structureBlock].filter(Boolean);
   const suffix = suffixParts.length > 0 ? `\n${suffixParts.join("\n")}` : "";
   const prefix = `${languageBlock}\n`;
-  const briefBudget = Math.max(8, SUNO_LYRICS_PROMPT_MAX_LENGTH - prefix.length - suffix.length);
+  const briefBudget = Math.max(8, LEGACYENGINE_LYRICS_PROMPT_MAX_LENGTH - prefix.length - suffix.length);
   const clippedBrief = brief.slice(0, briefBudget);
   const assembled = `${prefix}${clippedBrief}${suffix}`;
 
-  return assembled.slice(0, SUNO_LYRICS_PROMPT_MAX_LENGTH);
+  return assembled.slice(0, LEGACYENGINE_LYRICS_PROMPT_MAX_LENGTH);
 }
 
 /** @deprecated Prefer buildStructureRequirement. */

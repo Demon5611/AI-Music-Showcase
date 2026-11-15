@@ -7,7 +7,7 @@
     "dev:api": "turbo dev --filter=@ai-music/api",
     "dev:worker": "turbo dev --filter=@ai-music/worker",
     "build": "turbo build",
-    "build:packages": "turbo build --filter=@ai-music/shared --filter=@ai-music/storage --filter=@ai-music/observability --filter=@ai-music/api-client --filter=@ai-music/ai-providers --filter=@ai-music/db --filter=@ai-music/tbc-checkout --filter=@ai-music/flitt-checkout",
+    "build:packages": "turbo build --filter=@ai-music/shared --filter=@ai-music/storage --filter=@ai-music/observability --filter=@ai-music/api-client --filter=@ai-music/ai-providers --filter=@ai-music/db --filter=@ai-music/legacygateway-checkout --filter=@ai-music/checkoutgateway-checkout",
     "lint": "turbo lint",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
@@ -22,13 +22,14 @@
     "db:reset": "pnpm --filter @ai-music/db db:reset",
     "docker:up": "docker compose up -d",
     "docker:down": "docker compose down",
-    "dev:suno-fake": "pnpm --filter @ai-music/suno-fake dev",
+    "dev:legacyengine-fake": "pnpm --filter @ai-music/legacyengine-fake dev",
     "load:music:smoke": "./scripts/load/run-music-load.sh smoke",
     "load:music:baseline": "./scripts/load/run-music-load.sh baseline",
     "load:music:burst": "./scripts/load/run-music-load.sh burst",
-    "test:suno-submit-contract": "pnpm --filter @ai-music/ai-providers exec tsx src/music/providers/suno-api/suno-submit-once.contract.test.ts",
+    "test:legacyengine-submit-contract": "pnpm --filter @ai-music/ai-providers exec tsx src/music/providers/legacyengine-api/legacyengine-submit-once.contract.test.ts",
     "test:music-base-url": "pnpm --filter @ai-music/ai-providers exec tsx src/music/music-config.base-url.test.ts",
-    "test": "pnpm --filter @ai-music/shared test && pnpm --filter @ai-music/worker test"
+    "test": "pnpm --filter @ai-music/shared test && pnpm --filter @ai-music/worker test",
+    "public:check": "node scripts/check-public-boundary.mjs"
   },
   "devDependencies": {
     "eslint": "^9.28.0",

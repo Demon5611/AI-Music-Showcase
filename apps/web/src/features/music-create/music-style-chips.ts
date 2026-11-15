@@ -1,7 +1,7 @@
-/** Suno custom mode: comma-separated tags; first tags have the most weight. */
+/** Legacyengine custom mode: comma-separated tags; first tags have the most weight. */
 export const MAX_SELECTED_STYLE_CHIPS = 7;
 
-/** Recommended range for coherent Suno output (see sunoapi.md + provider docs). */
+/** Recommended range for coherent Legacyengine output (see legacyengineapi.md + provider docs). */
 export const RECOMMENDED_STYLE_CHIPS_MIN = 5;
 
 export const MUSIC_STYLE_CHIP_OPTIONS = [

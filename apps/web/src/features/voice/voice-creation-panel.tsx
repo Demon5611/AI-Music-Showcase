@@ -1,15 +1,15 @@
 "use client";
 
 import {
-  MUREKA_VOCAL_CLONE_MAX_DURATION_SEC,
-  MUREKA_VOCAL_CLONE_MIN_DURATION_SEC,
+  AUDIOENGINE_VOCAL_CLONE_MAX_DURATION_SEC,
+  AUDIOENGINE_VOCAL_CLONE_MIN_DURATION_SEC,
 } from "@ai-music/shared";
 import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
 import { useCallback, useEffect, useState } from "react";
 import { cn } from "@/lib/utils";
 import { isVoiceSampleReadyForGeneration } from "@/entities/voice-sample";
-import { SunoVoiceVerifyFlow } from "@/features/voice/suno-voice-verify-flow";
+import { LegacyengineVoiceVerifyFlow } from "@/features/voice/legacyengine-voice-verify-flow";
 import { VoiceSampleCard } from "@/features/voice/voice-sample-card";
 import { VoiceUploadPanel } from "@/features/voice/voice-upload-panel";
 import { PersonalVoiceProfilePanel } from "@/features/voice/personal-voice-profile-panel";
@@ -20,7 +20,7 @@ import { usePersonalVoiceCapability } from "@/shared/hooks/use-personal-voice-ca
 import { useVoiceProfileQuery } from "@/shared/hooks/use-voice-profile-query";
 import { useApi } from "@/shared/providers/api-provider";
 import { appShell } from "@/shared/theme/app-theme";
-import { LoadingPanel } from "@/shared/ui/elevenlabs";
+import { LoadingPanel } from "@/shared/ui/voiceengine";
 import { RequireAuth } from "@/shared/ui/require-auth";
 import type { VoiceSample } from "@ai-music/shared";
 
@@ -53,7 +53,7 @@ function VoiceCreationPanelContent({ variant = "landing" }: VoiceCreationPanelPr
   const t = useTranslations("VoiceUpload");
   const capabilityQuery = usePersonalVoiceCapability(authReady);
   // Feature off only when server explicitly says unavailable.
-  // Load/error keeps mureka mode so we never silently degrade to Suno verify.
+  // Load/error keeps audioengine mode so we never silently degrade to Legacyengine verify.
   const personalVoiceEnabled =
     capabilityQuery.isLoading || capabilityQuery.isError
       ? true
@@ -167,8 +167,8 @@ function VoiceCreationPanelContent({ variant = "landing" }: VoiceCreationPanelPr
         ? (voiceProfileQuery.data.status ?? null)
         : null,
     durationBounds: {
-      minSec: MUREKA_VOCAL_CLONE_MIN_DURATION_SEC,
-      maxSec: MUREKA_VOCAL_CLONE_MAX_DURATION_SEC,
+      minSec: AUDIOENGINE_VOCAL_CLONE_MIN_DURATION_SEC,
+      maxSec: AUDIOENGINE_VOCAL_CLONE_MAX_DURATION_SEC,
     },
   });
   return (
@@ -199,8 +199,8 @@ function VoiceCreationPanelContent({ variant = "landing" }: VoiceCreationPanelPr
         />
       ) : null}
 
-      {sample && view.showSunoVerification ? (
-        <SunoVoiceVerifyFlow
+      {sample && view.showLegacyengineVerification ? (
+        <LegacyengineVoiceVerifyFlow
           key={sample.id}
           sampleId={sample.id}
           variant="inline"

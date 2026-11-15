@@ -7,7 +7,7 @@ import {
   FREE_CREDIT_OFFER,
   type CreditPackageId,
 } from "./credit-packages.js";
-import { MUREKA_OUTPUT_COUNT } from "./mureka-economics.js";
+import { AUDIOENGINE_OUTPUT_COUNT } from "./audioengine-economics.js";
 
 /**
  * Marketing estimate helpers derived from credit-economy SoT.
@@ -15,10 +15,10 @@ import { MUREKA_OUTPUT_COUNT } from "./mureka-economics.js";
  */
 
 export interface StandardMusicGenerationExample {
-  /** Credits for one standard AI flow (lyrics + Mureka generateSongs). */
+  /** Credits for one standard AI flow (lyrics + Audioengine generateSongs). */
   creditsPerGeneration: number;
   generations: number;
-  /** Outputs per generation; follows Mureka default variant count. */
+  /** Outputs per generation; follows Audioengine default variant count. */
   variants: number;
 }
 
@@ -41,7 +41,7 @@ export function computeStandardMusicGenerationExample(
   return {
     creditsPerGeneration,
     generations,
-    variants: generations * MUREKA_OUTPUT_COUNT,
+    variants: generations * AUDIOENGINE_OUTPUT_COUNT,
   };
 }
 

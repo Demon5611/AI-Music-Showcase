@@ -26,7 +26,7 @@ import {
   wrapProviderJobError,
   type ProviderJobAttempt,
 } from "../common/provider-job-retry.js";
-import { resolveSignedSunoCallBackUrl } from "../common/suno-signed-callback-url.js";
+import { resolveSignedLegacyengineCallBackUrl } from "../common/legacyengine-signed-callback-url.js";
 import { createDefaultMusicGenerateSubmitDeps } from "../music-generate/default-submit-deps.js";
 import type { MusicGenerateSubmitDeps } from "../music-generate/submit-deps.js";
 
@@ -98,7 +98,7 @@ async function processMusicGenerateJob(
   }
 
   if (record.submissionState === "submitted" || !record.providerTaskId.startsWith("queue:")) {
-    logLoadControl("suno_submit", {
+    logLoadControl("legacyengine_submit", {
       source: "worker",
       jobType: "music_generate",
       recordId: record.id,
@@ -162,7 +162,7 @@ async function processMusicGenerateJob(
 
   // Signed callback URL is built only after CAS, immediately before POST.
   // Never persisted to DB / job payload / providerRequestJson.
-  const callBackUrl = resolveSignedSunoCallBackUrl(record.id);
+  const callBackUrl = resolveSignedLegacyengineCallBackUrl(record.id);
 
   // --- Exactly one vendor fetch after CAS ---
   let result: SubmitGenerationResult;
@@ -331,7 +331,7 @@ async function persistProviderTaskId(
           return;
         }
       } else {
-        logLoadControl("suno_submit", {
+        logLoadControl("legacyengine_submit", {
           source: "worker",
           jobType: "music_generate",
           recordId,
@@ -418,7 +418,7 @@ async function markSubmitUnknown(
   });
 
   logLoadControl(
-    "suno_submit",
+    "legacyengine_submit",
     {
       source: "worker",
       recordId,

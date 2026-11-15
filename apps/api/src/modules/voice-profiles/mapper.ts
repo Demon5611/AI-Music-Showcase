@@ -1,7 +1,7 @@
 import type { VoiceProfile } from "@ai-music/db";
 import { prisma } from "@ai-music/db";
 import {
-  buildMurekaVoiceProfileRefundKey,
+  buildAudioengineVoiceProfileRefundKey,
   isVoiceProfileStatus,
   type VoiceProfileDto,
   type VoiceProfileStatus,
@@ -17,7 +17,7 @@ export async function toVoiceProfileDto(profile: VoiceProfile): Promise<VoicePro
       ? Boolean(
           await prisma.creditTransaction.findUnique({
             where: {
-              idempotencyKey: buildMurekaVoiceProfileRefundKey(profile.id),
+              idempotencyKey: buildAudioengineVoiceProfileRefundKey(profile.id),
             },
             select: { id: true },
           }),

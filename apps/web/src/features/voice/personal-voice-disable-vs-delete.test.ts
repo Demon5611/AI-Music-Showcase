@@ -1,5 +1,5 @@
 /**
- * Documents Disable ≠ Delete for personal Mureka voice.
+ * Documents Disable ≠ Delete for personal Audioengine voice.
  * Disable is client generate-time only; Delete is Profile + request-deletion API.
  */
 import assert from "node:assert/strict";
@@ -9,7 +9,7 @@ function run() {
   const readyProfileId = "vp-ready-same";
   const externalIdWouldBe = "vocal-abc";
 
-  // Disable: Suno path; profile lifecycle untouched.
+  // Disable: Legacyengine path; profile lifecycle untouched.
   const disabled = buildMusicGenerateBody({
     prompt: "lyrics",
     style: "pop",
@@ -37,7 +37,7 @@ function run() {
   });
   assert.equal(enabled.voiceProfileId, readyProfileId);
   assert.equal(enabled.usePersonalVoice, true);
-  assert.equal(enabled.providerOptions?.providerId, "mureka");
+  assert.equal(enabled.providerOptions?.providerId, "audioengine");
 
   // OFF → ON: same profileId, no clone payload, no create-voice spend signal.
   const reEnabled = buildMusicGenerateBody({

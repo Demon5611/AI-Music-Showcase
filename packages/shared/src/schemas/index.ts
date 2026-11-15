@@ -62,8 +62,8 @@ export {
   creditPackCheckoutClientResultSchema,
   creditPackPurchaseStatusViewSchema,
   creditPackPricingFxQuoteSchema,
-  tbcCallbackBodySchema,
-  flittCallbackBodySchema,
+  legacygatewayCallbackBodySchema,
+  checkoutgatewayCallbackBodySchema,
 } from "./credit-pack-checkout.js";
 export type {
   CreateCreditPackCheckoutInput,
@@ -71,8 +71,8 @@ export type {
   CreditPackCheckoutClientResult,
   CreditPackPurchaseStatusView,
   CreditPackPricingFxQuote,
-  TbcCallbackBody,
-  FlittCallbackBody,
+  LegacygatewayCallbackBody,
+  CheckoutgatewayCallbackBody,
 } from "./credit-pack-checkout.js";
 
 export {
@@ -115,8 +115,8 @@ export type MusicRemixBody = z.infer<typeof musicRemixBodySchema>;
 export {
   musicGenerateBodySchema,
   providerGenerationOptionsSchema,
-  sunoGenerationOptionsSchema,
-  murekaGenerationOptionsSchema,
+  legacyengineGenerationOptionsSchema,
+  audioengineGenerationOptionsSchema,
   musicBriefSchema,
 } from "./music-generate-body.js";
 export type { MusicGenerateBody, MusicBriefBody } from "./music-generate-body.js";
@@ -124,5 +124,5 @@ export type { MusicGenerateBody, MusicBriefBody } from "./music-generate-body.js
 export { musicLyricsGenerateBodySchema } from "./music-lyrics-generate-body.js";
 export type { MusicLyricsGenerateBody } from "./music-lyrics-generate-body.js";
 
-export { createMurekaVoiceProfileSchema } from "./voice-profile.js";
-export type { CreateMurekaVoiceProfileBody } from "./voice-profile.js";
+export { createAudioengineVoiceProfileSchema } from "./voice-profile.js";
+export type { CreateAudioengineVoiceProfileBody } from "./voice-profile.js";

@@ -35,7 +35,7 @@ export type GenerationSubmitContext = {
 
 /**
  * Single vendor POST outcome — contractual for worker submission FSM.
- * Same kinds as the former SunoMusicSubmitOnceResult.
+ * Same kinds as the former LegacyengineMusicSubmitOnceResult.
  */
 export type SubmitGenerationResult =
   | { kind: "ok"; taskId: string }

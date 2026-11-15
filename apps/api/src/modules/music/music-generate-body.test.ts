@@ -4,7 +4,7 @@
  */
 import assert from "node:assert/strict";
 import {
-  createSunoApiProvider,
+  createLegacyengineApiProvider,
   fromPersistedSongInput,
   toPersistedSongInput,
   type GenerateSongInput,
@@ -45,8 +45,8 @@ function run() {
   assert.equal(legacy.voiceSampleId, "vs1");
   assert.equal(legacy.input.mode, "song");
   assert.equal(legacy.input.lyricsLanguage, "auto");
-  assert.equal(legacy.input.providerOptions?.providerId, "sunoapi");
-  if (legacy.input.providerOptions?.providerId === "sunoapi") {
+  assert.equal(legacy.input.providerOptions?.providerId, "legacyengineapi");
+  if (legacy.input.providerOptions?.providerId === "legacyengineapi") {
     assert.equal(legacy.input.providerOptions.options.customMode, true);
   }
 
@@ -72,7 +72,7 @@ function run() {
     durationSec: 60,
     mode: "song",
     providerOptions: {
-      providerId: "sunoapi",
+      providerId: "legacyengineapi",
       options: { customMode: true },
     },
   });
@@ -82,8 +82,8 @@ function run() {
   assert.equal(modernPersisted.prompt, legacyPersisted.prompt);
   assert.equal(modernPersisted.style, legacyPersisted.style);
   assert.equal(modernPersisted.customMode, legacyPersisted.customMode);
-  assert.equal(modernPersisted.providerId, "sunoapi");
-  assert.equal(legacyPersisted.providerId, "sunoapi");
+  assert.equal(modernPersisted.providerId, "legacyengineapi");
+  assert.equal(legacyPersisted.providerId, "legacyengineapi");
 
   assertConflict({
     prompt: "x",
@@ -94,7 +94,7 @@ function run() {
     prompt: "x",
     customMode: true,
     providerOptions: {
-      providerId: "sunoapi",
+      providerId: "legacyengineapi",
       options: { customMode: false },
     },
   });
@@ -112,13 +112,13 @@ function run() {
   );
   assert.equal(mockOnly.input.providerOptions?.providerId, "mock");
 
-  let sunoRejectedMock = false;
+  let legacyengineRejectedMock = false;
   try {
-    createSunoApiProvider().prepareMusicGenerate(mockOnly.input);
+    createLegacyengineApiProvider().prepareMusicGenerate(mockOnly.input);
   } catch {
-    sunoRejectedMock = true;
+    legacyengineRejectedMock = true;
   }
-  assert.equal(sunoRejectedMock, true, "Suno provider rejects mock options");
+  assert.equal(legacyengineRejectedMock, true, "Legacyengine provider rejects mock options");
 
   const flatLegacy = {
     prompt: "old",
@@ -131,7 +131,7 @@ function run() {
     personaModel: "voice_persona" as const,
   };
   const restored = fromPersistedSongInput(flatLegacy);
-  assert.equal(restored.providerOptions?.providerId, "sunoapi");
+  assert.equal(restored.providerOptions?.providerId, "legacyengineapi");
   assert.deepEqual(toPersistedSongInput(restored), {
     prompt: "old",
     style: "Jazz",
@@ -143,7 +143,7 @@ function run() {
     personaId: "persona-1",
     personaModel: "voice_persona",
     vocalGender: undefined,
-    providerId: "sunoapi",
+    providerId: "legacyengineapi",
     vocalId: undefined,
     voiceProfileId: undefined,
     musicPrompt: undefined,
@@ -159,25 +159,25 @@ function run() {
       mode: "song",
       durationSec: 60,
       providerOptions: {
-        providerId: "sunoapi",
+        providerId: "legacyengineapi",
         options: { customMode: true, vocalGender: "m" },
       },
     },
     {
       voiceSampleId: "vs",
       personaId: "p1",
-      sunoVoiceTaskId: "task",
+      legacyengineVoiceTaskId: "task",
       personaModel: "voice_persona",
     },
   );
   assert.equal(personaInput.prompt, "hello");
-  if (personaInput.providerOptions?.providerId === "sunoapi") {
+  if (personaInput.providerOptions?.providerId === "legacyengineapi") {
     assert.equal(personaInput.providerOptions.options.personaId, "p1");
     assert.equal(personaInput.providerOptions.options.vocalGender, undefined);
   }
 
   const withPersona: GenerateSongInput = personaInput;
-  const prepared = createSunoApiProvider().prepareMusicGenerate(withPersona);
+  const prepared = createLegacyengineApiProvider().prepareMusicGenerate(withPersona);
   assert.equal(prepared.path, "/generate");
   assert.equal(
     (prepared.body as { personaId?: string; vocalGender?: string }).personaId,
@@ -188,9 +188,9 @@ function run() {
     undefined,
   );
 
-  const murekaPersonal = normalizeMusicGenerateBody(
+  const audioenginePersonal = normalizeMusicGenerateBody(
     musicGenerateBodySchema.parse({
-      prompt: "mureka lyrics",
+      prompt: "audioengine lyrics",
       style: "pop",
       title: "M",
       durationSec: 60,
@@ -198,19 +198,19 @@ function run() {
       usePersonalVoice: true,
       musicBrief: { additionalInstructions: "pop" },
       providerOptions: {
-        providerId: "mureka",
+        providerId: "audioengine",
         options: { voiceProfileId: "vp1" },
       },
     }),
   );
-  assert.equal(murekaPersonal.input.providerOptions?.providerId, "mureka");
-  assert.equal(murekaPersonal.voiceProfileId, "vp1");
-  assert.equal(murekaPersonal.usePersonalVoice, true);
-  if (murekaPersonal.input.providerOptions?.providerId === "mureka") {
-    assert.equal(murekaPersonal.input.providerOptions.options.vocalId, undefined);
-    assert.equal(murekaPersonal.input.providerOptions.options.voiceProfileId, "vp1");
+  assert.equal(audioenginePersonal.input.providerOptions?.providerId, "audioengine");
+  assert.equal(audioenginePersonal.voiceProfileId, "vp1");
+  assert.equal(audioenginePersonal.usePersonalVoice, true);
+  if (audioenginePersonal.input.providerOptions?.providerId === "audioengine") {
+    assert.equal(audioenginePersonal.input.providerOptions.options.vocalId, undefined);
+    assert.equal(audioenginePersonal.input.providerOptions.options.voiceProfileId, "vp1");
     assert.equal(
-      "personaId" in murekaPersonal.input.providerOptions.options,
+      "personaId" in audioenginePersonal.input.providerOptions.options,
       false,
     );
   }
@@ -226,7 +226,7 @@ function run() {
     usePersonalVoice: true,
     voiceProfileId: "vp1",
     providerOptions: {
-      providerId: "mureka",
+      providerId: "audioengine",
       options: { vocalId: "client-vocal", voiceProfileId: "vp1" },
     },
   });
@@ -236,8 +236,8 @@ function run() {
     voiceSampleId: "vs1",
   });
 
-  // Personal voice OFF + explicit Mureka → remapped to Suno (ready profile alone ≠ Mureka).
-  const offExplicitMureka = normalizeMusicGenerateBody(
+  // Personal voice OFF + explicit Audioengine → remapped to Legacyengine (ready profile alone ≠ Audioengine).
+  const offExplicitAudioengine = normalizeMusicGenerateBody(
     musicGenerateBodySchema.parse({
       prompt: "standard vocals",
       style: "pop",
@@ -246,16 +246,16 @@ function run() {
       usePersonalVoice: false,
       musicBrief: { additionalInstructions: "pop" },
       providerOptions: {
-        providerId: "mureka",
+        providerId: "audioengine",
         options: {},
       },
     }),
   );
-  assert.equal(offExplicitMureka.usePersonalVoice, false);
-  assert.equal(offExplicitMureka.voiceProfileId, undefined);
-  assert.equal(offExplicitMureka.input.providerOptions?.providerId, "sunoapi");
+  assert.equal(offExplicitAudioengine.usePersonalVoice, false);
+  assert.equal(offExplicitAudioengine.voiceProfileId, undefined);
+  assert.equal(offExplicitAudioengine.input.providerOptions?.providerId, "legacyengineapi");
 
-  // Ready profile id in body without usePersonalVoice → no Mureka / no voiceProfileId.
+  // Ready profile id in body without usePersonalVoice → no Audioengine / no voiceProfileId.
   const readyProfileOff = normalizeMusicGenerateBody(
     musicGenerateBodySchema.parse({
       prompt: "off with profile id",
@@ -267,7 +267,7 @@ function run() {
   );
   assert.equal(readyProfileOff.usePersonalVoice, false);
   assert.equal(readyProfileOff.voiceProfileId, undefined);
-  assert.equal(readyProfileOff.input.providerOptions?.providerId, "sunoapi");
+  assert.equal(readyProfileOff.input.providerOptions?.providerId, "legacyengineapi");
 
   console.log("music-generate-body / persist / persona tests passed");
 }

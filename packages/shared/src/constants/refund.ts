@@ -26,24 +26,24 @@ export const REFUND_MONEY_COUNTED_STATUSES = [
   "refunded",
 ] as const satisfies readonly RefundStatus[];
 
-export const TBC_REFUND_QUEUE_NAME = "tbc-refund";
+export const LEGACYGATEWAY_REFUND_QUEUE_NAME = "legacygateway-refund";
 
-export const TBC_REFUND_JOB_NAME = "tbc-refund";
+export const LEGACYGATEWAY_REFUND_JOB_NAME = "legacygateway-refund";
 
-export const TBC_REFUND_ATTEMPTS_DEFAULT = 5;
+export const LEGACYGATEWAY_REFUND_ATTEMPTS_DEFAULT = 5;
 
-export const TBC_REFUND_BACKOFF_MS_DEFAULT = 5_000;
+export const LEGACYGATEWAY_REFUND_BACKOFF_MS_DEFAULT = 5_000;
 
 /**
  * Refund payment adapter mode.
  * `mock` is allowed only in development/staging — never production.
  */
-export const TBC_REFUND_PROVIDER_MODES = ["real", "mock"] as const;
+export const LEGACYGATEWAY_REFUND_PROVIDER_MODES = ["real", "mock"] as const;
 
-export type TbcRefundProviderMode = (typeof TBC_REFUND_PROVIDER_MODES)[number];
+export type LegacygatewayRefundProviderMode = (typeof LEGACYGATEWAY_REFUND_PROVIDER_MODES)[number];
 
 /** Deterministic mock scenarios selected via fixture metadata / payId — not user body. */
-export const TBC_REFUND_MOCK_SCENARIOS = [
+export const LEGACYGATEWAY_REFUND_MOCK_SCENARIOS = [
   "returned",
   "partial_returned",
   "rejected",
@@ -51,29 +51,29 @@ export const TBC_REFUND_MOCK_SCENARIOS = [
   "ambiguous_unresolved",
 ] as const;
 
-export type TbcRefundMockScenario = (typeof TBC_REFUND_MOCK_SCENARIOS)[number];
+export type LegacygatewayRefundMockScenario = (typeof LEGACYGATEWAY_REFUND_MOCK_SCENARIOS)[number];
 
-/** providerPaymentId prefix for mock fixtures: tbc-mock:{scenario}:{suffix} */
-export const TBC_REFUND_MOCK_PAY_ID_PREFIX = "tbc-mock";
+/** providerPaymentId prefix for mock fixtures: legacygateway-mock:{scenario}:{suffix} */
+export const LEGACYGATEWAY_REFUND_MOCK_PAY_ID_PREFIX = "legacygateway-mock";
 
-export type TbcRefundJobPayload = {
+export type LegacygatewayRefundJobPayload = {
   refundRequestId: string;
 };
 
 /** Deterministic BullMQ jobId — no colon separators. */
-export function tbcRefundJobId(refundRequestId: string): string {
-  return createBullMqJobId("tbc-refund", refundRequestId);
+export function legacygatewayRefundJobId(refundRequestId: string): string {
+  return createBullMqJobId("legacygateway-refund", refundRequestId);
 }
 
-export function buildTbcRefundMockPayId(
-  scenario: TbcRefundMockScenario,
+export function buildLegacygatewayRefundMockPayId(
+  scenario: LegacygatewayRefundMockScenario,
   suffix: string,
 ): string {
   const clean = suffix.trim().replace(/:/g, "-");
   if (!clean) {
     throw new Error("mock payId suffix required");
   }
-  return `${TBC_REFUND_MOCK_PAY_ID_PREFIX}:${scenario}:${clean}`;
+  return `${LEGACYGATEWAY_REFUND_MOCK_PAY_ID_PREFIX}:${scenario}:${clean}`;
 }
 
 /** Machine-readable credit-pack refund review codes (RefundRequest.rejectReason). */
@@ -107,11 +107,11 @@ export function buildCreditPackRefundClawbackIdempotencyKey(refundRequestId: str
   return `credit_pack_refund_clawback:${refundRequestId}`;
 }
 
-export function parseTbcRefundMockScenario(
+export function parseLegacygatewayRefundMockScenario(
   providerPaymentId: string,
-): TbcRefundMockScenario | null {
+): LegacygatewayRefundMockScenario | null {
   const trimmed = providerPaymentId.trim();
-  const prefix = `${TBC_REFUND_MOCK_PAY_ID_PREFIX}:`;
+  const prefix = `${LEGACYGATEWAY_REFUND_MOCK_PAY_ID_PREFIX}:`;
   if (!trimmed.startsWith(prefix)) {
     return null;
   }
@@ -122,9 +122,9 @@ export function parseTbcRefundMockScenario(
   }
   const scenario = rest.slice(0, colon);
   if (
-    !(TBC_REFUND_MOCK_SCENARIOS as readonly string[]).includes(scenario)
+    !(LEGACYGATEWAY_REFUND_MOCK_SCENARIOS as readonly string[]).includes(scenario)
   ) {
     return null;
   }
-  return scenario as TbcRefundMockScenario;
+  return scenario as LegacygatewayRefundMockScenario;
 }

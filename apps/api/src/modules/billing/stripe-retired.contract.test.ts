@@ -30,7 +30,7 @@ assert.equal(billingRoutes.includes("billing/portal"), false);
 assert.equal(billingRoutes.includes("billing/webhook"), false);
 assert.equal(billingRoutes.includes("stripe"), false);
 assert.match(billingRoutes, /credit-packs\/checkout/);
-assert.match(billingRoutes, /tbc\/callback/);
+assert.match(billingRoutes, /legacygateway\/callback/);
 
 assert.equal(entitlements.includes("currentPeriodEnd"), false);
 assert.equal(entitlements.includes("pendingPlanId"), false);

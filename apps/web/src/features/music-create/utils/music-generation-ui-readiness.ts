@@ -1,16 +1,16 @@
 import type { MusicStatusResponseDto } from "@ai-music/shared";
 
-/** Suno generation returns two variants. */
+/** Legacyengine generation returns two variants. */
 export const EXPECTED_SONG_VARIANTS = 2;
 
 /**
- * Mureka Voice-to-Song poll/UX expects one output.
- * Keep equal to `MUREKA_OUTPUT_COUNT` in `@ai-music/shared`.
+ * Audioengine Voice-to-Song poll/UX expects one output.
+ * Keep equal to `AUDIOENGINE_OUTPUT_COUNT` in `@ai-music/shared`.
  */
-export const EXPECTED_MUREKA_SONG_VARIANTS = 1;
+export const EXPECTED_AUDIOENGINE_SONG_VARIANTS = 1;
 
 export function resolveExpectedSongVariants(provider?: string | null): number {
-  return provider === "mureka" ? EXPECTED_MUREKA_SONG_VARIANTS : EXPECTED_SONG_VARIANTS;
+  return provider === "audioengine" ? EXPECTED_AUDIOENGINE_SONG_VARIANTS : EXPECTED_SONG_VARIANTS;
 }
 
 export type MusicGenerationUiState =

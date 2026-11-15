@@ -11,10 +11,10 @@ import {
 } from "@ai-music/observability";
 import { prisma, type Prisma, type VoiceProfile } from "@ai-music/db";
 import {
-  buildMurekaVoiceProfileRefundKey,
-  buildMurekaVoiceProfileSpendKey,
+  buildAudioengineVoiceProfileRefundKey,
+  buildAudioengineVoiceProfileSpendKey,
   buildProviderDeletionRequestMetadata,
-  DEFAULT_MUREKA_VOICE_DELETION_SCOPE,
+  DEFAULT_AUDIOENGINE_VOICE_DELETION_SCOPE,
   hasRealProviderExternalId,
   canMarkProviderDeletionSubmitted,
   isProviderDeletionRequestTerminal,
@@ -28,8 +28,8 @@ import {
 import { BadRequestError, NotFoundError } from "../../common/errors.js";
 import { refundOriginalSpend } from "../credits/service.js";
 import {
-  removeMurekaVocalCloneJobIfQueued,
-} from "../queue/mureka-provider-job-queue.js";
+  removeAudioengineVocalCloneJobIfQueued,
+} from "../queue/audioengine-provider-job-queue.js";
 import { enqueueProviderDataDeletionSubmitJob } from "../queue/provider-data-deletion-queue.js";
 import { getStorageService } from "../storage/storage.service.js";
 import { toVoiceProfileDto, type VoiceProfileDeletionResponse } from "./mapper.js";
@@ -140,7 +140,7 @@ async function executeVoiceProfileDeletion(
   options?: RequestVoiceProfileDeletionOptions,
 ): Promise<VoiceProfileDeletionResponse> {
   const now = new Date();
-  const deletionScope = DEFAULT_MUREKA_VOICE_DELETION_SCOPE;
+  const deletionScope = DEFAULT_AUDIOENGINE_VOICE_DELETION_SCOPE;
   const hasExternalId = hasRealProviderExternalId(profile.externalId);
 
   let createdDeletionRequestId: string | null = null;
@@ -209,7 +209,7 @@ async function executeVoiceProfileDeletion(
     voiceDeletionPendingProviderTotal.inc({ provider: profile.provider });
   }
 
-  if (createdDeletionRequestId && profile.provider === "mureka") {
+  if (createdDeletionRequestId && profile.provider === "audioengine") {
     await enqueueProviderDataDeletionSubmitJob({
       requestId: createdDeletionRequestId,
       provider: profile.provider,
@@ -228,7 +228,7 @@ async function executeVoiceProfileDeletion(
     });
   }
 
-  await removeMurekaVocalCloneJobIfQueued(profile.id).catch(() => undefined);
+  await removeAudioengineVocalCloneJobIfQueued(profile.id).catch(() => undefined);
 
   const purge = await purgeSourceSampleAudio(userId, profile.sourceVoiceSampleId);
 
@@ -249,9 +249,9 @@ async function executeVoiceProfileDeletion(
   if (profile.status === "creating") {
     await refundOriginalSpend({
       userId,
-      spendIdempotencyKey: buildMurekaVoiceProfileSpendKey(profile.id),
-      refundIdempotencyKey: buildMurekaVoiceProfileRefundKey(profile.id),
-      reason: "mureka_voice_profile_refund",
+      spendIdempotencyKey: buildAudioengineVoiceProfileSpendKey(profile.id),
+      refundIdempotencyKey: buildAudioengineVoiceProfileRefundKey(profile.id),
+      reason: "audioengine_voice_profile_refund",
       relatedEntityType: "voice_profile",
       relatedEntityId: profile.id,
     });

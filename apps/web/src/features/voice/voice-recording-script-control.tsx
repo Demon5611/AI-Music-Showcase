@@ -4,7 +4,7 @@ import { BookOpen } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { cn } from "@/lib/utils";
 import { voiceUi } from "@/features/voice/voice-classes";
-import { AiProcessingStatus } from "@/shared/ui/elevenlabs/ai-processing-status";
+import { AiProcessingStatus } from "@/shared/ui/voiceengine/ai-processing-status";
 
 interface VoiceRecordingScriptToggleProps {
   disabled?: boolean;

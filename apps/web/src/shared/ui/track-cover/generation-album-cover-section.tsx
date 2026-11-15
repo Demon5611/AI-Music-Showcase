@@ -25,7 +25,7 @@ interface GenerationAlbumCoverSectionProps {
   title: string;
   /**
    * MusicGeneration.provider from the completed record (not the current My Voice toggle).
-   * sunoapi → cover variants CTA; mureka → initials fallback only.
+   * legacyengineapi → cover variants CTA; audioengine → initials fallback only.
    */
   musicProvider?: string | null;
   defaultImageUrl?: string | null;

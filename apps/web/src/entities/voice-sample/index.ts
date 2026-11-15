@@ -19,12 +19,12 @@ export function isVoiceSampleReadyForGeneration(
 const VOICE_CLONE_CANCELLED_MESSAGE =
   "Процесс остановлен. Нажмите «Повторить верификацию», чтобы начать заново.";
 
-/** User stopped verification — do not resume Suno sync/polling. */
+/** User stopped verification — do not resume Legacyengine sync/polling. */
 export function isVoiceCloneCancelled(sample: VoiceSample): boolean {
   return sample.voiceCloneError === VOICE_CLONE_CANCELLED_MESSAGE;
 }
 
-/** Suno clone marked ready, but live check-voice(voice_id) failed — need /consent restart. */
+/** Legacyengine clone marked ready, but live check-voice(voice_id) failed — need /consent restart. */
 export function needsPersonaReverification(sample: VoiceSample): boolean {
   return sample.voiceCloneStatus === "ready" && sample.readyForMusicGeneration === false;
 }

@@ -9,7 +9,7 @@ type PurchaseLegalNoticeProps = {
 };
 
 /**
- * Reusable disclosure for Pricing and future TBC checkout CTA.
+ * Reusable disclosure for Pricing and future LEGACYGATEWAY checkout CTA.
  * Does not gate payments, store consent, or call billing APIs.
  */
 export function PurchaseLegalNotice({ className }: PurchaseLegalNoticeProps) {

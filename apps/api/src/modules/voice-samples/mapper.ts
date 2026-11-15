@@ -14,7 +14,7 @@ export function toVoiceSampleDto(
     status: sample.status as VoiceSampleDto["status"],
     consentConfirmed: sample.consentConfirmed,
     voiceLanguage: normalizeVoiceLanguage(sample.voiceLanguage),
-    sunoValidatePhrase: sample.sunoValidatePhrase,
+    legacyengineValidatePhrase: sample.legacyengineValidatePhrase,
     voiceCloneStatus: sample.voiceCloneStatus as VoiceSampleDto["voiceCloneStatus"],
     voiceCloneError: sample.voiceCloneError,
     voiceCloneStartedAt: sample.voiceCloneStartedAt?.toISOString() ?? null,
@@ -31,7 +31,7 @@ export async function toVoiceSampleDtoWithPersonaCheck(
   ) => Promise<string | null>,
 ): Promise<VoiceSampleDto> {
   const shouldCheck =
-    sample.voiceCloneStatus === "ready" || Boolean(sample.sunoVoiceId?.trim());
+    sample.voiceCloneStatus === "ready" || Boolean(sample.legacyengineVoiceId?.trim());
 
   const personaVoiceId = shouldCheck
     ? await resolvePersonaVoiceId(sample, { persistCorrection: true })

@@ -1,5 +1,5 @@
 /**
- * Guardrails for public legal copy (Flitt + refund semantics + registry identity).
+ * Guardrails for public legal copy (Checkoutgateway + refund semantics + registry identity).
  * Run: pnpm --filter @ai-music/shared exec tsx ../../apps/web/src/features/legal/legal-content.ui.test.ts
  */
 import assert from "node:assert/strict";
@@ -40,10 +40,10 @@ function refundBlob(locale: Record<string, unknown>): string {
 }
 
 for (const legal of [enLegal, ruLegal]) {
-  assert.match(termsPayment(legal), /Flitt/);
-  assert.doesNotMatch(termsPayment(legal), /TBC Bank/);
-  assert.match(privacyPayment(legal), /Flitt/);
-  assert.doesNotMatch(privacyPayment(legal), /TBC Bank/);
+  assert.match(termsPayment(legal), /Checkoutgateway/);
+  assert.doesNotMatch(termsPayment(legal), /LEGACYGATEWAY Bank/);
+  assert.match(privacyPayment(legal), /Checkoutgateway/);
+  assert.doesNotMatch(privacyPayment(legal), /LEGACYGATEWAY Bank/);
 
   const refund = refundBlob(legal);
   assert.doesNotMatch(refund, /generally not eligible/);
@@ -58,14 +58,14 @@ for (const legal of [enLegal, ruLegal]) {
   assert.match(refund, /original payment|исходн/);
   assert.match(refund, /operationRefund/);
   assert.match(refund, /not applied cumulatively|не применяются совместно/);
-  assert.match(refund, /Flitt/);
-  assert.doesNotMatch(refund, /TBC Bank/);
+  assert.match(refund, /Checkoutgateway/);
+  assert.doesNotMatch(refund, /LEGACYGATEWAY Bank/);
 }
 
-assert.doesNotMatch(enRaw, /TBC Bank/);
-assert.doesNotMatch(ruRaw, /TBC Bank/);
+assert.doesNotMatch(enRaw, /LEGACYGATEWAY Bank/);
+assert.doesNotMatch(ruRaw, /LEGACYGATEWAY Bank/);
 assert.doesNotMatch(enRaw, /planned payment processor/);
-assert.doesNotMatch(ruRaw, /планируется TBC/);
+assert.doesNotMatch(ruRaw, /планируется LEGACYGATEWAY/);
 assert.doesNotMatch(enRaw, /partially used packages are generally not eligible/i);
 assert.doesNotMatch(enRaw, /credits may remain reserved/i);
 

@@ -64,7 +64,7 @@
     },
     "payment": {
       "title": "5. Payment processing",
-      "p1": "When online payments are enabled, payments are processed by Flitt. The final amount and currency charged are displayed at checkout before the customer confirms payment.",
+      "p1": "When online payments are enabled, payments are processed by Checkoutgateway. The final amount and currency charged are displayed at checkout before the customer confirms payment.",
       "p2": "We do not intentionally store full card numbers, CVV/CVC codes, or internet-banking passwords.",
       "p3": "A purchase is considered completed after payment confirmation and crediting of the purchased package to your account balance. If confirmation is delayed, do not repeat the payment before checking your balance and contacting support."
     },
@@ -117,7 +117,7 @@
     "definitions": {
       "title": "1. Definitions",
       "p1": "Credit restoration means returning internal usage credits to your account balance after a paid operation does not produce a usable result, or after a verified billing or technical error.",
-      "p2": "Payment refund (monetary refund) means returning money through Flitt against the original payment transaction for a credit package purchase or, where approved, for paid credits attributable to a specific operation.",
+      "p2": "Payment refund (monetary refund) means returning money through Checkoutgateway against the original payment transaction for a credit package purchase or, where approved, for paid credits attributable to a specific operation.",
       "p3": "These processes are different. Restoring credits is not the same as a monetary refund, and a monetary refund request is reviewed separately from automatic credit restoration."
     },
     "model": {
@@ -159,7 +159,7 @@
     "duplicate": {
       "title": "8. Duplicate or incorrect charge",
       "p1": "Contact support if you see a duplicate charge, an incorrect amount, a successful payment without package credits, or a payment marked successful while the balance was not updated.",
-      "p2": "After verification, we may credit the package, restore credits, or initiate a monetary refund through Flitt, depending on the case. Immediate completion is not guaranteed."
+      "p2": "After verification, we may credit the package, restore credits, or initiate a monetary refund through Checkoutgateway, depending on the case. Immediate completion is not guaranteed."
     },
     "unauthorized": {
       "title": "9. Unauthorized payment",
@@ -181,7 +181,7 @@
     },
     "timing": {
       "title": "11. Review timing",
-      "p1": "We aim to review complete monetary refund requests within 10 business days. Approved monetary refunds are initiated through Flitt against the original payment transaction. The time for funds to appear depends on Flitt, the card/payment network, and the customer’s issuing bank.",
+      "p1": "We aim to review complete monetary refund requests within 10 business days. Approved monetary refunds are initiated through Checkoutgateway against the original payment transaction. The time for funds to appear depends on Checkoutgateway, the card/payment network, and the customer’s issuing bank.",
       "p2": "The 10-business-day period is a target for reviewing the request, not a guarantee of payment settlement timing."
     },
     "chargebacks": {
@@ -252,7 +252,7 @@
       ],
       "technicalNote": "We do not intentionally collect advertising identifiers, precise geolocation, or device fingerprinting for ads. Platform hosting logs may include IP addresses or similar connection metadata as part of ordinary infrastructure operation.",
       "paymentTitle": "Payment data",
-      "paymentP1": "When online payments are enabled, payments are processed by Flitt. We may receive payment or order identifiers, amount, currency, status, timestamps, and other information needed for reconciliation and refunds.",
+      "paymentP1": "When online payments are enabled, payments are processed by Checkoutgateway. We may receive payment or order identifiers, amount, currency, status, timestamps, and other information needed for reconciliation and refunds.",
       "paymentP2": "We do not receive or intentionally store full card numbers, CVV/CVC codes, banking passwords, or OTP codes.",
       "paymentP3": "Payment-related data is used to complete purchases, reconcile payments, and process eligible refunds. While online payments are not enabled in a given environment, payment transactions may be absent."
     },

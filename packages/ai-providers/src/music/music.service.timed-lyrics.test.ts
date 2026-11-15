@@ -1,5 +1,5 @@
 /**
- * MusicService.getTimestampedLyrics must use Suno regardless of default provider.
+ * MusicService.getTimestampedLyrics must use Legacyengine regardless of default provider.
  * Run: pnpm --filter @ai-music/ai-providers exec tsx src/music/music.service.timed-lyrics.test.ts
  */
 import assert from "node:assert/strict";
@@ -30,20 +30,20 @@ function stubProvider(
   };
 }
 
-async function testForcesSunoWhenDefaultIsMureka(): Promise<void> {
+async function testForcesLegacyengineWhenDefaultIsAudioengine(): Promise<void> {
   const previous = process.env.MUSIC_DEFAULT_PROVIDER;
-  process.env.MUSIC_DEFAULT_PROVIDER = "mureka";
+  process.env.MUSIC_DEFAULT_PROVIDER = "audioengine";
 
   let calledWith: TimestampedLyricsInput | null = null;
-  let murekaCalled = false;
+  let audioengineCalled = false;
 
   try {
     const factory = new MusicProviderFactory({
-      mureka: stubProvider("mureka", async () => {
-        murekaCalled = true;
-        throw new Error("mureka must not handle timed lyrics");
+      audioengine: stubProvider("audioengine", async () => {
+        audioengineCalled = true;
+        throw new Error("audioengine must not handle timed lyrics");
       }),
-      sunoapi: stubProvider("sunoapi", async (input) => {
+      legacyengineapi: stubProvider("legacyengineapi", async (input) => {
         calledWith = input;
         return {
           lines: [{ startSec: 0, endSec: 1, text: "hi" }],
@@ -52,16 +52,16 @@ async function testForcesSunoWhenDefaultIsMureka(): Promise<void> {
       }),
     });
 
-    assert.equal(factory.getProvider().id, "mureka");
+    assert.equal(factory.getProvider().id, "audioengine");
 
     const service = new MusicService(factory);
     const result = await service.getTimestampedLyrics({
-      taskId: "suno-task",
-      audioId: "suno-audio",
+      taskId: "legacyengine-task",
+      audioId: "legacyengine-audio",
     });
 
-    assert.equal(murekaCalled, false);
-    assert.deepEqual(calledWith, { taskId: "suno-task", audioId: "suno-audio" });
+    assert.equal(audioengineCalled, false);
+    assert.deepEqual(calledWith, { taskId: "legacyengine-task", audioId: "legacyengine-audio" });
     assert.equal(result.lines.length, 1);
   } finally {
     if (previous === undefined) {
@@ -74,7 +74,7 @@ async function testForcesSunoWhenDefaultIsMureka(): Promise<void> {
 
 async function testRejectsMissingIds(): Promise<void> {
   const factory = new MusicProviderFactory({
-    sunoapi: stubProvider("sunoapi", async () => {
+    legacyengineapi: stubProvider("legacyengineapi", async () => {
       throw new Error("should not call provider");
     }),
   });
@@ -89,6 +89,6 @@ async function testRejectsMissingIds(): Promise<void> {
   }
 }
 
-await testForcesSunoWhenDefaultIsMureka();
+await testForcesLegacyengineWhenDefaultIsAudioengine();
 await testRejectsMissingIds();
 console.log("music.service.timed-lyrics.test.ts: ok");

@@ -1,11 +1,11 @@
 /**
- * Flitt-only new checkout. TBC env must not enable CTA or create purchases.
- * Historical TBC refunds still route by stored provider.
+ * Checkoutgateway-only new checkout. LEGACYGATEWAY env must not enable CTA or create purchases.
+ * Historical LEGACYGATEWAY refunds still route by stored provider.
  * Run: pnpm --filter @ai-music/api exec tsx src/modules/billing/payment-provider-selection.contract.test.ts
  */
 import assert from "node:assert/strict";
 import { Prisma, type CreditPackPurchase } from "@ai-music/db";
-import { FLITT_PAYMENT_PROVIDER, TBC_PAYMENT_PROVIDER, createTestUsdGelQuote } from "@ai-music/shared";
+import { CHECKOUTGATEWAY_PAYMENT_PROVIDER, LEGACYGATEWAY_PAYMENT_PROVIDER, createTestUsdGelQuote } from "@ai-music/shared";
 import {
   createCreditPackCheckout,
   getCreditPackCheckoutStatus,
@@ -15,101 +15,101 @@ import {
   isConfiguredCheckoutEnabled,
   resolveConfiguredCheckoutProvider,
 } from "./payment-provider-selection.js";
-import { applyFetchedTbcPayment, handleTbcCallback } from "./tbc-payment-fulfillment.service.js";
+import { applyFetchedLegacygatewayPayment, handleLegacygatewayCallback } from "./legacygateway-payment-fulfillment.service.js";
 import { readFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 
 const here = dirname(fileURLToPath(import.meta.url));
 
-const FLITT_READY = {
-  PAYMENT_PROVIDER: "flitt",
+const CHECKOUTGATEWAY_READY = {
+  PAYMENT_PROVIDER: "checkoutgateway",
   APP_ENV: "staging",
-  FLITT_ENABLED: true,
-  FLITT_API_BASE_URL: "https://pay.flitt.com",
-  FLITT_MERCHANT_ID: "1549901",
-  FLITT_PAYMENT_KEY: "staging-test-key",
-  FLITT_CURRENCY: "GEL",
-  FLITT_CALLBACK_URL: "https://api.example.com/api/billing/flitt/callback",
-  FLITT_RETURN_URL: "https://web.example.com/pricing",
+  CHECKOUTGATEWAY_ENABLED: true,
+  CHECKOUTGATEWAY_API_BASE_URL: "https://pay.integration.example.invalid",
+  CHECKOUTGATEWAY_MERCHANT_ID: "1549901",
+  CHECKOUTGATEWAY_PAYMENT_KEY: "staging-test-key",
+  CHECKOUTGATEWAY_CURRENCY: "GEL",
+  CHECKOUTGATEWAY_CALLBACK_URL: "https://api.example.com/api/billing/checkoutgateway/callback",
+  CHECKOUTGATEWAY_RETURN_URL: "https://web.example.com/pricing",
 };
 
-const TBC_CREDENTIALS = {
-  TBC_CHECKOUT_ENABLED: true,
-  TBC_API_BASE_URL: "https://api.tbcbank.ge",
-  TBC_CHECKOUT_API_VERSION: "v1",
-  TBC_API_KEY: "test-api-key",
-  TBC_CLIENT_ID: "test-client-id",
-  TBC_CLIENT_SECRET: "test-client-secret",
-  TBC_CHECKOUT_CURRENCY: "USD",
-  TBC_CALLBACK_URL: "https://api.example.com/api/billing/tbc/callback",
-  TBC_RETURN_URL: "https://example.com/pricing",
+const LEGACYGATEWAY_CREDENTIALS = {
+  LEGACYGATEWAY_CHECKOUT_ENABLED: true,
+  LEGACYGATEWAY_API_BASE_URL: "https://api.legacygatewaybank.ge",
+  LEGACYGATEWAY_CHECKOUT_API_VERSION: "v1",
+  LEGACYGATEWAY_API_KEY: "test-api-key",
+  LEGACYGATEWAY_CLIENT_ID: "test-client-id",
+  LEGACYGATEWAY_CLIENT_SECRET: "test-client-secret",
+  LEGACYGATEWAY_CHECKOUT_CURRENCY: "USD",
+  LEGACYGATEWAY_CALLBACK_URL: "https://api.example.com/api/billing/legacygateway/callback",
+  LEGACYGATEWAY_RETURN_URL: "https://example.com/pricing",
 };
 
-const TBC_READY = {
-  PAYMENT_PROVIDER: "tbc",
-  ...TBC_CREDENTIALS,
+const LEGACYGATEWAY_READY = {
+  PAYMENT_PROVIDER: "legacygateway",
+  ...LEGACYGATEWAY_CREDENTIALS,
 };
 
-const FLITT_CONFIG = {
+const CHECKOUTGATEWAY_CONFIG = {
   enabled: true,
-  apiBaseUrl: "https://pay.flitt.com",
+  apiBaseUrl: "https://pay.integration.example.invalid",
   merchantId: 1_549_901,
   paymentKey: "staging-test-key",
   currency: "GEL" as const,
-  callbackUrl: FLITT_READY.FLITT_CALLBACK_URL,
-  returnUrl: FLITT_READY.FLITT_RETURN_URL,
+  callbackUrl: CHECKOUTGATEWAY_READY.CHECKOUTGATEWAY_CALLBACK_URL,
+  returnUrl: CHECKOUTGATEWAY_READY.CHECKOUTGATEWAY_RETURN_URL,
 };
 
-const FLITT_INCOMPLETE = {
-  PAYMENT_PROVIDER: "flitt",
+const CHECKOUTGATEWAY_INCOMPLETE = {
+  PAYMENT_PROVIDER: "checkoutgateway",
   APP_ENV: "staging",
-  FLITT_ENABLED: true,
-  ...TBC_CREDENTIALS,
+  CHECKOUTGATEWAY_ENABLED: true,
+  ...LEGACYGATEWAY_CREDENTIALS,
 };
 
-assert.equal(resolveConfiguredCheckoutProvider(FLITT_READY), "flitt");
-assert.equal(isConfiguredCheckoutEnabled(FLITT_READY), true);
-assert.deepEqual(getCreditPackCheckoutStatus(FLITT_READY), { checkoutEnabled: true });
+assert.equal(resolveConfiguredCheckoutProvider(CHECKOUTGATEWAY_READY), "checkoutgateway");
+assert.equal(isConfiguredCheckoutEnabled(CHECKOUTGATEWAY_READY), true);
+assert.deepEqual(getCreditPackCheckoutStatus(CHECKOUTGATEWAY_READY), { checkoutEnabled: true });
 
 assert.deepEqual(
   getCreditPackCheckoutStatus({
-    ...FLITT_READY,
+    ...CHECKOUTGATEWAY_READY,
     PAYMENT_PROVIDER: undefined,
   }),
   { checkoutEnabled: true },
-  "unset PAYMENT_PROVIDER + Flitt ready → checkout enabled",
+  "unset PAYMENT_PROVIDER + Checkoutgateway ready → checkout enabled",
 );
 
-assert.deepEqual(getCreditPackCheckoutStatus(FLITT_INCOMPLETE), { checkoutEnabled: false });
+assert.deepEqual(getCreditPackCheckoutStatus(CHECKOUTGATEWAY_INCOMPLETE), { checkoutEnabled: false });
 assert.deepEqual(
   getCreditPackCheckoutStatus({
-    PAYMENT_PROVIDER: "flitt",
-    FLITT_ENABLED: false,
-    ...TBC_CREDENTIALS,
+    PAYMENT_PROVIDER: "checkoutgateway",
+    CHECKOUTGATEWAY_ENABLED: false,
+    ...LEGACYGATEWAY_CREDENTIALS,
   }),
   { checkoutEnabled: false },
 );
 
 assert.deepEqual(
-  getCreditPackCheckoutStatus(TBC_READY),
+  getCreditPackCheckoutStatus(LEGACYGATEWAY_READY),
   { checkoutEnabled: false },
-  "TBC env must not enable CTA",
+  "LEGACYGATEWAY env must not enable CTA",
 );
 
 assert.deepEqual(
   getCreditPackCheckoutStatus({
-    ...FLITT_READY,
-    PAYMENT_PROVIDER: "tbc",
-    ...TBC_CREDENTIALS,
+    ...CHECKOUTGATEWAY_READY,
+    PAYMENT_PROVIDER: "legacygateway",
+    ...LEGACYGATEWAY_CREDENTIALS,
   }),
   { checkoutEnabled: false },
-  "PAYMENT_PROVIDER=tbc fails closed even if Flitt is ready",
+  "PAYMENT_PROVIDER=legacygateway fails closed even if Checkoutgateway is ready",
 );
 
 assert.deepEqual(
   getCreditPackCheckoutStatus({
-    ...FLITT_READY,
+    ...CHECKOUTGATEWAY_READY,
     PAYMENT_PROVIDER: "stripe",
   }),
   { checkoutEnabled: false },
@@ -119,10 +119,10 @@ assert.deepEqual(
 assert.deepEqual(
   getCreditPackCheckoutStatus({
     PAYMENT_PROVIDER: undefined,
-    ...TBC_CREDENTIALS,
+    ...LEGACYGATEWAY_CREDENTIALS,
   }),
   { checkoutEnabled: false },
-  "TBC ready without Flitt → checkout disabled",
+  "LEGACYGATEWAY ready without Checkoutgateway → checkout disabled",
 );
 
 function createCheckoutDb() {
@@ -172,77 +172,77 @@ function createCheckoutDb() {
 
 {
   const db = createCheckoutDb();
-  let flittCreates = 0;
+  let checkoutgatewayCreates = 0;
   let capturedReturnUrl = "";
 
   const result = await createCreditPackCheckout(
     "user-1",
     { packageId: "creator" },
     {
-      env: { ...FLITT_READY, ...TBC_CREDENTIALS },
+      env: { ...CHECKOUTGATEWAY_READY, ...LEGACYGATEWAY_CREDENTIALS },
       prismaClient: db as never,
-      resolveFlittConfig: () => FLITT_CONFIG,
+      resolveCheckoutgatewayConfig: () => CHECKOUTGATEWAY_CONFIG,
       getUsdGelQuote: async () => createTestUsdGelQuote("2.72"),
-      createFlittProvider: () =>
+      createCheckoutgatewayProvider: () =>
         ({
           createCheckout: async (input: { returnUrl: string; amountMinor: number; currency: string }) => {
-            flittCreates += 1;
+            checkoutgatewayCreates += 1;
             capturedReturnUrl = input.returnUrl;
             assert.equal(input.amountMinor, 7888);
             assert.equal(input.currency, "GEL");
             return {
-              provider: FLITT_PAYMENT_PROVIDER,
+              provider: CHECKOUTGATEWAY_PAYMENT_PROVIDER,
               providerPaymentId: "805230052",
-              approvalUrl: "https://pay.flitt.com/merchants/x/default/index.html?token=1",
+              approvalUrl: "https://pay.integration.example.invalid/merchants/x/default/index.html?token=1",
               providerStatus: "created",
             };
           },
         }) as never,
-      createIdFn: () => "purchase-flitt-ready",
+      createIdFn: () => "purchase-checkoutgateway-ready",
     },
   );
 
   assert.equal(result.currency, "GEL");
   assert.equal(result.priceAmount, 78.88);
-  assert.equal(flittCreates, 1);
-  assert.equal(db.purchases.get("purchase-flitt-ready")?.provider, FLITT_PAYMENT_PROVIDER);
+  assert.equal(checkoutgatewayCreates, 1);
+  assert.equal(db.purchases.get("purchase-checkoutgateway-ready")?.provider, CHECKOUTGATEWAY_PAYMENT_PROVIDER);
   assert.equal(
     capturedReturnUrl,
-    "https://web.example.com/pricing?purchaseId=purchase-flitt-ready",
+    "https://web.example.com/pricing?purchaseId=purchase-checkoutgateway-ready",
   );
 }
 
 {
   const db = createCheckoutDb();
-  let flittCreates = 0;
+  let checkoutgatewayCreates = 0;
 
   const result = await createCreditPackCheckout(
     "user-1",
     { packageId: "creator" },
     {
-      env: { ...FLITT_READY, PAYMENT_PROVIDER: undefined, ...TBC_CREDENTIALS },
+      env: { ...CHECKOUTGATEWAY_READY, PAYMENT_PROVIDER: undefined, ...LEGACYGATEWAY_CREDENTIALS },
       prismaClient: db as never,
-      resolveFlittConfig: () => FLITT_CONFIG,
+      resolveCheckoutgatewayConfig: () => CHECKOUTGATEWAY_CONFIG,
       getUsdGelQuote: async () => createTestUsdGelQuote("2.72"),
-      createFlittProvider: () =>
+      createCheckoutgatewayProvider: () =>
         ({
           createCheckout: async () => {
-            flittCreates += 1;
+            checkoutgatewayCreates += 1;
             return {
-              provider: FLITT_PAYMENT_PROVIDER,
+              provider: CHECKOUTGATEWAY_PAYMENT_PROVIDER,
               providerPaymentId: "805230053",
-              approvalUrl: "https://pay.flitt.com/merchants/x/default/index.html?token=2",
+              approvalUrl: "https://pay.integration.example.invalid/merchants/x/default/index.html?token=2",
               providerStatus: "created",
             };
           },
         }) as never,
-      createIdFn: () => "purchase-flitt-unset-selector",
+      createIdFn: () => "purchase-checkoutgateway-unset-selector",
     },
   );
 
-  assert.equal(flittCreates, 1);
-  assert.equal(db.purchases.get("purchase-flitt-unset-selector")?.provider, FLITT_PAYMENT_PROVIDER);
-  assert.equal(result.purchaseId, "purchase-flitt-unset-selector");
+  assert.equal(checkoutgatewayCreates, 1);
+  assert.equal(db.purchases.get("purchase-checkoutgateway-unset-selector")?.provider, CHECKOUTGATEWAY_PAYMENT_PROVIDER);
+  assert.equal(result.purchaseId, "purchase-checkoutgateway-unset-selector");
 }
 
 {
@@ -254,16 +254,16 @@ function createCheckoutDb() {
         "user-1",
         { packageId: "creator" },
         {
-          env: TBC_READY,
+          env: LEGACYGATEWAY_READY,
           prismaClient: db as never,
-          resolveFlittConfig: () => FLITT_CONFIG,
-          createFlittProvider: () =>
+          resolveCheckoutgatewayConfig: () => CHECKOUTGATEWAY_CONFIG,
+          createCheckoutgatewayProvider: () =>
             ({
               createCheckout: async () => {
-                throw new Error("TBC must not be selected for new purchase");
+                throw new Error("LEGACYGATEWAY must not be selected for new purchase");
               },
             }) as never,
-          createIdFn: () => "purchase-tbc-blocked",
+          createIdFn: () => "purchase-legacygateway-blocked",
         },
       ),
   );
@@ -276,9 +276,9 @@ function createCheckoutDb() {
 
   await assert.rejects(() =>
     createCreditPackCheckout("user-1", { packageId: "creator" }, {
-      env: { PAYMENT_PROVIDER: "flitt", FLITT_ENABLED: false, ...TBC_CREDENTIALS },
+      env: { PAYMENT_PROVIDER: "checkoutgateway", CHECKOUTGATEWAY_ENABLED: false, ...LEGACYGATEWAY_CREDENTIALS },
       prismaClient: db as never,
-      createIdFn: () => "purchase-flitt-disabled",
+      createIdFn: () => "purchase-checkoutgateway-disabled",
     }),
   );
 
@@ -288,15 +288,15 @@ function createCheckoutDb() {
 {
   const db = createCheckoutDb();
   const historical = {
-    id: "purchase-tbc-historical",
+    id: "purchase-legacygateway-historical",
     userId: "user-1",
-    provider: TBC_PAYMENT_PROVIDER,
+    provider: LEGACYGATEWAY_PAYMENT_PROVIDER,
     packageId: "creator",
     priceAmount: new Prisma.Decimal(29),
     currency: "USD",
     creditsAmount: 2000,
-    merchantPaymentId: "purchase-tbc-historical",
-    providerPaymentId: "pay-tbc-1",
+    merchantPaymentId: "purchase-legacygateway-historical",
+    providerPaymentId: "pay-legacygateway-1",
     status: "provider_created",
     providerStatus: "Created",
     approvalUrl: "https://tpay.example/approve-legacy",
@@ -317,13 +317,13 @@ function createCheckoutDb() {
         "user-1",
         { packageId: "creator", clientRequestId: "same-key-legacy" },
         {
-          env: FLITT_READY,
+          env: CHECKOUTGATEWAY_READY,
           prismaClient: db as never,
-          resolveFlittConfig: () => FLITT_CONFIG,
-          createFlittProvider: () =>
+          resolveCheckoutgatewayConfig: () => CHECKOUTGATEWAY_CONFIG,
+          createCheckoutgatewayProvider: () =>
             ({
               createCheckout: async () => {
-                throw new Error("must not create Flitt over historical TBC idempotency key");
+                throw new Error("must not create Checkoutgateway over historical LEGACYGATEWAY idempotency key");
               },
             }) as never,
           createIdFn: () => "purchase-should-not-exist",
@@ -334,16 +334,16 @@ function createCheckoutDb() {
   );
 
   assert.equal(db.purchases.size, 1);
-  assert.equal(db.purchases.get("purchase-tbc-historical")?.provider, TBC_PAYMENT_PROVIDER);
+  assert.equal(db.purchases.get("purchase-legacygateway-historical")?.provider, LEGACYGATEWAY_PAYMENT_PROVIDER);
 }
 
 {
   const previous = process.env.PAYMENT_PROVIDER;
   try {
-    process.env.PAYMENT_PROVIDER = "tbc";
-    assert.equal(resolveMonetaryRefundEnqueueTarget("flitt"), FLITT_PAYMENT_PROVIDER);
-    process.env.PAYMENT_PROVIDER = "flitt";
-    assert.equal(resolveMonetaryRefundEnqueueTarget("tbc"), TBC_PAYMENT_PROVIDER);
+    process.env.PAYMENT_PROVIDER = "legacygateway";
+    assert.equal(resolveMonetaryRefundEnqueueTarget("checkoutgateway"), CHECKOUTGATEWAY_PAYMENT_PROVIDER);
+    process.env.PAYMENT_PROVIDER = "checkoutgateway";
+    assert.equal(resolveMonetaryRefundEnqueueTarget("legacygateway"), LEGACYGATEWAY_PAYMENT_PROVIDER);
   } finally {
     if (previous === undefined) {
       delete process.env.PAYMENT_PROVIDER;
@@ -353,8 +353,8 @@ function createCheckoutDb() {
   }
 
   const refundService = readFileSync(join(here, "refund.service.ts"), "utf8");
-  assert.match(refundService, /storedProvider === FLITT_PAYMENT_PROVIDER/);
-  assert.match(refundService, /storedProvider === TBC_PAYMENT_PROVIDER/);
+  assert.match(refundService, /storedProvider === CHECKOUTGATEWAY_PAYMENT_PROVIDER/);
+  assert.match(refundService, /storedProvider === LEGACYGATEWAY_PAYMENT_PROVIDER/);
   assert.match(refundService, /provider: storedProvider/);
   assert.match(refundService, /refundable\.provider/);
   assert.doesNotMatch(refundService, /process\.env\.PAYMENT_PROVIDER/);
@@ -363,15 +363,15 @@ function createCheckoutDb() {
 
 {
   const checkout = readFileSync(join(here, "credit-pack-checkout.service.ts"), "utf8");
-  assert.doesNotMatch(checkout, /TBC_CHECKOUT_EXPIRATION_MINUTES/);
-  assert.doesNotMatch(checkout, /provider: TBC_PAYMENT_PROVIDER/);
-  assert.doesNotMatch(checkout, /isTbcCheckoutReady/);
-  assert.doesNotMatch(checkout, /new TbcCheckoutClient/);
+  assert.doesNotMatch(checkout, /LEGACYGATEWAY_CHECKOUT_EXPIRATION_MINUTES/);
+  assert.doesNotMatch(checkout, /provider: LEGACYGATEWAY_PAYMENT_PROVIDER/);
+  assert.doesNotMatch(checkout, /isLegacygatewayCheckoutReady/);
+  assert.doesNotMatch(checkout, /new LegacygatewayCheckoutClient/);
 }
 
 {
   const selection = readFileSync(join(here, "payment-provider-selection.ts"), "utf8");
-  assert.doesNotMatch(selection, /isTbcCheckoutReady/);
+  assert.doesNotMatch(selection, /isLegacygatewayCheckoutReady/);
 }
 
 {
@@ -381,19 +381,19 @@ function createCheckoutDb() {
 }
 
 {
-  const flittPurchase = {
-    id: "p-flitt-shared-payid",
+  const checkoutgatewayPurchase = {
+    id: "p-checkoutgateway-shared-payid",
     userId: "user-1",
-    provider: FLITT_PAYMENT_PROVIDER,
+    provider: CHECKOUTGATEWAY_PAYMENT_PROVIDER,
     packageId: "creator",
     priceAmount: new Prisma.Decimal(29),
     currency: "GEL",
     creditsAmount: 2000,
-    merchantPaymentId: "p-flitt-shared-payid",
+    merchantPaymentId: "p-checkoutgateway-shared-payid",
     providerPaymentId: "shared-pay-id",
     status: "provider_created",
     providerStatus: "created",
-    approvalUrl: "https://pay.flitt.com/merchants/x/default/index.html?token=1",
+    approvalUrl: "https://pay.integration.example.invalid/merchants/x/default/index.html?token=1",
     clientRequestId: null,
     paidAt: null,
     creditedAt: null,
@@ -404,7 +404,7 @@ function createCheckoutDb() {
     updatedAt: new Date(),
   } as CreditPackPurchase;
 
-  const purchases = new Map<string, CreditPackPurchase>([[flittPurchase.id, { ...flittPurchase }]]);
+  const purchases = new Map<string, CreditPackPurchase>([[checkoutgatewayPurchase.id, { ...checkoutgatewayPurchase }]]);
   const ledger: Array<{ idempotencyKey: string }> = [];
   const db = {
     creditPackPurchase: {
@@ -437,20 +437,20 @@ function createCheckoutDb() {
     $transaction: async <T>(fn: (tx: unknown) => Promise<T>) => fn(db),
   };
 
-  const callback = await handleTbcCallback("shared-pay-id", {
+  const callback = await handleLegacygatewayCallback("shared-pay-id", {
     prismaClient: db as never,
     log: () => undefined,
     createClient: () => {
-      throw new Error("TBC GET must not run for a Flitt purchase");
+      throw new Error("LEGACYGATEWAY GET must not run for a Checkoutgateway purchase");
     },
   });
   assert.equal(callback.ignored, true);
   assert.equal(callback.reason, "unknown_payment_id");
-  assert.equal(purchases.get(flittPurchase.id)?.status, "provider_created");
+  assert.equal(purchases.get(checkoutgatewayPurchase.id)?.status, "provider_created");
   assert.equal(ledger.length, 0);
 
-  const applied = await applyFetchedTbcPayment(
-    flittPurchase,
+  const applied = await applyFetchedLegacygatewayPayment(
+    checkoutgatewayPurchase,
     {
       payId: "shared-pay-id",
       status: "Succeeded",
@@ -466,7 +466,7 @@ function createCheckoutDb() {
   assert.equal(applied.ignored, true);
   assert.equal(applied.reason, "provider_mismatch");
   assert.equal(applied.credited, false);
-  assert.equal(purchases.get(flittPurchase.id)?.status, "provider_created");
+  assert.equal(purchases.get(checkoutgatewayPurchase.id)?.status, "provider_created");
 }
 
 console.log("payment-provider-selection.contract.test.ts: ok");

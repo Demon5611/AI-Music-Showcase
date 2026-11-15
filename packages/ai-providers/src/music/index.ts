@@ -23,18 +23,18 @@ export type {
   GenerationStatusResult,
   PersistedSongInput,
   ProviderGenerationOptions,
-  SunoGenerationOptions,
-  MurekaGenerationOptions,
+  LegacyengineGenerationOptions,
+  AudioengineGenerationOptions,
 } from "./domain/music.types.js";
 export {
   fromPersistedSongInput,
-  getSunoGenerationOptions,
-  getMurekaGenerationOptions,
+  getLegacyengineGenerationOptions,
+  getAudioengineGenerationOptions,
   isInstrumentalMode,
-  requireSunoGenerationOptions,
+  requireLegacyengineGenerationOptions,
   toPersistedSongInput,
-  withSunoGenerationOptions,
-  withMurekaGenerationOptions,
+  withLegacyengineGenerationOptions,
+  withAudioengineGenerationOptions,
 } from "./domain/music.types.js";
 export type {
   MusicGenerationProvider,
@@ -51,13 +51,13 @@ export type {
   NormalizedCallbackIgnoreReason,
 } from "./domain/music-generation-callback-normalizer.js";
 export {
-  SunoMusicCallbackNormalizer,
-  createSunoMusicCallbackNormalizer,
-} from "./providers/suno-api/suno-callback.normalizer.js";
+  LegacyengineMusicCallbackNormalizer,
+  createLegacyengineMusicCallbackNormalizer,
+} from "./providers/legacyengine-api/legacyengine-callback.normalizer.js";
 export {
-  tryNormalizeSunoAlbumCoverCallback,
-  type NormalizedSunoAlbumCoverCallback,
-} from "./providers/suno-api/suno-album-cover-callback.js";
+  tryNormalizeLegacyengineAlbumCoverCallback,
+  type NormalizedLegacyengineAlbumCoverCallback,
+} from "./providers/legacyengine-api/legacyengine-album-cover-callback.js";
 export {
   MockMusicCallbackNormalizer,
   createMockMusicCallbackNormalizer,
@@ -73,12 +73,12 @@ export {
   MusicTimeoutError,
 } from "./domain/errors/index.js";
 export { NotImplementedMusicProviderError } from "./domain/not-implemented.error.js";
-export { SunoApiProvider, createSunoApiProvider } from "./providers/suno-api/suno-api.provider.js";
-export type { PreparedSunoMusicGenerate } from "./providers/suno-api/suno-api.provider.js";
+export { LegacyengineApiProvider, createLegacyengineApiProvider } from "./providers/legacyengine-api/legacyengine-api.provider.js";
+export type { PreparedLegacyengineMusicGenerate } from "./providers/legacyengine-api/legacyengine-api.provider.js";
 export {
-  SunoMusicGenerationProvider,
-  createSunoMusicGenerationProvider,
-} from "./providers/suno-api/suno-music-generation.provider.js";
+  LegacyengineMusicGenerationProvider,
+  createLegacyengineMusicGenerationProvider,
+} from "./providers/legacyengine-api/legacyengine-music-generation.provider.js";
 export {
   MockMusicGenerationProvider,
   createMockMusicGenerationProvider,
@@ -87,61 +87,61 @@ export {
   type MockPreparedPayload,
 } from "./providers/mock/mock-music-generation.provider.js";
 export {
-  submitSunoMusicTaskOnce,
-  type SunoMusicSubmitOnceResult,
-} from "./providers/suno-api/suno-music-submit-once.js";
-export { getSunoRateLimiter } from "./providers/suno-api/suno-rate-limiter.js";
-export { SunoApiClient, toSunoModelId } from "./providers/suno-api/suno-api.client.js";
-export { createSunoApiClient } from "./providers/suno-api/create-suno-api-client.js";
-export { mapSunoTrack } from "./providers/suno-api/suno-api.mapper.js";
-export type { SunoApiClientConfig } from "./providers/suno-api/suno-api.client.js";
+  submitLegacyengineMusicTaskOnce,
+  type LegacyengineMusicSubmitOnceResult,
+} from "./providers/legacyengine-api/legacyengine-music-submit-once.js";
+export { getLegacyengineRateLimiter } from "./providers/legacyengine-api/legacyengine-rate-limiter.js";
+export { LegacyengineApiClient, toLegacyengineModelId } from "./providers/legacyengine-api/legacyengine-api.client.js";
+export { createLegacyengineApiClient } from "./providers/legacyengine-api/create-legacyengine-api-client.js";
+export { mapLegacyengineTrack } from "./providers/legacyengine-api/legacyengine-api.mapper.js";
+export type { LegacyengineApiClientConfig } from "./providers/legacyengine-api/legacyengine-api.client.js";
 export type {
-  SunoMusicTaskRaw,
-  SunoLyricsTaskRaw,
-  SunoModelId,
-} from "./providers/suno-api/suno-api.types.js";
+  LegacyengineMusicTaskRaw,
+  LegacyengineLyricsTaskRaw,
+  LegacyengineModelId,
+} from "./providers/legacyengine-api/legacyengine-api.types.js";
 export {
-  MUREKA_PROVIDER_ID,
-  MurekaClient,
-  createMurekaClient,
-  MurekaMusicProvider,
-  createMurekaMusicProvider,
-  MurekaMusicGenerationProvider,
-  createMurekaMusicGenerationProvider,
-  MurekaVocalCloneProvider,
-  createMurekaVocalCloneProvider,
-  MurekaHttpError,
-  MurekaConfigurationError,
-  classifyMurekaHttpStatus,
-  isMurekaInvalidUrlFetchError,
-  mapMurekaHttpErrorToMusicError,
-  mapMurekaStatusToMusicStatus,
-  mapMurekaQueryToGenerationStatus,
-  mapMurekaChoiceToGeneratedTrack,
-  isMurekaTerminalStatus,
-  getMurekaSongLimiter,
-  getMurekaVocalCloneLimiter,
-  resetMurekaLimitersForTests,
-  resolveMurekaClientConfig,
-  assertMurekaEnabled,
-  canListenMurekaProviderJobs,
-  resolveMurekaVocalId,
-} from "./providers/mureka/index.js";
+  AUDIOENGINE_PROVIDER_ID,
+  AudioengineClient,
+  createAudioengineClient,
+  AudioengineMusicProvider,
+  createAudioengineMusicProvider,
+  AudioengineMusicGenerationProvider,
+  createAudioengineMusicGenerationProvider,
+  AudioengineVocalCloneProvider,
+  createAudioengineVocalCloneProvider,
+  AudioengineHttpError,
+  AudioengineConfigurationError,
+  classifyAudioengineHttpStatus,
+  isAudioengineInvalidUrlFetchError,
+  mapAudioengineHttpErrorToMusicError,
+  mapAudioengineStatusToMusicStatus,
+  mapAudioengineQueryToGenerationStatus,
+  mapAudioengineChoiceToGeneratedTrack,
+  isAudioengineTerminalStatus,
+  getAudioengineSongLimiter,
+  getAudioengineVocalCloneLimiter,
+  resetAudioengineLimitersForTests,
+  resolveAudioengineClientConfig,
+  assertAudioengineEnabled,
+  canListenAudioengineProviderJobs,
+  resolveAudioengineVocalId,
+} from "./providers/audioengine/index.js";
 export type {
-  MurekaErrorKind,
-  MurekaClientConfig,
-  MurekaVocalCloneInput,
-  PreparedMurekaMusicGenerate,
-} from "./providers/mureka/index.js";
+  AudioengineErrorKind,
+  AudioengineClientConfig,
+  AudioengineVocalCloneInput,
+  PreparedAudioengineMusicGenerate,
+} from "./providers/audioengine/index.js";
 export { createMusicGenerationProvider } from "./music-generation-provider.factory.js";
 export {
   resolveMusicProviderForGeneration,
   type ResolveMusicProviderInput,
   type ResolveMusicProviderResult,
 } from "./resolve-music-provider.js";
-export { ElevenLabsMusicProviderAdapter } from "./providers/elevenlabs/elevenlabs-music.provider.js";
-export { OfficialSunoProvider } from "./providers/official-suno/official-suno.provider.js";
-export { UdioProvider } from "./providers/udio/udio.provider.js";
+export { VoiceengineMusicProviderAdapter } from "./providers/voiceengine/voiceengine-music.provider.js";
+export { OfficialLegacyengineProvider } from "./providers/official-legacyengine/official-legacyengine.provider.js";
+export { UdioProvider } from "./providers/alternateengine/alternateengine.provider.js";
 export {
   MusicProviderFactory,
   createMusicProviderFactory,
@@ -159,7 +159,7 @@ export {
 export { pollMusicUntilComplete, type PollMusicOptions } from "./poll-music.js";
 export {
   resolveMusicProviderConfig,
-  assertSafeSunoMusicApiBaseUrl,
+  assertSafeLegacyengineMusicApiBaseUrl,
   type MusicProviderConfig,
 } from "./music-config.js";
 export type {

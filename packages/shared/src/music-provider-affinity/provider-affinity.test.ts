@@ -8,21 +8,21 @@ import {
   resolveExistingMusicAssetProvider,
 } from "./resolve-existing-music-asset-provider.js";
 
-function testA_DefaultMurekaStillResolvesSunoTrack(): void {
+function testA_DefaultAudioengineStillResolvesLegacyengineTrack(): void {
   // MUSIC_DEFAULT_PROVIDER must not appear in this resolver.
   const previous = process.env.MUSIC_DEFAULT_PROVIDER;
-  process.env.MUSIC_DEFAULT_PROVIDER = "mureka";
+  process.env.MUSIC_DEFAULT_PROVIDER = "audioengine";
   try {
     const result = resolveExistingMusicAssetProvider({
-      generationProvider: "sunoapi",
-      providerTaskId: "suno-task",
-      providerTrackId: "suno-audio",
+      generationProvider: "legacyengineapi",
+      providerTaskId: "legacyengine-task",
+      providerTrackId: "legacyengine-audio",
     });
     assert.equal(result.ok, true);
     if (result.ok) {
-      assert.equal(result.provider, "sunoapi");
-      assert.equal(result.providerTaskId, "suno-task");
-      assert.equal(result.providerTrackId, "suno-audio");
+      assert.equal(result.provider, "legacyengineapi");
+      assert.equal(result.providerTaskId, "legacyengine-task");
+      assert.equal(result.providerTrackId, "legacyengine-audio");
     }
   } finally {
     if (previous === undefined) {
@@ -33,19 +33,19 @@ function testA_DefaultMurekaStillResolvesSunoTrack(): void {
   }
 }
 
-function testB_DefaultSunoStillResolvesMurekaTrack(): void {
+function testB_DefaultLegacyengineStillResolvesAudioengineTrack(): void {
   const previous = process.env.MUSIC_DEFAULT_PROVIDER;
-  process.env.MUSIC_DEFAULT_PROVIDER = "sunoapi";
+  process.env.MUSIC_DEFAULT_PROVIDER = "legacyengineapi";
   try {
     const result = resolveExistingMusicAssetProvider({
-      generationProvider: "mureka",
-      providerTaskId: "mureka-task",
-      providerTrackId: "mureka-choice",
+      generationProvider: "audioengine",
+      providerTaskId: "audioengine-task",
+      providerTrackId: "audioengine-choice",
     });
     assert.equal(result.ok, true);
     if (result.ok) {
-      assert.equal(result.provider, "mureka");
-      assert.equal(result.providerTaskId, "mureka-task");
+      assert.equal(result.provider, "audioengine");
+      assert.equal(result.providerTaskId, "audioengine-task");
     }
   } finally {
     if (previous === undefined) {
@@ -58,7 +58,7 @@ function testB_DefaultSunoStillResolvesMurekaTrack(): void {
 
 function testC_MyVoiceIrrelevant(): void {
   const result = resolveExistingMusicAssetProvider({
-    generationProvider: "sunoapi",
+    generationProvider: "legacyengineapi",
     providerTaskId: "t",
     providerTrackId: "a",
   });
@@ -67,29 +67,29 @@ function testC_MyVoiceIrrelevant(): void {
 }
 
 function testD_E_IdsStayWithResolvedProvider(): void {
-  const suno = resolveExistingMusicAssetProvider({
-    generationProvider: "sunoapi",
-    providerTaskId: "suno-only-task",
-    providerTrackId: "suno-only-audio",
+  const legacyengine = resolveExistingMusicAssetProvider({
+    generationProvider: "legacyengineapi",
+    providerTaskId: "legacyengine-only-task",
+    providerTrackId: "legacyengine-only-audio",
   });
-  assert.equal(suno.ok && suno.provider === "sunoapi", true);
+  assert.equal(legacyengine.ok && legacyengine.provider === "legacyengineapi", true);
 
-  const mureka = resolveExistingMusicAssetProvider({
-    generationProvider: "mureka",
-    providerTaskId: "mureka-only-task",
-    providerTrackId: "mureka-only-choice",
+  const audioengine = resolveExistingMusicAssetProvider({
+    generationProvider: "audioengine",
+    providerTaskId: "audioengine-only-task",
+    providerTrackId: "audioengine-only-choice",
   });
-  assert.equal(mureka.ok && mureka.provider === "mureka", true);
-  // Callers must not pass mureka ids into Suno — affinity keeps them tagged mureka.
-  if (mureka.ok) {
-    assert.notEqual(mureka.provider, "sunoapi");
+  assert.equal(audioengine.ok && audioengine.provider === "audioengine", true);
+  // Callers must not pass audioengine ids into Legacyengine — affinity keeps them tagged audioengine.
+  if (audioengine.ok) {
+    assert.notEqual(audioengine.provider, "legacyengineapi");
   }
 }
 
 function testF_MismatchFailClosed(): void {
   const result = resolveExistingMusicAssetProvider({
-    trackProvider: "sunoapi",
-    generationProvider: "mureka",
+    trackProvider: "legacyengineapi",
+    generationProvider: "audioengine",
     providerTaskId: "x",
     providerTrackId: "y",
   });
@@ -109,20 +109,20 @@ function testF_MismatchFailClosed(): void {
 function testG_LegacyNullTrackUsesGeneration(): void {
   const result = resolveExistingMusicAssetProvider({
     trackProvider: null,
-    generationProvider: "sunoapi",
-    providerTaskId: "suno-task",
-    providerTrackId: "suno-audio",
+    generationProvider: "legacyengineapi",
+    providerTaskId: "legacyengine-task",
+    providerTrackId: "legacyengine-audio",
   });
   assert.equal(result.ok, true);
   if (result.ok) {
-    assert.equal(result.provider, "sunoapi");
+    assert.equal(result.provider, "legacyengineapi");
     assert.equal(result.resolvedFrom, "generation");
   }
 }
 
 function testH_BothUnknownNoDefaultFallback(): void {
   const previous = process.env.MUSIC_DEFAULT_PROVIDER;
-  process.env.MUSIC_DEFAULT_PROVIDER = "sunoapi";
+  process.env.MUSIC_DEFAULT_PROVIDER = "legacyengineapi";
   try {
     const result = resolveExistingMusicAssetProvider({
       trackProvider: null,
@@ -144,8 +144,8 @@ function testH_BothUnknownNoDefaultFallback(): void {
 
 function testI_SongConsistentWithGeneration(): void {
   const result = resolveExistingMusicAssetProvider({
-    generationProvider: "sunoapi",
-    songProvider: "sunoapi",
+    generationProvider: "legacyengineapi",
+    songProvider: "legacyengineapi",
     providerTaskId: "t",
     providerTrackId: "a",
   });
@@ -157,7 +157,7 @@ function testI_SongConsistentWithGeneration(): void {
 
 function testUnknownVendorNoGuess(): void {
   const result = resolveExistingMusicAssetProvider({
-    generationProvider: "udio",
+    generationProvider: "alternateengine",
   });
   assert.equal(result.ok, false);
   if (!result.ok) {
@@ -165,8 +165,8 @@ function testUnknownVendorNoGuess(): void {
   }
 }
 
-testA_DefaultMurekaStillResolvesSunoTrack();
-testB_DefaultSunoStillResolvesMurekaTrack();
+testA_DefaultAudioengineStillResolvesLegacyengineTrack();
+testB_DefaultLegacyengineStillResolvesAudioengineTrack();
 testC_MyVoiceIrrelevant();
 testD_E_IdsStayWithResolvedProvider();
 testF_MismatchFailClosed();

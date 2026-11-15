@@ -74,11 +74,11 @@ assert.deepEqual(
   { eligible: false, reason: "not_song" },
 );
 
-// F. Mureka playable source is provider-neutral for eligibility
+// F. Audioengine playable source is provider-neutral for eligibility
 assert.equal(
   resolveRemixEligibility({
     generationType: "song",
-    audioStorageKey: "music-generations/u/g/mureka.mp3",
+    audioStorageKey: "music-generations/u/g/audioengine.mp3",
     persistenceState: "stored",
   }).eligible,
   true,

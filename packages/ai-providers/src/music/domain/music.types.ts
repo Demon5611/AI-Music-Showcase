@@ -15,18 +15,18 @@ export type {
   GenerateSongInput,
   PersistedSongInput,
   ProviderGenerationOptions,
-  SunoGenerationOptions,
-  MurekaGenerationOptions,
+  LegacyengineGenerationOptions,
+  AudioengineGenerationOptions,
 } from "./generate-song-input.js";
 export {
   fromPersistedSongInput,
-  getSunoGenerationOptions,
-  getMurekaGenerationOptions,
+  getLegacyengineGenerationOptions,
+  getAudioengineGenerationOptions,
   isInstrumentalMode,
-  requireSunoGenerationOptions,
+  requireLegacyengineGenerationOptions,
   toPersistedSongInput,
-  withSunoGenerationOptions,
-  withMurekaGenerationOptions,
+  withLegacyengineGenerationOptions,
+  withAudioengineGenerationOptions,
 } from "./generate-song-input.js";
 
 export interface ExtendSongInput {

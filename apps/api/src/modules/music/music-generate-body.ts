@@ -1,16 +1,16 @@
 import type {
   GenerateSongInput,
   ProviderGenerationOptions,
-  SunoGenerationOptions,
-  MurekaGenerationOptions,
+  LegacyengineGenerationOptions,
+  AudioengineGenerationOptions,
 } from "@ai-music/ai-providers";
 import {
-  buildMurekaPrompt,
+  buildAudioenginePrompt,
   normalizeLyricsLanguage,
   type MusicGenerateBody,
 } from "@ai-music/shared";
 import { BadRequestError } from "../../common/errors.js";
-import { extractMusicGenerateRouteOptions } from "./music-generate-mureka.js";
+import { extractMusicGenerateRouteOptions } from "./music-generate-audioengine.js";
 
 export type NormalizedMusicGenerateRequest = {
   input: GenerateSongInput;
@@ -64,9 +64,9 @@ function resolveMode(body: MusicGenerateBody): "song" | "instrumental" {
   return body.mode;
 }
 
-function mergeSunoOptions(body: MusicGenerateBody): SunoGenerationOptions {
+function mergeLegacyengineOptions(body: MusicGenerateBody): LegacyengineGenerationOptions {
   const fromProvider =
-    body.providerOptions?.providerId === "sunoapi"
+    body.providerOptions?.providerId === "legacyengineapi"
       ? body.providerOptions.options
       : undefined;
 
@@ -83,9 +83,9 @@ function mergeSunoOptions(body: MusicGenerateBody): SunoGenerationOptions {
   };
 }
 
-function mergeMurekaOptions(body: MusicGenerateBody): MurekaGenerationOptions {
+function mergeAudioengineOptions(body: MusicGenerateBody): AudioengineGenerationOptions {
   const fromProvider =
-    body.providerOptions?.providerId === "mureka"
+    body.providerOptions?.providerId === "audioengine"
       ? body.providerOptions.options
       : undefined;
 
@@ -96,7 +96,7 @@ function mergeMurekaOptions(body: MusicGenerateBody): MurekaGenerationOptions {
     );
   }
 
-  const briefPrompt = body.musicBrief ? buildMurekaPrompt(body.musicBrief).trim() : "";
+  const briefPrompt = body.musicBrief ? buildAudioenginePrompt(body.musicBrief).trim() : "";
   const musicPrompt =
     fromProvider?.musicPrompt?.trim() ||
     briefPrompt ||
@@ -112,28 +112,28 @@ function mergeMurekaOptions(body: MusicGenerateBody): MurekaGenerationOptions {
   };
 }
 
-function assertNoLegacySunoFieldsForMureka(body: MusicGenerateBody): void {
+function assertNoLegacyLegacyengineFieldsForAudioengine(body: MusicGenerateBody): void {
   if (
     body.customMode !== undefined ||
     body.referenceAudioUrl !== undefined ||
     body.vocalGender !== undefined
   ) {
     throw new BadRequestError(
-      "Legacy Suno fields cannot be combined with Mureka generation",
+      "Legacy Legacyengine fields cannot be combined with Audioengine generation",
       "GENERATE_BODY_CONFLICT",
     );
   }
 
   if (body.voiceSampleId) {
     throw new BadRequestError(
-      "voiceSampleId cannot be combined with Mureka generation",
+      "voiceSampleId cannot be combined with Audioengine generation",
       "GENERATE_BODY_CONFLICT",
     );
   }
 
-  if (body.providerOptions?.providerId === "sunoapi") {
+  if (body.providerOptions?.providerId === "legacyengineapi") {
     throw new BadRequestError(
-      "Legacy Suno fields cannot be combined with Mureka generation",
+      "Legacy Legacyengine fields cannot be combined with Audioengine generation",
       "GENERATE_BODY_CONFLICT",
     );
   }
@@ -147,7 +147,7 @@ function resolveProviderOptions(body: MusicGenerateBody): ProviderGenerationOpti
       body.vocalGender !== undefined
     ) {
       throw new BadRequestError(
-        "Legacy Suno fields cannot be combined with non-sunoapi providerOptions",
+        "Legacy Legacyengine fields cannot be combined with non-legacyengineapi providerOptions",
         "GENERATE_BODY_CONFLICT",
       );
     }
@@ -158,33 +158,33 @@ function resolveProviderOptions(body: MusicGenerateBody): ProviderGenerationOpti
     };
   }
 
-  // Product contract: Mureka only when Personal Voice is explicitly ON.
+  // Product contract: Audioengine only when Personal Voice is explicitly ON.
   if (body.usePersonalVoice === true) {
-    assertNoLegacySunoFieldsForMureka(body);
+    assertNoLegacyLegacyengineFieldsForAudioengine(body);
 
-    if (body.providerOptions?.providerId === "sunoapi") {
+    if (body.providerOptions?.providerId === "legacyengineapi") {
       throw new BadRequestError(
-        "Personal voice generation cannot use sunoapi providerOptions",
+        "Personal voice generation cannot use legacyengineapi providerOptions",
         "GENERATE_BODY_CONFLICT",
       );
     }
 
     return {
-      providerId: "mureka",
-      options: mergeMurekaOptions(body),
+      providerId: "audioengine",
+      options: mergeAudioengineOptions(body),
     };
   }
 
-  // OFF / no personal voice → always Suno (ignore client mureka providerOptions).
+  // OFF / no personal voice → always Legacyengine (ignore client audioengine providerOptions).
   return {
-    providerId: "sunoapi",
-    options: mergeSunoOptions(body),
+    providerId: "legacyengineapi",
+    options: mergeLegacyengineOptions(body),
   };
 }
 
 /**
  * Legacy adapter (strategy A): conflict-check → neutral GenerateSongInput.
- * Personal Voice ON → mureka; otherwise → sunoapi.
+ * Personal Voice ON → audioengine; otherwise → legacyengineapi.
  */
 export function normalizeMusicGenerateBody(
   body: MusicGenerateBody,
@@ -193,7 +193,7 @@ export function normalizeMusicGenerateBody(
   const usePersonalVoice = route.usePersonalVoice === true;
   const styleFromBrief =
     body.musicBrief && !body.style?.trim()
-      ? buildMurekaPrompt(body.musicBrief).trim() || undefined
+      ? buildAudioenginePrompt(body.musicBrief).trim() || undefined
       : undefined;
 
   const input: GenerateSongInput = {

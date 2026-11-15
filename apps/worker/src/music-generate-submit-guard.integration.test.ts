@@ -107,17 +107,17 @@ async function cleanup(): Promise<void> {
   await prisma.user.deleteMany({ where: { id: { in: createdUserIds } } });
 }
 
-async function testProcessorHasNoSunoSubmitImports(): Promise<void> {
-  console.log("test: processor source has no Suno submit imports");
+async function testProcessorHasNoLegacyengineSubmitImports(): Promise<void> {
+  console.log("test: processor source has no Legacyengine submit imports");
   const here = dirname(fileURLToPath(import.meta.url));
   const source = readFileSync(join(here, "processors/process-provider-job.ts"), "utf8");
   const banned = [
-    "createSunoApiProvider",
-    "submitSunoMusicTaskOnce",
-    "PreparedSunoMusicGenerate",
+    "createLegacyengineApiProvider",
+    "submitLegacyengineMusicTaskOnce",
+    "PreparedLegacyengineMusicGenerate",
     "prepareMusicGenerate",
-    "getSunoRateLimiter",
-    "createSunoMusicGenerationProvider",
+    "getLegacyengineRateLimiter",
+    "createLegacyengineMusicGenerationProvider",
   ];
   for (const token of banned) {
     assert(!source.includes(token), `processor must not mention ${token}`);
@@ -425,7 +425,7 @@ async function testMigrationBackfill(): Promise<void> {
 
 async function main(): Promise<void> {
   try {
-    await testProcessorHasNoSunoSubmitImports();
+    await testProcessorHasNoLegacyengineSubmitImports();
     await testHappySubmitViaMock();
     await testConcurrentWorkersOnePost();
     await testCrashAfterCasBeforeFetch();

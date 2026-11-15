@@ -1,9 +1,9 @@
 export {
-  buildMurekaVocalDeletionEmailBody,
-  buildMurekaVocalDeletionEmailSubject,
+  buildAudioengineVocalDeletionEmailBody,
+  buildAudioengineVocalDeletionEmailSubject,
   sanitizeProviderDeletionEmailError,
-  type MurekaVocalDeletionEmailInput,
-} from "./mureka-vocal-deletion-message.js";
+  type AudioengineVocalDeletionEmailInput,
+} from "./audioengine-vocal-deletion-message.js";
 export {
   ResendSendError,
   resolveTransactionalEmailFromEnv,
@@ -58,7 +58,7 @@ export {
   type ForwardReceivedEmailResult,
 } from "./forward-received-email.js";
 export {
-  sendMurekaVocalDeletionEmail,
-  type SendMurekaVocalDeletionEmailInput,
-  type SendMurekaVocalDeletionEmailResult,
-} from "./send-mureka-vocal-deletion-email.js";
+  sendAudioengineVocalDeletionEmail,
+  type SendAudioengineVocalDeletionEmailInput,
+  type SendAudioengineVocalDeletionEmailResult,
+} from "./send-audioengine-vocal-deletion-email.js";

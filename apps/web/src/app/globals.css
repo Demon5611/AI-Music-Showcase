@@ -40,7 +40,7 @@
   --muted: var(--app-text-muted);
   --border: var(--app-border-default);
 
-  /* shadcn / ElevenLabs UI tokens */
+  /* shadcn / Voiceengine UI tokens */
   --muted-bg: oklch(0.97 0 0);
   --muted-foreground: #737373;
   --card: oklch(1 0 0);

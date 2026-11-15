@@ -22,12 +22,12 @@ function localeFromPathname(pathname: string): "en" | "ru" | "ka" | null {
 }
 
 /**
- * Flitt browser return is HTTPS POST or GET (official payment flow).
+ * Checkoutgateway browser return is HTTPS POST or GET (official payment flow).
  * POST to a Clerk-wrapped GET page was sent to clerk.accounts.dev → HTTP 405.
  * Convert return POSTs to GET before Clerk/i18n. Do not read the POST body
  * as payment proof — only purchaseId/order_id already on the query string.
  */
-function redirectFlittBrowserReturn(request: NextRequest): NextResponse | null {
+function redirectCheckoutgatewayBrowserReturn(request: NextRequest): NextResponse | null {
   if (isPaymentReturnApiPath(request.nextUrl.pathname)) {
     return NextResponse.next();
   }
@@ -51,7 +51,7 @@ function redirectFlittBrowserReturn(request: NextRequest): NextResponse | null {
 }
 
 export default function proxy(request: NextRequest, event: NextFetchEvent) {
-  const converted = redirectFlittBrowserReturn(request);
+  const converted = redirectCheckoutgatewayBrowserReturn(request);
   if (converted) {
     return converted;
   }

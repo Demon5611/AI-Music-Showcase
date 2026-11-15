@@ -11,14 +11,14 @@ import {
   resetMusicMetricsForTests,
 } from "@ai-music/observability";
 import {
-  createSunoCallbackToken,
+  createLegacyengineCallbackToken,
   musicTrackPersistJobId,
   OPERATION_COST_UNITS,
   resolveMusicTrackAudioPersistence,
 } from "@ai-music/shared";
 import { Queue } from "bullmq";
 import { resolveProviderReferenceSecret } from "../../config/env.js";
-import { handleSignedSunoMusicCallback } from "./suno-callback.service.js";
+import { handleSignedLegacyengineMusicCallback } from "./legacyengine-callback.service.js";
 import {
   getMusicTrackPersistenceQueue,
   enqueueMusicTrackPersistJob,
@@ -78,7 +78,7 @@ async function createRecord(userId: string, taskId: string) {
 }
 
 function tokenFor(recordId: string): string {
-  return createSunoCallbackToken(resolveProviderReferenceSecret(), recordId, 3600);
+  return createLegacyengineCallbackToken(resolveProviderReferenceSecret(), recordId, 3600);
 }
 
 function completePayload(taskId: string, tracks: Array<Record<string, unknown>>) {
@@ -123,7 +123,7 @@ async function main(): Promise<void> {
       const taskId = `task_${randomUUID()}`;
       const record = await createRecord(userId, taskId);
       const started = Date.now();
-      const result = await handleSignedSunoMusicCallback({
+      const result = await handleSignedLegacyengineMusicCallback({
         recordId: record.id,
         token: tokenFor(record.id),
         payload: completePayload(taskId, [
@@ -177,7 +177,7 @@ async function main(): Promise<void> {
 
       try {
         const started = Date.now();
-        const result = await handleSignedSunoMusicCallback({
+        const result = await handleSignedLegacyengineMusicCallback({
           recordId: record.id,
           token: tokenFor(record.id),
           payload: completePayload(taskId, [
@@ -222,7 +222,7 @@ async function main(): Promise<void> {
         { id: "dup", title: "t", audio_url: "https://example.test/d.mp3", duration: 1 },
       ]);
 
-      await handleSignedSunoMusicCallback({
+      await handleSignedLegacyengineMusicCallback({
         recordId: record.id,
         token: tokenFor(record.id),
         payload,
@@ -259,7 +259,7 @@ async function main(): Promise<void> {
         const metrics = getMusicMetrics();
         const completedBefore = await metrics.musicGenerationCompletedTotal.get();
 
-        const second = await handleSignedSunoMusicCallback({
+        const second = await handleSignedLegacyengineMusicCallback({
           recordId: record.id,
           token: tokenFor(record.id),
           payload,
@@ -300,14 +300,14 @@ async function main(): Promise<void> {
       const userId = await createUser();
       const taskId = `task_${randomUUID()}`;
       const record = await createRecord(userId, taskId);
-      await handleSignedSunoMusicCallback({
+      await handleSignedLegacyengineMusicCallback({
         recordId: record.id,
         token: tokenFor(record.id),
         payload: completePayload(taskId, [
           { id: "url1", title: "t", audio_url: "https://example.test/old.mp3" },
         ]),
       });
-      await handleSignedSunoMusicCallback({
+      await handleSignedLegacyengineMusicCallback({
         recordId: record.id,
         token: tokenFor(record.id),
         payload: completePayload(taskId, [
@@ -376,7 +376,7 @@ async function main(): Promise<void> {
       const userId = await createUser();
       const taskId = `task_${randomUUID()}`;
       const record = await createRecord(userId, taskId);
-      await handleSignedSunoMusicCallback({
+      await handleSignedLegacyengineMusicCallback({
         recordId: record.id,
         token: tokenFor(record.id),
         payload: completePayload(taskId, [

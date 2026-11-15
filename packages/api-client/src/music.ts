@@ -36,7 +36,7 @@ export interface GenerateSongBody {
   };
   providerOptions?:
     | {
-        providerId: "mureka";
+        providerId: "audioengine";
         options?: {
           voiceProfileId?: string;
           musicPrompt?: string;
@@ -45,7 +45,7 @@ export interface GenerateSongBody {
         };
       }
     | {
-        providerId: "sunoapi";
+        providerId: "legacyengineapi";
         options?: {
           customMode?: boolean;
           referenceAudioUrl?: string;

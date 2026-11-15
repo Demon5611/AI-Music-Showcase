@@ -1,38 +1,38 @@
 import type { MusicProviderId } from "./domain/music-provider-id.js";
 import { resolveMusicProviderId } from "./domain/music-provider-id.js";
 
-const OFFICIAL_SUNO_API_HOST = "api.sunoapi.org";
+const OFFICIAL_LEGACYENGINE_API_HOST = "integration.example.invalid";
 
 export interface MusicProviderConfig {
   providerId: MusicProviderId;
   /**
-   * Required by Suno async API. Webhook at SUNO_CALLBACK_URL syncs status; polling is fallback.
+   * Required by Legacyengine async API. Webhook at LEGACYENGINE_CALLBACK_URL syncs status; polling is fallback.
    */
-  sunoCallbackUrl: string;
-  /** Music generate/submit/poll only — never used by Suno Voice clients. */
-  sunoApiBaseUrl: string;
-  sunoApiKey: string;
-  sunoModel: string;
-  /** Model for Suno Voice persona (voice_persona requires V5 or V5_5). */
-  sunoVoiceModel: string;
+  legacyengineCallbackUrl: string;
+  /** Music generate/submit/poll only — never used by Legacyengine Voice clients. */
+  legacyengineApiBaseUrl: string;
+  legacyengineApiKey: string;
+  legacyengineModel: string;
+  /** Model for Legacyengine Voice persona (voice_persona requires V5 or V5_5). */
+  legacyengineVoiceModel: string;
   requestTimeoutMs: number;
   pollIntervalMs: number;
   pollTimeoutMs: number;
 }
 
-function resolveSunoMusicApiBaseUrl(env: NodeJS.ProcessEnv): string {
+function resolveLegacyengineMusicApiBaseUrl(env: NodeJS.ProcessEnv): string {
   return (
-    env.SUNO_MUSIC_API_BASE_URL?.trim() ||
-    env.SUNO_API_BASE_URL?.trim() ||
-    `https://${OFFICIAL_SUNO_API_HOST}`
+    env.LEGACYENGINE_MUSIC_API_BASE_URL?.trim() ||
+    env.LEGACYENGINE_API_BASE_URL?.trim() ||
+    `https://${OFFICIAL_LEGACYENGINE_API_HOST}`
   );
 }
 
 /**
  * Production must not point music generate at a non-official host (e.g. load-test fake).
- * Voice continues to use SUNO_API_BASE_URL via resolveSunoVoiceConfig.
+ * Voice continues to use LEGACYENGINE_API_BASE_URL via resolveLegacyengineVoiceConfig.
  */
-export function assertSafeSunoMusicApiBaseUrl(
+export function assertSafeLegacyengineMusicApiBaseUrl(
   baseUrl: string,
   appEnv: string | undefined = process.env.APP_ENV,
 ): void {
@@ -44,12 +44,12 @@ export function assertSafeSunoMusicApiBaseUrl(
   try {
     hostname = new URL(baseUrl).hostname;
   } catch {
-    throw new Error(`Invalid SUNO_MUSIC_API_BASE_URL / SUNO_API_BASE_URL: ${baseUrl}`);
+    throw new Error(`Invalid LEGACYENGINE_MUSIC_API_BASE_URL / LEGACYENGINE_API_BASE_URL: ${baseUrl}`);
   }
 
-  if (hostname !== OFFICIAL_SUNO_API_HOST) {
+  if (hostname !== OFFICIAL_LEGACYENGINE_API_HOST) {
     throw new Error(
-      `Production music API base URL host must be ${OFFICIAL_SUNO_API_HOST}, got ${hostname}`,
+      `Production music API base URL host must be ${OFFICIAL_LEGACYENGINE_API_HOST}, got ${hostname}`,
     );
   }
 }
@@ -57,20 +57,20 @@ export function assertSafeSunoMusicApiBaseUrl(
 export function resolveMusicProviderConfig(
   env: NodeJS.ProcessEnv = process.env,
 ): MusicProviderConfig {
-  const sunoApiBaseUrl = resolveSunoMusicApiBaseUrl(env);
-  assertSafeSunoMusicApiBaseUrl(sunoApiBaseUrl, env.APP_ENV);
+  const legacyengineApiBaseUrl = resolveLegacyengineMusicApiBaseUrl(env);
+  assertSafeLegacyengineMusicApiBaseUrl(legacyengineApiBaseUrl, env.APP_ENV);
 
   return {
     providerId: resolveMusicProviderId(env),
-    sunoCallbackUrl:
-      env.SUNO_CALLBACK_URL ??
-      "http://localhost:3001/api/music/callback/suno",
-    sunoApiBaseUrl,
-    sunoApiKey: env.SUNO_API_KEY ?? "",
-    sunoModel: env.SUNO_API_MODEL ?? "V4_5ALL",
-    sunoVoiceModel: env.SUNO_VOICE_MODEL ?? "V5",
-    requestTimeoutMs: Number(env.SUNO_REQUEST_TIMEOUT_MS ?? 30_000),
-    pollIntervalMs: Number(env.SUNO_POLL_INTERVAL_MS ?? 5_000),
-    pollTimeoutMs: Number(env.SUNO_POLL_TIMEOUT_MS ?? 600_000),
+    legacyengineCallbackUrl:
+      env.LEGACYENGINE_CALLBACK_URL ??
+      "http://localhost:3001/api/music/callback/legacyengine",
+    legacyengineApiBaseUrl,
+    legacyengineApiKey: env.LEGACYENGINE_API_KEY ?? "",
+    legacyengineModel: env.LEGACYENGINE_API_MODEL ?? "V4_5ALL",
+    legacyengineVoiceModel: env.LEGACYENGINE_VOICE_MODEL ?? "V5",
+    requestTimeoutMs: Number(env.LEGACYENGINE_REQUEST_TIMEOUT_MS ?? 30_000),
+    pollIntervalMs: Number(env.LEGACYENGINE_POLL_INTERVAL_MS ?? 5_000),
+    pollTimeoutMs: Number(env.LEGACYENGINE_POLL_TIMEOUT_MS ?? 600_000),
   };
 }

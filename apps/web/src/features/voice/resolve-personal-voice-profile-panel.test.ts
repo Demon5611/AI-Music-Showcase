@@ -9,7 +9,7 @@ function profile(overrides: Partial<VoiceProfileDto>): VoiceProfileDto {
   return {
     id: "vp-1",
     status: "failed",
-    provider: "mureka",
+    provider: "audioengine",
     sourceVoiceSampleId: "sample-a",
     refundConfirmed: false,
     createdAt: "2026-08-06T00:00:00.000Z",

@@ -3,19 +3,19 @@ import {
   type CreditUnits,
   unitsToCredits,
 } from "./credits-economy.js";
-import { MUREKA_CREDIT_COST_UNITS } from "./mureka-credits.js";
+import { AUDIOENGINE_CREDIT_COST_UNITS } from "./audioengine-credits.js";
 
 /**
  * Single source for song-generation credit cost (ledger units).
- * Personal Voice (Mureka) → generateSongs (24);
- * otherwise Suno → generateTrack (15).
+ * Personal Voice (Audioengine) → generateSongs (24);
+ * otherwise Legacyengine → generateTrack (15).
  */
 export function resolveMusicGenerateCostUnits(input: {
   usePersonalVoice?: boolean;
   providerId?: string;
 }): CreditUnits {
-  if (input.usePersonalVoice === true || input.providerId === "mureka") {
-    return MUREKA_CREDIT_COST_UNITS.generateSongs;
+  if (input.usePersonalVoice === true || input.providerId === "audioengine") {
+    return AUDIOENGINE_CREDIT_COST_UNITS.generateSongs;
   }
 
   return OPERATION_COST_UNITS.generateTrack;

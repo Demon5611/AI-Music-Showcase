@@ -4,9 +4,9 @@
 import assert from "node:assert/strict";
 import { isTimedLyricsAvailableForProvider } from "./timed-lyrics-capability.js";
 
-assert.equal(isTimedLyricsAvailableForProvider("sunoapi"), true);
-assert.equal(isTimedLyricsAvailableForProvider("SunoAPI"), true);
-assert.equal(isTimedLyricsAvailableForProvider("mureka"), false);
+assert.equal(isTimedLyricsAvailableForProvider("legacyengineapi"), true);
+assert.equal(isTimedLyricsAvailableForProvider("LegacyengineAPI"), true);
+assert.equal(isTimedLyricsAvailableForProvider("audioengine"), false);
 assert.equal(isTimedLyricsAvailableForProvider(null), false);
 assert.equal(isTimedLyricsAvailableForProvider(""), false);
 assert.equal(isTimedLyricsAvailableForProvider("  "), false);

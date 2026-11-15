@@ -3,7 +3,7 @@ import { CREDIT_PACK_REFUND_REVIEW_REASONS } from "./refund.js";
 /**
  * Monetary refund approval eligibility.
  *
- * Credit-lot consumption must NOT gate monetary refund. Flitt/TBC merchant
+ * Credit-lot consumption must NOT gate monetary refund. Checkoutgateway/LEGACYGATEWAY merchant
  * reserve is owner financial risk, not a user credit freeze.
  *
  * Partial amounts still require admin review (amount policy), unrelated to lots.

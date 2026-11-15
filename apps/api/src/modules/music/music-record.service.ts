@@ -4,7 +4,7 @@ import type {
   PersistedSongInput,
 } from "@ai-music/ai-providers";
 import {
-  getSunoGenerationOptions,
+  getLegacyengineGenerationOptions,
   isInstrumentalMode,
   toPersistedSongInput,
 } from "@ai-music/ai-providers";
@@ -58,7 +58,7 @@ export async function createMusicGenerationRecord(input: CreateRecordInput) {
     data: {
       userId: input.userId,
       type: input.type,
-      provider: input.provider ?? "sunoapi",
+      provider: input.provider ?? "legacyengineapi",
       providerTaskId: input.providerTaskId,
       clientRequestId: input.clientRequestId ?? null,
       prompt: input.prompt,
@@ -310,7 +310,7 @@ export function buildSongRecordInput(
   input: GenerateSongInput,
   providerTaskId: string,
 ): CreateRecordInput {
-  const suno = getSunoGenerationOptions(input) ?? {};
+  const legacyengine = getLegacyengineGenerationOptions(input) ?? {};
 
   return {
     userId,
@@ -319,7 +319,7 @@ export function buildSongRecordInput(
     prompt: input.prompt,
     style: input.style,
     title: input.title,
-    customMode: suno.customMode ?? false,
+    customMode: legacyengine.customMode ?? false,
     instrumental: isInstrumentalMode(input),
     providerRequestJson: toPersistedSongInput(input),
   };

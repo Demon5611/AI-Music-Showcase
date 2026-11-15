@@ -6,8 +6,8 @@ import { OPERATION_COST_CREDITS } from "../constants/credits-economy.js";
 import { isStemSeparationAvailableForProvider } from "./stem-separation-capability.js";
 
 assert.equal(OPERATION_COST_CREDITS.stemSeparation, 12);
-assert.equal(isStemSeparationAvailableForProvider("sunoapi"), true);
-assert.equal(isStemSeparationAvailableForProvider("mureka"), false);
+assert.equal(isStemSeparationAvailableForProvider("legacyengineapi"), true);
+assert.equal(isStemSeparationAvailableForProvider("audioengine"), false);
 
 // Distinct UX states: stems absent vs master audio missing are different codes/phases.
 assert.notEqual("absent", "missing");

@@ -1,8 +1,8 @@
 import { createHash } from "node:crypto";
 import type { GenerateSongInput } from "@ai-music/ai-providers";
 import {
-  getMurekaGenerationOptions,
-  getSunoGenerationOptions,
+  getAudioengineGenerationOptions,
+  getLegacyengineGenerationOptions,
   isInstrumentalMode,
 } from "@ai-music/ai-providers";
 import { BadRequestError } from "../../common/errors.js";
@@ -59,26 +59,26 @@ export function buildCanonicalMusicGenerateRequest(
   input: GenerateSongInput,
   options: { voiceSampleId?: string; voiceProfileId?: string } = {},
 ): MusicGenerateCanonicalRequest {
-  const providerId = input.providerOptions?.providerId ?? "sunoapi";
-  const suno = getSunoGenerationOptions(input) ?? {};
-  const mureka = getMurekaGenerationOptions(input) ?? {};
+  const providerId = input.providerOptions?.providerId ?? "legacyengineapi";
+  const legacyengine = getLegacyengineGenerationOptions(input) ?? {};
+  const audioengine = getAudioengineGenerationOptions(input) ?? {};
 
   return {
     version: CANONICAL_REQUEST_VERSION,
     provider: providerId,
-    model: mureka.model ?? null,
-    requestedSongCount: mureka.n ?? null,
+    model: audioengine.model ?? null,
+    requestedSongCount: audioengine.n ?? null,
     prompt: input.prompt.trim(),
-    style: (mureka.musicPrompt ?? input.style)?.trim() || null,
+    style: (audioengine.musicPrompt ?? input.style)?.trim() || null,
     title: input.title?.trim() || null,
     instrumental: isInstrumentalMode(input),
-    customMode: suno.customMode ?? false,
+    customMode: legacyengine.customMode ?? false,
     durationSec: input.durationSec && input.durationSec > 0 ? input.durationSec : null,
-    referenceAudioUrl: suno.referenceAudioUrl?.trim() || null,
-    vocalGender: suno.vocalGender ?? null,
+    referenceAudioUrl: legacyengine.referenceAudioUrl?.trim() || null,
+    vocalGender: legacyengine.vocalGender ?? null,
     voiceSampleId: options.voiceSampleId?.trim() || null,
     voiceProfileId:
-      options.voiceProfileId?.trim() || mureka.voiceProfileId?.trim() || null,
+      options.voiceProfileId?.trim() || audioengine.voiceProfileId?.trim() || null,
     // Never put provider vocal_id into the hash payload (privacy + client DTO parity).
     vocalId: null,
     lyricsLanguage: input.lyricsLanguage?.trim() || "auto",

@@ -9,7 +9,7 @@ export interface PreprocessedVoice {
 export async function preprocessVoice(
   voiceSample: VoiceSample,
 ): Promise<PreprocessedVoice> {
-  if (!voiceSample.sunoVoiceId || voiceSample.voiceCloneStatus !== "ready") {
+  if (!voiceSample.legacyengineVoiceId || voiceSample.voiceCloneStatus !== "ready") {
     throw new Error("Голос AI Music не готов");
   }
 

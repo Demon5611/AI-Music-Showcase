@@ -81,3 +81,7 @@ The public showcase does not attempt to teach a reader how to reproduce the prod
 - commercial and operational decision rules.
 
 Those details are maintained in the private production repository.
+
+## Tradeoffs and current enforcement
+
+See [architecture-decisions.md](architecture-decisions.md) for the product impact and limits of each pattern. The public refresh adds package import restrictions and a tracked-content publication check; it does not claim that production security tooling has been transplanted wholesale.

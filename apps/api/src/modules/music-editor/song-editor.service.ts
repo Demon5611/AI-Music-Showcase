@@ -166,7 +166,7 @@ export async function retryStemSeparation(userId: string, songId: string) {
   }
 
   const generationProvider = song.sourceTrack?.musicGeneration?.provider ?? song.provider;
-  if (generationProvider !== "sunoapi") {
+  if (generationProvider !== "legacyengineapi") {
     throw new BadRequestError(
       "Разделение вокала и инструментала для этого трека пока недоступно",
       "STEM_SEPARATION_UNAVAILABLE",
@@ -215,8 +215,8 @@ export async function kickoffStemSeparation(userId: string, songId: string) {
 
   await assertFeature(userId, "stemSeparation");
 
-  // Affinity + capability before spend: Suno vocal-removal needs Suno task/audio ids.
-  // generation.provider is authoritative; legacy Song.provider may be wrongly "sunoapi".
+  // Affinity + capability before spend: Legacyengine vocal-removal needs Legacyengine task/audio ids.
+  // generation.provider is authoritative; legacy Song.provider may be wrongly "legacyengineapi".
   const generationProvider = song.sourceTrack?.musicGeneration?.provider;
   const affinity = resolveSongProviderAffinity({
     generationProvider: generationProvider ?? song.provider,
@@ -227,7 +227,7 @@ export async function kickoffStemSeparation(userId: string, songId: string) {
     generationId: song.sourceTrack?.musicGeneration?.id,
   });
 
-  if (affinity.provider !== "sunoapi" || !affinity.providerTaskId || !affinity.providerTrackId) {
+  if (affinity.provider !== "legacyengineapi" || !affinity.providerTaskId || !affinity.providerTrackId) {
     throw new BadRequestError(
       "Разделение вокала и инструментала для этого трека пока недоступно",
       "STEM_SEPARATION_UNAVAILABLE",
@@ -266,7 +266,7 @@ export async function kickoffStemSeparation(userId: string, songId: string) {
         providerTrackId: affinity.providerTrackId,
         separationType: "separate_vocal",
       },
-      "sunoapi",
+      "legacyengineapi",
     )
     .catch(async (error) => {
       if (charged) {

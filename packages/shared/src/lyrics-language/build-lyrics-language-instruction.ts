@@ -1,7 +1,7 @@
 import type { ResolvedLyricsLanguage } from "./lyrics-language.js";
 
 /**
- * Ultra-compact language line for Suno `/lyrics` (hard 200-char prompt limit).
+ * Ultra-compact language line for Legacyengine `/lyrics` (hard 200-char prompt limit).
  * English names only — stable provider instruction, not UI locale.
  */
 export function buildLyricsLanguageInstruction(resolved: ResolvedLyricsLanguage): string {

@@ -50,7 +50,7 @@ export class MockMusicGenerationProvider implements MusicGenerationProvider {
     void _context;
     return createPreparedGeneration(this.id, {
       prompt: input.prompt,
-      customMode: input.providerOptions?.providerId === "sunoapi"
+      customMode: input.providerOptions?.providerId === "legacyengineapi"
         ? input.providerOptions.options.customMode
         : undefined,
     });

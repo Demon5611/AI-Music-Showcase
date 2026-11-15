@@ -1,66 +1,23 @@
-# Product overview
+# A small creative moment, supported by a complete product
 
-AI Music helps a user turn an idea or custom lyrics into a finished song, optionally using a personal AI voice, edit the result, and create a short-form share video from the track.
+Someone arrives with an idea rather than an audio production workflow. The product lets them start with words, optionally bring a personal voice, refine the result, and leave with a piece of media they can share.
 
-## Core product flow
+## Three acts
 
-```text
-Idea or custom lyrics
-        ↓
-AI song creation request
-        ↓
-Optional personal-voice workflow
-        ↓
-Asynchronous track generation
-        ↓
-Music editing / track result
-        ↓
-Audio export
-        └───────────────→ Share Video / AI Story
-                              ↓
-                         Template + source media
-                              ↓
-                         Async video-generation boundary
-                              ↓
-                         Application media composition
-                              ↓
-                         Validated vertical MP4
-```
+**Create.** Turn intent into a generation request. Clear progress and a durable history make waiting understandable, and optional voice onboarding avoids forcing every user through the longest path.
 
-## Capabilities
+**Shape.** Bring the result into a timeline. Editing and export turn a generated output into something the user can make their own.
 
-- prompt or custom-lyrics song creation;
-- optional personal-voice onboarding;
-- asynchronous generation with durable job state;
-- generation history and playback;
-- integrated timeline / audio editor;
-- credit-based monetization architecture;
-- prepaid checkout / refund lifecycle architecture;
-- Share Video experiences ranging from non-AI presentation to AI-generated animation/story flows;
-- curated video-template catalog with server-side availability rules;
-- durable multi-scene job state and recovery concepts;
-- application-owned final media composition and validation.
+**Share.** Combine a track with visual material. Generation and composition have separate lifecycles; a finished asset is validated before it becomes available.
 
-## Video generation
+## The business thinking in the engineering
 
-The product architecture supports short-form portrait video generation through a dedicated provider boundary rather than coupling application logic to one model vendor.
+| Constraint | Product response | Architectural support |
+| --- | --- | --- |
+| External work has real cost | Make consumption explicit | Credit ledger and authorized operations |
+| Failures should not feel like lost purchases | Recover or compensate eligible failures | Durable state and idempotent compensation |
+| More than one creative workflow | Keep one coherent experience | Stable contracts behind feature-oriented UI |
+| Suppliers and capabilities evolve | Preserve application-owned history | Adapter boundaries and stored task identity |
+| A result must remain useful later | Own the output lifecycle | Durable storage, controlled delivery and export |
 
-Production has used multiple external video-generation systems behind this boundary. The public repository intentionally exposes the interface and mock/demo behavior rather than the production adapters.
-
-Provider-specific model assignment, prompts, payload mapping, fallback policy, credentials, limits, and commercial economics remain private.
-
-## What the application owns
-
-The application owns:
-
-- product UX and workflow;
-- authorization and ownership;
-- credit accounting;
-- durable job lifecycle and recovery;
-- application-level generation state;
-- media composition and validation;
-- media persistence and controlled delivery;
-- payment / refund lifecycle state;
-- stable provider interfaces.
-
-External foundation models, payment rails, and cloud services are dependencies behind those interfaces. The public showcase demonstrates the application architecture around them without publishing production integration recipes.
+These explain tradeoffs rather than claim measured business outcomes. Demo balances, fixture prices and limits are synthetic; they are not commercial offers.

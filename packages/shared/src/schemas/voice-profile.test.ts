@@ -5,12 +5,12 @@ import {
   VOICE_PROFILE_ACTIVE_STATUSES,
   VOICE_PROFILE_STATUSES,
   VOICE_PROFILE_USER_VISIBLE_STATUSES,
-} from "../constants/mureka-flags.js";
-import { createMurekaVoiceProfileSchema } from "./voice-profile.js";
+} from "../constants/audioengine-flags.js";
+import { createAudioengineVoiceProfileSchema } from "./voice-profile.js";
 
-describe("createMurekaVoiceProfileSchema", () => {
+describe("createAudioengineVoiceProfileSchema", () => {
   it("accepts explicit consent and a sample id", () => {
-    const result = createMurekaVoiceProfileSchema.safeParse({
+    const result = createAudioengineVoiceProfileSchema.safeParse({
       voiceSampleId: "sample-1",
       consentConfirmed: true,
     });
@@ -19,7 +19,7 @@ describe("createMurekaVoiceProfileSchema", () => {
   });
 
   it("rejects missing consent", () => {
-    const result = createMurekaVoiceProfileSchema.safeParse({
+    const result = createAudioengineVoiceProfileSchema.safeParse({
       voiceSampleId: "sample-1",
       consentConfirmed: false,
     });

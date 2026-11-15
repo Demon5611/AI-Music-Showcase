@@ -1,5 +1,5 @@
 /**
- * Submit ProviderDataDeletionRequest to Mureka via transactional email.
+ * Submit ProviderDataDeletionRequest to Audioengine via transactional email.
  * Idempotent: atomic pending→submitting claim; Resend Idempotency-Key.
  * Stops at submitted_to_provider (confirmed/completed = later task).
  */
@@ -8,7 +8,7 @@ import {
   logLoadControl,
   providerDataDeletionSubmitJobId,
   sanitizeProviderDeletionEmailError,
-  sendMurekaVocalDeletionEmail,
+  sendAudioengineVocalDeletionEmail,
   type ProviderDataDeletionSubmitJobPayload,
 } from "@ai-music/shared";
 
@@ -151,7 +151,7 @@ export async function processProviderDataDeletionSubmit(
     return;
   }
 
-  if (request.provider !== "mureka") {
+  if (request.provider !== "audioengine") {
     return;
   }
 
@@ -171,7 +171,7 @@ export async function processProviderDataDeletionSubmit(
 
   const vocalIds = [request.providerExternalId.trim()].filter(Boolean);
   const idempotencyKey = providerDataDeletionSubmitJobId(request.provider, request.id);
-  const sendResult = await sendMurekaVocalDeletionEmail({
+  const sendResult = await sendAudioengineVocalDeletionEmail({
     requestId: request.id,
     vocalIds,
     idempotencyKey,

@@ -10,7 +10,7 @@ import { me } from "@/features/music-editor/music-editor-classes";
 import { Link } from "@/i18n/navigation";
 import { parseApiError } from "@/shared/lib/parse-api-error";
 import { useApi } from "@/shared/providers/api-provider";
-import { AudioPreviewPlayer } from "@/shared/ui/elevenlabs";
+import { AudioPreviewPlayer } from "@/shared/ui/voiceengine";
 import { PlanGatedWrap } from "@/shared/ui/plan-gated";
 import { Tooltip } from "@/shared/ui/tooltip";
 

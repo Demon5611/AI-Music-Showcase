@@ -12,7 +12,7 @@ export const RATE_LIMITS = {
   signedUrl: { max: 12, timeWindowMs: ONE_MINUTE_MS },
   billingCheckout: { max: 5, timeWindowMs: ONE_MINUTE_MS },
   billingPricingFx: { max: 30, timeWindowMs: ONE_MINUTE_MS },
-  sunoCallback: { max: 120, timeWindowMs: ONE_MINUTE_MS },
+  legacyengineCallback: { max: 120, timeWindowMs: ONE_MINUTE_MS },
 } as const;
 
 function resolveRateLimitKey(request: FastifyRequest): string {

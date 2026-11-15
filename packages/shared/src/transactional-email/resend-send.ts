@@ -99,13 +99,13 @@ export function resolveTransactionalEmailFromEnv(
 ): {
   apiKey: string | null;
   from: string | null;
-  murekaDataDeletionTo: string | null;
+  audioengineDataDeletionTo: string | null;
 } {
   const apiKey = env.RESEND_API_KEY?.trim() || null;
   const from =
     env.TRANSACTIONAL_EMAIL_FROM?.trim() ||
     env.EMAIL_FROM?.trim() ||
     null;
-  const murekaDataDeletionTo = env.MUREKA_DATA_DELETION_EMAIL?.trim() || null;
-  return { apiKey, from, murekaDataDeletionTo };
+  const audioengineDataDeletionTo = env.AUDIOENGINE_DATA_DELETION_EMAIL?.trim() || null;
+  return { apiKey, from, audioengineDataDeletionTo };
 }

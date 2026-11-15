@@ -1,7 +1,7 @@
 import type { FastifyInstance } from "fastify";
 import {
-  createMurekaVoiceProfileSchema,
-  type CreateMurekaVoiceProfileBody,
+  createAudioengineVoiceProfileSchema,
+  type CreateAudioengineVoiceProfileBody,
 } from "@ai-music/shared";
 import { BadRequestError, sendAppError } from "../../common/errors.js";
 import { assertOpsAdmin } from "../../common/ops-auth.js";
@@ -13,7 +13,7 @@ import {
   requestVoiceProfileDeletion,
 } from "./deletion.service.js";
 import {
-  createMurekaVoiceProfile,
+  createAudioengineVoiceProfile,
   getMyVoiceProfile,
 } from "./service.js";
 
@@ -30,11 +30,11 @@ export async function registerVoiceProfileRoutes(app: FastifyInstance) {
     },
   );
 
-  app.post<{ Body: CreateMurekaVoiceProfileBody }>(
-    "/api/voice-profiles/mureka",
+  app.post<{ Body: CreateAudioengineVoiceProfileBody }>(
+    "/api/voice-profiles/audioengine",
     { preHandler: requireAuth },
     async (request, reply) => {
-      const parsed = createMurekaVoiceProfileSchema.safeParse(request.body);
+      const parsed = createAudioengineVoiceProfileSchema.safeParse(request.body);
 
       if (!parsed.success) {
         return sendAppError(
@@ -47,7 +47,7 @@ export async function registerVoiceProfileRoutes(app: FastifyInstance) {
       }
 
       try {
-        const profile = await createMurekaVoiceProfile(
+        const profile = await createAudioengineVoiceProfile(
           request.userId!,
           parsed.data,
           request.id,

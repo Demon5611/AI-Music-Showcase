@@ -26,7 +26,7 @@ import { useQuery } from "@tanstack/react-query";
 import { useSubscriptionQuery } from "@/features/billing/hooks/use-subscription-query";
 import { useInvalidateCreditsBalance } from "@/features/billing/hooks/invalidate-credits-balance";
 import { usePollingQuery } from "@/shared/hooks/use-polling-query";
-import { AiProcessingStatus } from "@/shared/ui/elevenlabs/ai-processing-status";
+import { AiProcessingStatus } from "@/shared/ui/voiceengine/ai-processing-status";
 import { useAuthReady } from "@/shared/hooks/use-auth-ready";
 import { useApi } from "@/shared/providers/api-provider";
 import { mc } from "@/features/music-create/music-create-classes";

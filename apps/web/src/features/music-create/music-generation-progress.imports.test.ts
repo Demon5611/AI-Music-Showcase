@@ -1,5 +1,5 @@
 /**
- * UI must not branch on Suno rawStatus enums after PR8.3.
+ * UI must not branch on Legacyengine rawStatus enums after PR8.3.
  * Run: `pnpm --filter @ai-music/web exec tsx src/features/music-create/music-generation-progress.imports.test.ts`
  */
 import assert from "node:assert/strict";

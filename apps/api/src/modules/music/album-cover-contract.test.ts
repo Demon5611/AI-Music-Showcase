@@ -19,13 +19,13 @@ import {
 import { BadRequestError } from "../../common/errors.js";
 import { resolveAlbumCoverStrategy } from "./album-cover-strategy.js";
 
-function assertMurekaNeverYieldsSunoTaskId(taskId: string): void {
+function assertAudioengineNeverYieldsLegacyengineTaskId(taskId: string): void {
   const strategy = resolveAlbumCoverStrategy({
-    musicProvider: "mureka",
+    musicProvider: "audioengine",
     providerTaskId: taskId,
   });
   assert.equal(strategy.kind, "unavailable");
-  assert.equal("sunoMusicTaskId" in strategy, false);
+  assert.equal("legacyengineMusicTaskId" in strategy, false);
 }
 
 function assertCoverCostIsZeroUserCredits(): void {
@@ -58,16 +58,16 @@ function assertCoverReadyOnlyWhenGenerationFinished(): void {
   assert.equal(isAlbumCoverGenerationReady({ status: "pending" }), false);
 }
 
-assertMurekaNeverYieldsSunoTaskId("mureka-personal-voice-task");
-assertMurekaNeverYieldsSunoTaskId("mureka-standard-vocal-task");
+assertAudioengineNeverYieldsLegacyengineTaskId("audioengine-personal-voice-task");
+assertAudioengineNeverYieldsLegacyengineTaskId("audioengine-standard-vocal-task");
 assertCoverCostIsZeroUserCredits();
 assertUnavailableErrorDoesNotImplySongFailed();
 assertCoverReadyOnlyWhenGenerationFinished();
 
-const suno = resolveAlbumCoverStrategy({
-  musicProvider: "sunoapi",
-  providerTaskId: "suno-ok",
+const legacyengine = resolveAlbumCoverStrategy({
+  musicProvider: "legacyengineapi",
+  providerTaskId: "legacyengine-ok",
 });
-assert.equal(suno.kind, "suno_music_task");
+assert.equal(legacyengine.kind, "legacyengine_music_task");
 
 console.log("album-cover-contract.test.ts: ok");

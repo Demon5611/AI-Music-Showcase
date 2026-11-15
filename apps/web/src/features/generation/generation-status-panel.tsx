@@ -14,7 +14,7 @@ import {
   isGenerationInProgress,
   LoadingPanel,
   resolveGenerationProgress,
-} from "@/shared/ui/elevenlabs";
+} from "@/shared/ui/voiceengine";
 import { RequireAuth } from "@/shared/ui/require-auth";
 
 interface GenerationStatusPanelProps {

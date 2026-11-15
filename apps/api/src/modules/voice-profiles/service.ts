@@ -11,17 +11,17 @@ import {
 } from "@ai-music/db";
 import type { Prisma, VoiceProfile, VoiceSample } from "@ai-music/db";
 import {
-  buildMurekaVoiceProfileOperationKey,
-  buildMurekaVoiceProfileRefundKey,
-  buildMurekaVoiceProfileSpendKey,
-  MUREKA_CREDIT_COST_UNITS,
-  MUREKA_VOCAL_CLONE_MAX_BYTES,
-  MUREKA_VOCAL_CLONE_MAX_DURATION_SEC,
-  MUREKA_VOCAL_CLONE_MIN_DURATION_SEC,
-  resolveMurekaPersonalVoiceAvailability,
+  buildAudioengineVoiceProfileOperationKey,
+  buildAudioengineVoiceProfileRefundKey,
+  buildAudioengineVoiceProfileSpendKey,
+  AUDIOENGINE_CREDIT_COST_UNITS,
+  AUDIOENGINE_VOCAL_CLONE_MAX_BYTES,
+  AUDIOENGINE_VOCAL_CLONE_MAX_DURATION_SEC,
+  AUDIOENGINE_VOCAL_CLONE_MIN_DURATION_SEC,
+  resolveAudioenginePersonalVoiceAvailability,
   VOICE_PROFILE_ACTIVE_STATUSES,
   VOICE_PROFILE_USER_VISIBLE_STATUSES,
-  type CreateMurekaVoiceProfileBody,
+  type CreateAudioengineVoiceProfileBody,
 } from "@ai-music/shared";
 import {
   BadRequestError,
@@ -34,19 +34,19 @@ import {
   convertAudioFileToMp3,
 } from "../../common/ffmpeg-audio.js";
 import { getApiEnv } from "../../config/env.js";
-import { enqueueMurekaVocalCloneJob } from "../queue/mureka-provider-job-queue.js";
-import { isMurekaWorkerListenHeartbeatFresh } from "../music/mureka-worker-heartbeat.js";
+import { enqueueAudioengineVocalCloneJob } from "../queue/audioengine-provider-job-queue.js";
+import { isAudioengineWorkerListenHeartbeatFresh } from "../music/audioengine-worker-heartbeat.js";
 import {
   buildVoiceSampleKey,
   getStorageService,
 } from "../storage/storage.service.js";
 import { toVoiceProfileDto } from "./mapper.js";
 
-const PROVIDER = "mureka";
+const PROVIDER = "audioengine";
 
 function assertPersonalVoiceEnabled(): void {
   const env = getApiEnv();
-  const availability = resolveMurekaPersonalVoiceAvailability({
+  const availability = resolveAudioenginePersonalVoiceAvailability({
     appEnv: env.APP_ENV,
   });
 
@@ -57,19 +57,19 @@ function assertPersonalVoiceEnabled(): void {
 
 function assertVoiceSampleDuration(durationSec: number): void {
   if (
-    durationSec < MUREKA_VOCAL_CLONE_MIN_DURATION_SEC ||
-    durationSec > MUREKA_VOCAL_CLONE_MAX_DURATION_SEC
+    durationSec < AUDIOENGINE_VOCAL_CLONE_MIN_DURATION_SEC ||
+    durationSec > AUDIOENGINE_VOCAL_CLONE_MAX_DURATION_SEC
   ) {
     throw new BadRequestError(
-      `Voice sample duration must be ${MUREKA_VOCAL_CLONE_MIN_DURATION_SEC}–` +
-        `${MUREKA_VOCAL_CLONE_MAX_DURATION_SEC} seconds`,
+      `Voice sample duration must be ${AUDIOENGINE_VOCAL_CLONE_MIN_DURATION_SEC}–` +
+        `${AUDIOENGINE_VOCAL_CLONE_MAX_DURATION_SEC} seconds`,
       "VOICE_PROFILE_DURATION_INVALID",
     );
   }
 }
 
 function assertAudioSize(sizeBytes: number): void {
-  if (sizeBytes >= MUREKA_VOCAL_CLONE_MAX_BYTES) {
+  if (sizeBytes >= AUDIOENGINE_VOCAL_CLONE_MAX_BYTES) {
     throw new BadRequestError(
       "Voice sample must be smaller than 10 MB",
       "VOICE_PROFILE_FILE_TOO_LARGE",
@@ -268,9 +268,9 @@ async function createProfileInTransaction(
   await spendCreditsInTransaction(
     {
       userId: input.userId,
-      amountUnits: MUREKA_CREDIT_COST_UNITS.createPersonalVoice,
-      reason: "mureka_voice_profile_create",
-      idempotencyKey: buildMurekaVoiceProfileSpendKey(profile.id),
+      amountUnits: AUDIOENGINE_CREDIT_COST_UNITS.createPersonalVoice,
+      reason: "audioengine_voice_profile_create",
+      idempotencyKey: buildAudioengineVoiceProfileSpendKey(profile.id),
       relatedEntityType: "voice_profile",
       relatedEntityId: profile.id,
     },
@@ -311,7 +311,7 @@ async function markFailedAndRefund(
     });
 
     const spend = await tx.creditTransaction.findUnique({
-      where: { idempotencyKey: buildMurekaVoiceProfileSpendKey(profileId) },
+      where: { idempotencyKey: buildAudioengineVoiceProfileSpendKey(profileId) },
       select: { amountUnits: true },
     });
 
@@ -320,11 +320,11 @@ async function markFailedAndRefund(
         {
           userId: input.userId,
           amountUnits: Math.abs(spend.amountUnits),
-          reason: "mureka_voice_profile_enqueue_failed",
-          idempotencyKey: buildMurekaVoiceProfileRefundKey(profileId),
+          reason: "audioengine_voice_profile_enqueue_failed",
+          idempotencyKey: buildAudioengineVoiceProfileRefundKey(profileId),
           relatedEntityType: "voice_profile",
           relatedEntityId: profileId,
-          sourceSpendIdempotencyKey: buildMurekaVoiceProfileSpendKey(profileId),
+          sourceSpendIdempotencyKey: buildAudioengineVoiceProfileSpendKey(profileId),
         },
         tx,
       );
@@ -337,8 +337,8 @@ async function enqueueProfile(
   input: CommitProfileInput,
 ): Promise<void> {
   try {
-    await enqueueMurekaVocalCloneJob({
-      type: "mureka_vocal_clone",
+    await enqueueAudioengineVocalCloneJob({
+      type: "audioengine_vocal_clone",
       userId: input.userId,
       voiceProfileId: profile.id,
       voiceSampleId: input.sample.id,
@@ -351,21 +351,21 @@ async function enqueueProfile(
   }
 }
 
-export async function createMurekaVoiceProfile(
+export async function createAudioengineVoiceProfile(
   userId: string,
-  input: CreateMurekaVoiceProfileBody,
+  input: CreateAudioengineVoiceProfileBody,
   requestId?: string,
 ) {
   assertPersonalVoiceEnabled();
 
   const env = getApiEnv();
   if (
-    !resolveMurekaPersonalVoiceAvailability({ appEnv: env.APP_ENV }).workerListenReady
+    !resolveAudioenginePersonalVoiceAvailability({ appEnv: env.APP_ENV }).workerListenReady
   ) {
     throw new ServiceUnavailableError("Personal AI voice is not ready");
   }
 
-  const heartbeatFresh = await isMurekaWorkerListenHeartbeatFresh();
+  const heartbeatFresh = await isAudioengineWorkerListenHeartbeatFresh();
   if (!heartbeatFresh) {
     throw new ServiceUnavailableError("Personal AI voice is not ready");
   }
@@ -383,7 +383,7 @@ export async function createMurekaVoiceProfile(
     userId,
     sample,
     normalizedBytes,
-    operationKey: buildMurekaVoiceProfileOperationKey(userId, sample.id),
+    operationKey: buildAudioengineVoiceProfileOperationKey(userId, sample.id),
     requestId,
   };
   const txResult = await commitProfile(commitInput);

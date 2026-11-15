@@ -49,7 +49,7 @@ function toAlbumCoverDto(
     images: parseAlbumCoverImagesJson(record.albumCoverImagesJson) ?? [],
     selectedImageUrl: record.selectedAlbumCoverUrl,
     cached,
-    variantsAvailable: strategy.kind === "suno_music_task",
+    variantsAvailable: strategy.kind === "legacyengine_music_task",
   };
 }
 
@@ -100,10 +100,10 @@ async function pollAlbumCoverImages(coverTaskId: string): Promise<string[]> {
 }
 
 /**
- * Suno cover API accepts only a Suno music generation taskId.
- * Never pass Mureka (or other) providerTaskId into MusicService.generateAlbumCover.
+ * Legacyengine cover API accepts only a Legacyengine music generation taskId.
+ * Never pass Audioengine (or other) providerTaskId into MusicService.generateAlbumCover.
  */
-function requireSunoCoverMusicTaskId(
+function requireLegacyengineCoverMusicTaskId(
   record: Prisma.MusicGenerationGetPayload<{ include: { tracks: true } }>,
 ): string {
   const strategy = resolveAlbumCoverStrategy({
@@ -111,7 +111,7 @@ function requireSunoCoverMusicTaskId(
     providerTaskId: record.providerTaskId,
   });
 
-  if (strategy.kind !== "suno_music_task") {
+  if (strategy.kind !== "legacyengine_music_task") {
     const code =
       strategy.reason === "provider_affinity_mismatch"
         ? "MUSIC_PROVIDER_AFFINITY_MISMATCH"
@@ -121,7 +121,7 @@ function requireSunoCoverMusicTaskId(
     throw new BadRequestError("Варианты обложки недоступны для этого трека", code);
   }
 
-  return strategy.sunoMusicTaskId;
+  return strategy.legacyengineMusicTaskId;
 }
 
 export async function getAlbumCoverForGeneration(
@@ -151,8 +151,8 @@ export async function fetchAlbumCoverForGeneration(
     return toAlbumCoverDto(record, true);
   }
 
-  // Fail fast before credits / provider calls: Mureka task ids must not hit Suno cover.
-  const sunoMusicTaskId = requireSunoCoverMusicTaskId(record);
+  // Fail fast before credits / provider calls: Audioengine task ids must not hit Legacyengine cover.
+  const legacyengineMusicTaskId = requireLegacyengineCoverMusicTaskId(record);
 
   const spendKey = `album_cover:${generationId}:spend`;
   const coverCostUnits = OPERATION_COST_UNITS.albumCover;
@@ -201,7 +201,7 @@ export async function fetchAlbumCoverForGeneration(
     let coverTaskId = record.albumCoverTaskId?.trim() || null;
 
     if (!coverTaskId) {
-      const coverTask = await musicService.generateAlbumCover(sunoMusicTaskId);
+      const coverTask = await musicService.generateAlbumCover(legacyengineMusicTaskId);
       coverTaskId = coverTask.taskId;
 
       await prisma.musicGeneration.update({

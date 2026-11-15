@@ -5,7 +5,7 @@ import { mtk } from "@/shared/theme/music-track-classes";
 import { buildAudioDownloadFilename } from "@/shared/lib/build-audio-download-filename";
 import { DeleteIconButton } from "@/shared/ui/delete-icon-button";
 import { DownloadAudioButton } from "@/shared/ui/download-audio-button";
-import { AudioPreviewPlayer } from "@/shared/ui/elevenlabs";
+import { AudioPreviewPlayer } from "@/shared/ui/voiceengine";
 
 interface SongTrackResultProps {
   trackId?: string;

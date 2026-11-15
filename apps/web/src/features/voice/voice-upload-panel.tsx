@@ -30,7 +30,7 @@ import { VoiceUseNotes } from "@/features/legal/voice-use-notes";
 import { useAuthSession } from "@/shared/hooks/use-auth-ready";
 import { useApi } from "@/shared/providers/api-provider";
 import { lp } from "@/features/landing/landing-classes";
-import { LoadingPanel } from "@/shared/ui/elevenlabs";
+import { LoadingPanel } from "@/shared/ui/voiceengine";
 import { appShell } from "@/shared/theme/app-theme";
 import { AuthGate } from "@/shared/ui/auth-gate";
 

@@ -10,7 +10,7 @@ import {
   pricePerCreditUsd,
   savingsPercentVsStarter,
 } from "./credit-packages.js";
-import { FLITT_PRODUCTION_PRICING_APPROVED } from "./flitt-checkout.js";
+import { CHECKOUTGATEWAY_DEMO_PRICING_CONFIGURED } from "./checkoutgateway-checkout.js";
 
 assert.equal(FREE_CREDIT_OFFER.credits, 50);
 assert.equal(FREE_CREDIT_OFFER.priceUsd, 0);
@@ -19,29 +19,29 @@ assert.equal(SHARED_AI_TOOLS.length, 7);
 
 const byId = Object.fromEntries(CREDIT_PACKAGES.map((pkg) => [pkg.id, pkg]));
 
-assert.equal(byId.starter?.priceUsd, 9);
-assert.equal(FLITT_PRODUCTION_PRICING_APPROVED, true);
+assert.equal(byId.starter?.priceUsd, 18);
+assert.equal(CHECKOUTGATEWAY_DEMO_PRICING_CONFIGURED, true);
 assert.equal("priceGel" in (byId.starter ?? {}), false);
-assert.equal(getCreditPackagePriceUsd("starter"), 9);
-assert.equal(getCreditPackagePriceUsd("creator"), 29);
+assert.equal(getCreditPackagePriceUsd("starter"), 18);
+assert.equal(getCreditPackagePriceUsd("creator"), 58);
 assert.equal(byId.starter?.credits, 500);
 assert.equal(getPackageSavingsPercent("starter"), null);
 
-assert.equal(byId.creator?.priceUsd, 29);
+assert.equal(byId.creator?.priceUsd, 58);
 assert.equal(byId.creator?.credits, 2000);
 assert.equal(byId.creator?.featured, true);
 assert.equal(getPackageSavingsPercent("creator"), 19);
 
-assert.equal(byId.studio?.priceUsd, 99);
+assert.equal(byId.studio?.priceUsd, 198);
 assert.equal(byId.studio?.credits, 8000);
 assert.equal(byId.studio?.bestValue, true);
 assert.equal(getPackageSavingsPercent("studio"), 31);
 
-assert.equal(pricePerCreditUsd(9, 500), 0.018);
-assert.equal(pricePerCreditUsd(29, 2000), 0.0145);
-assert.equal(pricePerCreditUsd(99, 8000), 0.012375);
-assert.equal(savingsPercentVsStarter(29, 2000), 19);
-assert.equal(savingsPercentVsStarter(99, 8000), 31);
+assert.equal(pricePerCreditUsd(18, 500), 0.036);
+assert.equal(pricePerCreditUsd(58, 2000), 0.029);
+assert.equal(pricePerCreditUsd(198, 8000), 0.02475);
+assert.equal(savingsPercentVsStarter(58, 2000), 19);
+assert.equal(savingsPercentVsStarter(198, 8000), 31);
 
 assert.equal("queue" in (byId.starter ?? {}), false);
 assert.equal("maxProjects" in (byId.starter ?? {}), false);

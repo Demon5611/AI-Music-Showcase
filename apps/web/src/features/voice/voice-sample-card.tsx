@@ -16,7 +16,7 @@ import {
 } from "@/entities/voice-sample/voice-sample-display";
 import { voiceUi } from "@/features/voice/voice-classes";
 import { cn } from "@/lib/utils";
-import { AudioPreviewPlayer } from "@/shared/ui/elevenlabs";
+import { AudioPreviewPlayer } from "@/shared/ui/voiceengine";
 
 interface VoiceSampleCardProps {
   sample: VoiceSample;

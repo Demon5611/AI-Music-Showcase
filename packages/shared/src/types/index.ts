@@ -22,7 +22,7 @@ export type CreditTransactionType = "purchase" | "spend" | "refund";
 
 import type { VocalGender } from "../constants/vocal-gender.js";
 import type { PlanId } from "../constants/plans.js";
-import type { VoiceProfileStatus } from "../constants/mureka-flags.js";
+import type { VoiceProfileStatus } from "../constants/audioengine-flags.js";
 import type { ResolvedEntitlements } from "../entitlements/index.js";
 import type { VoiceLanguage } from "../voice-language/voice-language.js";
 
@@ -38,16 +38,16 @@ export interface User {
   updatedAt: string;
 }
 
-/** Public API shape — без storage keys и Suno task/persona IDs. */
+/** Public API shape — без storage keys и Legacyengine task/persona IDs. */
 export interface VoiceSample {
   id: string;
   userId: string;
   durationSec: number;
   status: VoiceSampleStatus;
   consentConfirmed: boolean;
-  /** Language for consent + Suno validation phrase (Suno validate allowlist). */
+  /** Language for consent + Legacyengine validation phrase (Legacyengine validate allowlist). */
   voiceLanguage: VoiceLanguage;
-  sunoValidatePhrase: string | null;
+  legacyengineValidatePhrase: string | null;
   voiceCloneStatus: VoiceCloneStatus;
   voiceCloneError: string | null;
   /** ISO-время старта текущей подготовки/фразы верификации — якорь для countdown TTL. */
@@ -135,14 +135,14 @@ export interface GenerationJobPayload {
 }
 
 export type {
-  KitsInferenceJob,
-  KitsJobStatus,
-  KitsPaginationMeta,
-  KitsStemFileUrl,
-  KitsVocalSeparationJob,
-  KitsVoiceModel,
-  KitsVoiceModelsResponse,
-} from "./kits.js";
+  VoiceadapterInferenceJob,
+  VoiceadapterJobStatus,
+  VoiceadapterPaginationMeta,
+  VoiceadapterStemFileUrl,
+  VoiceadapterVocalSeparationJob,
+  VoiceadapterVoiceModel,
+  VoiceadapterVoiceModelsResponse,
+} from "./voiceadapter.js";
 
 export type {
   MusicGenerationPhaseHint,

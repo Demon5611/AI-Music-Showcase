@@ -1,3 +1,4 @@
+/** SHOWCASE ONLY: synthetic accounting fixtures; no production commercial offer. */
 export type CreditUnits = number;
 
 export const CREDIT_UNIT_SCALE = 1000;
@@ -8,9 +9,9 @@ export const CREDIT_UNIT_SCALE = 1000;
  */
 export const OPERATION_COST_CREDITS = {
   generateText: 1,
-  /** Suno generation, 2 variants. */
+  /** Legacyengine generation, 2 variants. */
   generateTrack: 15,
-  /** Mureka generation product credit. Independent of current default 1 provider output. */
+  /** Audioengine generation product credit. Independent of current default 1 provider output. */
   generateSongs: 24,
   createPersonalVoice: 1_200,
   reusePersonalVoice: 0,
@@ -84,7 +85,7 @@ export const OPERATION_COST_UNITS = {
 /**
  * Marketing example only — not a guarantee.
  * Real spend depends on selected AI operations.
- * Default standard AI flow: lyrics + Mureka generation product credit.
+ * Default standard AI flow: lyrics + Audioengine generation product credit.
  */
 export const STANDARD_MUSIC_GENERATION_EXAMPLE_CREDITS =
   OPERATION_COST_CREDITS.generateText + OPERATION_COST_CREDITS.generateSongs;

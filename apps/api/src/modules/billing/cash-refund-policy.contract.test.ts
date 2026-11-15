@@ -19,12 +19,12 @@ import {
 const here = dirname(fileURLToPath(import.meta.url));
 const repoRoot = join(here, "../../../../..");
 const refundService = readFileSync(join(here, "refund.service.ts"), "utf8");
-const flittProcessor = readFileSync(
-  join(repoRoot, "packages/flitt-checkout/src/process-flitt-refund.ts"),
+const checkoutgatewayProcessor = readFileSync(
+  join(repoRoot, "packages/checkoutgateway-checkout/src/process-checkoutgateway-refund.ts"),
   "utf8",
 );
-const tbcProcessor = readFileSync(
-  join(repoRoot, "packages/tbc-checkout/src/process-tbc-refund.ts"),
+const legacygatewayProcessor = readFileSync(
+  join(repoRoot, "packages/legacygateway-checkout/src/process-legacygateway-refund.ts"),
   "utf8",
 );
 const migration = readFileSync(
@@ -90,8 +90,8 @@ describe("cash refund product policy contracts", () => {
   });
 
   it("worker finalize uses scope-aware local effects", () => {
-    assert.match(flittProcessor, /finalizeUserCashRefundLocalEffects/);
-    assert.match(tbcProcessor, /finalizeUserCashRefundLocalEffects/);
+    assert.match(checkoutgatewayProcessor, /finalizeUserCashRefundLocalEffects/);
+    assert.match(legacygatewayProcessor, /finalizeUserCashRefundLocalEffects/);
   });
 
   it("additive migration adds entitlement columns without DROP", () => {

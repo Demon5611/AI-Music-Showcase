@@ -1,7 +1,7 @@
 /**
  * Landing standard-path CTA after the optional Personal Voice section.
  *
- * Always enabled: VoiceProfile / VoiceSample / consent / mic / Mureka state
+ * Always enabled: VoiceProfile / VoiceSample / consent / mic / Audioengine state
  * must not disable "Create a track with AI vocals".
  */
 export type ContinueWithoutVoiceCtaInput = {

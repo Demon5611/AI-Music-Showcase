@@ -25,7 +25,7 @@ export async function createGenerationJob(
     throw new ForbiddenError("Voice sample is not ready");
   }
 
-  if (!voiceSample.sunoVoiceId || voiceSample.voiceCloneStatus !== "ready") {
+  if (!voiceSample.legacyengineVoiceId || voiceSample.voiceCloneStatus !== "ready") {
     throw new ForbiddenError("Голос AI Music не готов");
   }
 

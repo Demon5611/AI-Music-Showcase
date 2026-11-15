@@ -25,9 +25,9 @@ import {
   selectAlbumCoverForGeneration,
 } from "./album-cover.service.js";
 import {
-  handleLegacySunoMusicCallback,
-  handleSignedSunoMusicCallback,
-} from "./suno-callback.service.js";
+  handleLegacyLegacyengineMusicCallback,
+  handleSignedLegacyengineMusicCallback,
+} from "./legacyengine-callback.service.js";
 import { remixMusicTrackForUser } from "./remix.service.js";
 import { verifyProviderReferenceToken } from "./track-provider-reference.js";
 import {
@@ -433,16 +433,16 @@ export async function registerMusicRoutes(app: FastifyInstance) {
   );
 
   app.post(
-    "/api/music/callback/suno/:recordId/:token",
+    "/api/music/callback/legacyengine/:recordId/:token",
     {
       config: userRateLimitRouteConfig(
-        RATE_LIMITS.sunoCallback.max,
-        RATE_LIMITS.sunoCallback.timeWindowMs,
+        RATE_LIMITS.legacyengineCallback.max,
+        RATE_LIMITS.legacyengineCallback.timeWindowMs,
       ),
     },
     async (request, reply) => {
       const { recordId, token } = request.params as { recordId: string; token: string };
-      const result = await handleSignedSunoMusicCallback({
+      const result = await handleSignedLegacyengineMusicCallback({
         recordId,
         token,
         payload: request.body,
@@ -452,15 +452,15 @@ export async function registerMusicRoutes(app: FastifyInstance) {
   );
 
   app.post(
-    "/api/music/callback/suno",
+    "/api/music/callback/legacyengine",
     {
       config: userRateLimitRouteConfig(
-        RATE_LIMITS.sunoCallback.max,
-        RATE_LIMITS.sunoCallback.timeWindowMs,
+        RATE_LIMITS.legacyengineCallback.max,
+        RATE_LIMITS.legacyengineCallback.timeWindowMs,
       ),
     },
     async (request, reply) => {
-      const result = await handleLegacySunoMusicCallback(request.body);
+      const result = await handleLegacyLegacyengineMusicCallback(request.body);
       return reply.status(result.statusCode).send(result.body);
     },
   );

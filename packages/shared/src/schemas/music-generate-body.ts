@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { lyricsLanguageSchema } from "../lyrics-language/lyrics-language.js";
 
-export const sunoGenerationOptionsSchema = z
+export const legacyengineGenerationOptionsSchema = z
   .object({
     customMode: z.boolean().optional(),
     referenceAudioUrl: z.string().min(1).optional(),
@@ -11,7 +11,7 @@ export const sunoGenerationOptionsSchema = z
   })
   .strict();
 
-export const murekaGenerationOptionsSchema = z
+export const audioengineGenerationOptionsSchema = z
   .object({
     vocalId: z.string().min(1).optional(),
     voiceProfileId: z.string().min(1).optional(),
@@ -38,14 +38,14 @@ export const musicBriefSchema = z
 export const providerGenerationOptionsSchema = z.discriminatedUnion("providerId", [
   z
     .object({
-      providerId: z.literal("sunoapi"),
-      options: sunoGenerationOptionsSchema.default({}),
+      providerId: z.literal("legacyengineapi"),
+      options: legacyengineGenerationOptionsSchema.default({}),
     })
     .strict(),
   z
     .object({
-      providerId: z.literal("mureka"),
-      options: murekaGenerationOptionsSchema.default({}),
+      providerId: z.literal("audioengine"),
+      options: audioengineGenerationOptionsSchema.default({}),
     })
     .strict(),
   z
@@ -58,7 +58,7 @@ export const providerGenerationOptionsSchema = z.discriminatedUnion("providerId"
 
 /**
  * HTTP body for POST /api/music/generate.
- * Accepts legacy flat Suno fields and/or typed providerOptions.
+ * Accepts legacy flat Legacyengine fields and/or typed providerOptions.
  * `lyricsLanguage` is metadata only for customMode (no prompt/style injection).
  */
 export const musicGenerateBodySchema = z

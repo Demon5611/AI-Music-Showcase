@@ -9,7 +9,7 @@ import { usePaymentReturnPurchase } from "@/features/billing/hooks/use-payment-r
 import { Link, useRouter } from "@/i18n/navigation";
 import { parseApiError } from "@/shared/lib/parse-api-error";
 import { RequireAuth } from "@/shared/ui/require-auth";
-import { LoadingPanel } from "@/shared/ui/elevenlabs";
+import { LoadingPanel } from "@/shared/ui/voiceengine";
 
 const SUCCESS_REDIRECT_MS = 2500;
 

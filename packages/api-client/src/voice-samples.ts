@@ -6,15 +6,15 @@ export function createVoiceSamplesApi(client: ApiClient) {
     list: () => client.get<VoiceSample[]>("/api/voice-samples"),
     create: (formData: FormData) =>
       client.postForm<VoiceSample>("/api/voice-samples", formData),
-    prepareSunoVoice: (id: string, options?: { restart?: boolean }) =>
-      client.post<VoiceSample>(`/api/voice-samples/${id}/suno-voice/prepare`, options ?? {}),
-    getSunoVoiceStatus: (id: string) =>
-      client.get<VoiceSample>(`/api/voice-samples/${id}/suno-voice/status`),
-    cancelSunoVoice: (id: string) =>
-      client.post<VoiceSample>(`/api/voice-samples/${id}/suno-voice/cancel`, {}),
-    verifySunoVoice: (id: string, formData: FormData) =>
+    prepareLegacyengineVoice: (id: string, options?: { restart?: boolean }) =>
+      client.post<VoiceSample>(`/api/voice-samples/${id}/legacyengine-voice/prepare`, options ?? {}),
+    getLegacyengineVoiceStatus: (id: string) =>
+      client.get<VoiceSample>(`/api/voice-samples/${id}/legacyengine-voice/status`),
+    cancelLegacyengineVoice: (id: string) =>
+      client.post<VoiceSample>(`/api/voice-samples/${id}/legacyengine-voice/cancel`, {}),
+    verifyLegacyengineVoice: (id: string, formData: FormData) =>
       client.postForm<VoiceSample>(
-        `/api/voice-samples/${id}/suno-voice/verify`,
+        `/api/voice-samples/${id}/legacyengine-voice/verify`,
         formData,
       ),
     remove: (id: string) =>

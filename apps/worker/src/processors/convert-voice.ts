@@ -12,18 +12,18 @@ function buildTrackTitle(prompt: string): string {
   return trimmed.slice(0, 80) || "Generated Track";
 }
 
-export async function generateSongWithSunoVoice(
+export async function generateSongWithLegacyengineVoice(
   job: GenerationJob,
   voiceSample: VoiceSample,
 ): Promise<Buffer> {
   const config = resolveMusicProviderConfig();
-  const sunoVoiceId = voiceSample.sunoVoiceId;
+  const legacyengineVoiceId = voiceSample.legacyengineVoiceId;
 
-  if (!sunoVoiceId) {
+  if (!legacyengineVoiceId) {
     throw new Error("Голос AI Music не готов");
   }
 
-  if (config.providerId === "sunoapi" && config.sunoApiKey.trim()) {
+  if (config.providerId === "legacyengineapi" && config.legacyengineApiKey.trim()) {
     const music = createMusicService();
     const started = await music.generateSong({
       prompt: job.prompt,
@@ -31,10 +31,10 @@ export async function generateSongWithSunoVoice(
       title: buildTrackTitle(job.prompt),
       mode: "song",
       providerOptions: {
-        providerId: "sunoapi",
+        providerId: "legacyengineapi",
         options: {
           customMode: true,
-          personaId: sunoVoiceId,
+          personaId: legacyengineVoiceId,
           personaModel: "voice_persona",
         },
       },
@@ -58,5 +58,5 @@ export async function generateSongWithSunoVoice(
     return readStorageObject(voiceSample.r2Key);
   }
 
-  throw new Error("SUNO_API_KEY is required for music generation");
+  throw new Error("LEGACYENGINE_API_KEY is required for music generation");
 }

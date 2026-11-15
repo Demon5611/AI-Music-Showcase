@@ -4,12 +4,12 @@ import { createLyricsEngine } from "./lyrics-engine.js";
 import type { MusicProvider } from "./domain/music-provider.interface.js";
 
 describe("createLyricsEngine", () => {
-  it("uses injected Suno lyrics methods and ignores active song provider", async () => {
+  it("uses injected Legacyengine lyrics methods and ignores active song provider", async () => {
     let generateCalls = 0;
     let statusCalls = 0;
 
-    const stubSuno = {
-      id: "sunoapi",
+    const stubLegacyengine = {
+      id: "legacyengineapi",
       generateSong: async () => {
         throw new Error("song path must not be used for lyrics");
       },
@@ -18,7 +18,7 @@ describe("createLyricsEngine", () => {
       },
       generateLyrics: async () => {
         generateCalls += 1;
-        return { provider: "sunoapi", taskId: "lyrics-task", status: "pending" as const };
+        return { provider: "legacyengineapi", taskId: "lyrics-task", status: "pending" as const };
       },
       getLyricsGenerationStatus: async () => {
         statusCalls += 1;
@@ -26,7 +26,7 @@ describe("createLyricsEngine", () => {
       },
     } as unknown as MusicProvider;
 
-    const engine = createLyricsEngine(stubSuno);
+    const engine = createLyricsEngine(stubLegacyengine);
     const created = await engine.generateLyrics({ prompt: "brief" });
     const status = await engine.getLyricsGenerationStatus("lyrics-task");
 

@@ -5,7 +5,7 @@
 import assert from "node:assert/strict";
 import { resolveMusicProviderForGeneration } from "@ai-music/ai-providers";
 import {
-  MUREKA_CREDIT_COST_UNITS,
+  AUDIOENGINE_CREDIT_COST_UNITS,
   OPERATION_COST_UNITS,
   musicGenerateBodySchema,
   normalizeLyricsLanguage,
@@ -16,9 +16,9 @@ import { resolveAlbumCoverStrategy } from "./album-cover-strategy.js";
 import { normalizeMusicGenerateBody } from "./music-generate-body.js";
 
 const stagingEnv = {
-  MUREKA_ENABLED: "true",
-  MUREKA_PERSONAL_VOICE_ENABLED: "true",
-  MUSIC_DEFAULT_PROVIDER: "sunoapi",
+  AUDIOENGINE_ENABLED: "true",
+  AUDIOENGINE_PERSONAL_VOICE_ENABLED: "true",
+  MUSIC_DEFAULT_PROVIDER: "legacyengineapi",
 };
 
 function resolveForRouting(selected: string, prompt: string): string {
@@ -36,11 +36,11 @@ function testAutoRuPersonalVoice(): void {
   assert.notEqual(resolved, "auto");
 
   const routed = resolveMusicProviderForGeneration({
-    hasPersonalMurekaVoice: true,
+    hasPersonalAudioengineVoice: true,
     lyricsLanguage: resolved,
     env: stagingEnv,
   });
-  assert.equal("providerId" in routed && routed.providerId, "mureka");
+  assert.equal("providerId" in routed && routed.providerId, "audioengine");
 }
 
 function testAutoEnPersonalVoice(): void {
@@ -51,11 +51,11 @@ function testAutoEnPersonalVoice(): void {
   assert.equal(resolved, "en");
 
   const routed = resolveMusicProviderForGeneration({
-    hasPersonalMurekaVoice: true,
+    hasPersonalAudioengineVoice: true,
     lyricsLanguage: resolved,
     env: stagingEnv,
   });
-  assert.equal("providerId" in routed && routed.providerId, "mureka");
+  assert.equal("providerId" in routed && routed.providerId, "audioengine");
 }
 
 function testExplicitRuUnchanged(): void {
@@ -64,29 +64,29 @@ function testExplicitRuUnchanged(): void {
 
 function testLiteralAutoRejectedByProviderRouter(): void {
   const routed = resolveMusicProviderForGeneration({
-    hasPersonalMurekaVoice: true,
+    hasPersonalAudioengineVoice: true,
     lyricsLanguage: "auto",
     env: stagingEnv,
   });
   assert.equal("error" in routed, true);
   if ("error" in routed) {
-    assert.equal(routed.error.code, "MUREKA_LANGUAGE_UNSUPPORTED");
+    assert.equal(routed.error.code, "AUDIOENGINE_LANGUAGE_UNSUPPORTED");
   }
 }
 
 function testUnsupportedResolvedLanguage(): void {
   const routed = resolveMusicProviderForGeneration({
-    hasPersonalMurekaVoice: true,
+    hasPersonalAudioengineVoice: true,
     lyricsLanguage: "ka",
     env: stagingEnv,
   });
   assert.equal("error" in routed, true);
   if ("error" in routed) {
-    assert.equal(routed.error.code, "MUREKA_LANGUAGE_UNSUPPORTED");
+    assert.equal(routed.error.code, "AUDIOENGINE_LANGUAGE_UNSUPPORTED");
   }
 }
 
-function testOffNormalizeIsSunoNoVoiceGates(): void {
+function testOffNormalizeIsLegacyengineNoVoiceGates(): void {
   const normalized = normalizeMusicGenerateBody(
     musicGenerateBodySchema.parse({
       prompt: "lyrics",
@@ -102,7 +102,7 @@ function testOffNormalizeIsSunoNoVoiceGates(): void {
   assert.equal(normalized.usePersonalVoice, false);
   assert.equal(normalized.voiceProfileId, undefined);
   assert.equal(normalized.voiceSampleId, undefined);
-  assert.equal(normalized.input.providerOptions?.providerId, "sunoapi");
+  assert.equal(normalized.input.providerOptions?.providerId, "legacyengineapi");
   assert.equal(
     resolveMusicGenerateCostUnits({ usePersonalVoice: false }),
     OPERATION_COST_UNITS.generateTrack,
@@ -110,54 +110,54 @@ function testOffNormalizeIsSunoNoVoiceGates(): void {
   assert.equal(OPERATION_COST_UNITS.generateTrack, 15_000);
 }
 
-function testOnNormalizeIsMureka(): void {
+function testOnNormalizeIsAudioengine(): void {
   const normalized = normalizeMusicGenerateBody(
     musicGenerateBodySchema.parse({
       prompt: "lyrics",
       voiceProfileId: "vp-ready",
       usePersonalVoice: true,
       providerOptions: {
-        providerId: "mureka",
+        providerId: "audioengine",
         options: { voiceProfileId: "vp-ready" },
       },
     }),
   );
   assert.equal(normalized.usePersonalVoice, true);
   assert.equal(normalized.voiceProfileId, "vp-ready");
-  assert.equal(normalized.input.providerOptions?.providerId, "mureka");
+  assert.equal(normalized.input.providerOptions?.providerId, "audioengine");
   assert.equal(
     resolveMusicGenerateCostUnits({ usePersonalVoice: true }),
-    MUREKA_CREDIT_COST_UNITS.generateSongs,
+    AUDIOENGINE_CREDIT_COST_UNITS.generateSongs,
   );
-  assert.equal(MUREKA_CREDIT_COST_UNITS.generateSongs, 24_000);
+  assert.equal(AUDIOENGINE_CREDIT_COST_UNITS.generateSongs, 24_000);
 }
 
 function testOffOnOffProviders(): void {
   const off = resolveMusicProviderForGeneration({
-    hasPersonalMurekaVoice: false,
+    hasPersonalAudioengineVoice: false,
     env: stagingEnv,
   });
   const on = resolveMusicProviderForGeneration({
-    hasPersonalMurekaVoice: true,
+    hasPersonalAudioengineVoice: true,
     lyricsLanguage: "ru",
     env: stagingEnv,
   });
   const offAgain = resolveMusicProviderForGeneration({
-    hasPersonalMurekaVoice: false,
+    hasPersonalAudioengineVoice: false,
     env: stagingEnv,
   });
-  assert.equal("providerId" in off && off.providerId, "sunoapi");
-  assert.equal("providerId" in on && on.providerId, "mureka");
-  assert.equal("providerId" in offAgain && offAgain.providerId, "sunoapi");
+  assert.equal("providerId" in off && off.providerId, "legacyengineapi");
+  assert.equal("providerId" in on && on.providerId, "audioengine");
+  assert.equal("providerId" in offAgain && offAgain.providerId, "legacyengineapi");
 }
 
 function testCoverNeverMixes(): void {
-  const mureka = resolveAlbumCoverStrategy({
-    musicProvider: "mureka",
+  const audioengine = resolveAlbumCoverStrategy({
+    musicProvider: "audioengine",
     providerTaskId: "154182084722690",
   });
-  assert.equal(mureka.kind, "unavailable");
-  assert.equal("sunoMusicTaskId" in mureka, false);
+  assert.equal(audioengine.kind, "unavailable");
+  assert.equal("legacyengineMusicTaskId" in audioengine, false);
 }
 
 testAutoRuPersonalVoice();
@@ -165,8 +165,8 @@ testAutoEnPersonalVoice();
 testExplicitRuUnchanged();
 testLiteralAutoRejectedByProviderRouter();
 testUnsupportedResolvedLanguage();
-testOffNormalizeIsSunoNoVoiceGates();
-testOnNormalizeIsMureka();
+testOffNormalizeIsLegacyengineNoVoiceGates();
+testOnNormalizeIsAudioengine();
 testOffOnOffProviders();
 testCoverNeverMixes();
 console.log("music-generate-routing-fixes.contract.test.ts: ok");

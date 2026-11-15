@@ -36,7 +36,7 @@ export type VoiceProfileRecoveryDecision =
 
 /**
  * Fail-closed eligibility for restoring a VoiceProfile after an erroneous
- * local-only provider deletion request (never submitted to Mureka).
+ * local-only provider deletion request (never submitted to Audioengine).
  */
 export function evaluateVoiceProfileRecoveryEligibility(
   input: VoiceProfileRecoveryEligibilityInput,

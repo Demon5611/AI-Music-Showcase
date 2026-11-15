@@ -27,7 +27,7 @@ assert.equal(
     karaokeEnabled: true,
     canUseKaraoke: true,
     hasLyrics: true,
-    musicProvider: "sunoapi",
+    musicProvider: "legacyengineapi",
   }),
   true,
 );
@@ -38,7 +38,7 @@ assert.equal(
     karaokeEnabled: true,
     canUseKaraoke: true,
     hasLyrics: true,
-    musicProvider: "mureka",
+    musicProvider: "audioengine",
   }),
   false,
 );
@@ -49,7 +49,7 @@ assert.equal(
     karaokeEnabled: true,
     canUseKaraoke: true,
     hasLyrics: false,
-    musicProvider: "sunoapi",
+    musicProvider: "legacyengineapi",
   }),
   false,
 );

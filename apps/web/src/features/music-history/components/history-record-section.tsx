@@ -2,7 +2,7 @@
 
 import type { MusicGenerationRecordDto } from "@ai-music/shared";
 import { useFormatter, useTranslations } from "next-intl";
-import { AudioPreviewPlayer } from "@/shared/ui/elevenlabs";
+import { AudioPreviewPlayer } from "@/shared/ui/voiceengine";
 import { mtk } from "@/shared/theme/music-track-classes";
 import { buildAudioDownloadFilename } from "@/shared/lib/build-audio-download-filename";
 import { isTrackPlaybackAvailable } from "@/shared/lib/is-track-playback-available";

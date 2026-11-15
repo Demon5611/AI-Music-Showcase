@@ -57,20 +57,20 @@ describe("enqueueRefundJobIdempotent", () => {
     const queue = createFakeQueue();
     const outcome = await enqueueRefundJobIdempotent({
       queue,
-      jobName: "flitt-refund",
-      jobId: "flitt-refund-rr-1",
+      jobName: "checkoutgateway-refund",
+      jobId: "checkoutgateway-refund-rr-1",
       payload: { refundRequestId: "rr-1" },
       attempts: 5,
       backoffMs: 1000,
     });
     assert.equal(outcome, "queued");
     assert.equal(queue.added, 1);
-    assert.equal(queue.lastJobId, "flitt-refund-rr-1");
+    assert.equal(queue.lastJobId, "checkoutgateway-refund-rr-1");
   });
 
   it("reuses a waiting job without a second add", async () => {
     const existing: FakeJob = {
-      id: "flitt-refund-rr-1",
+      id: "checkoutgateway-refund-rr-1",
       state: "waiting",
       timestamp: Date.now() - 1000,
       retryCount: 0,
@@ -82,16 +82,16 @@ describe("enqueueRefundJobIdempotent", () => {
     const queue = createFakeQueue(existing);
     const first = await enqueueRefundJobIdempotent({
       queue,
-      jobName: "flitt-refund",
-      jobId: "flitt-refund-rr-1",
+      jobName: "checkoutgateway-refund",
+      jobId: "checkoutgateway-refund-rr-1",
       payload: { refundRequestId: "rr-1" },
       attempts: 5,
       backoffMs: 1000,
     });
     const second = await enqueueRefundJobIdempotent({
       queue,
-      jobName: "flitt-refund",
-      jobId: "flitt-refund-rr-1",
+      jobName: "checkoutgateway-refund",
+      jobId: "checkoutgateway-refund-rr-1",
       payload: { refundRequestId: "rr-1" },
       attempts: 5,
       backoffMs: 1000,
@@ -107,12 +107,12 @@ describe("enqueueRefundJobIdempotent", () => {
     let calls = 0;
     queue.add = async () => {
       calls += 1;
-      throw new Error("Job flitt-refund-rr-1 already exists");
+      throw new Error("Job checkoutgateway-refund-rr-1 already exists");
     };
     const outcome = await enqueueRefundJobIdempotent({
       queue,
-      jobName: "flitt-refund",
-      jobId: "flitt-refund-rr-1",
+      jobName: "checkoutgateway-refund",
+      jobId: "checkoutgateway-refund-rr-1",
       payload: { refundRequestId: "rr-1" },
       attempts: 5,
       backoffMs: 1000,
@@ -123,7 +123,7 @@ describe("enqueueRefundJobIdempotent", () => {
 
   it("retries a failed job in place instead of creating a new id", async () => {
     const existing: FakeJob = {
-      id: "tbc-refund-rr-1",
+      id: "legacygateway-refund-rr-1",
       state: "failed",
       timestamp: Date.now() - 1000,
       retryCount: 0,
@@ -136,8 +136,8 @@ describe("enqueueRefundJobIdempotent", () => {
     const queue = createFakeQueue(existing);
     const outcome = await enqueueRefundJobIdempotent({
       queue,
-      jobName: "tbc-refund",
-      jobId: "tbc-refund-rr-1",
+      jobName: "legacygateway-refund",
+      jobId: "legacygateway-refund-rr-1",
       payload: { refundRequestId: "rr-1" },
       attempts: 5,
       backoffMs: 1000,
@@ -149,7 +149,7 @@ describe("enqueueRefundJobIdempotent", () => {
 
   it("does not re-add a completed job", async () => {
     const existing: FakeJob = {
-      id: "flitt-refund-rr-1",
+      id: "checkoutgateway-refund-rr-1",
       state: "completed",
       timestamp: Date.now() - 1000,
       retryCount: 0,
@@ -161,8 +161,8 @@ describe("enqueueRefundJobIdempotent", () => {
     const queue = createFakeQueue(existing);
     const outcome = await enqueueRefundJobIdempotent({
       queue,
-      jobName: "flitt-refund",
-      jobId: "flitt-refund-rr-1",
+      jobName: "checkoutgateway-refund",
+      jobId: "checkoutgateway-refund-rr-1",
       payload: { refundRequestId: "rr-1" },
       attempts: 5,
       backoffMs: 1000,

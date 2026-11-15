@@ -3,10 +3,10 @@ import {
   parseCheckoutPaymentProvider,
 } from "./payment-provider.js";
 
-assert.equal(parseCheckoutPaymentProvider("flitt"), "flitt");
-assert.equal(parseCheckoutPaymentProvider(" flitt "), "flitt");
-assert.equal(parseCheckoutPaymentProvider("TBC"), null);
-assert.equal(parseCheckoutPaymentProvider("tbc"), null);
+assert.equal(parseCheckoutPaymentProvider("checkoutgateway"), "checkoutgateway");
+assert.equal(parseCheckoutPaymentProvider(" checkoutgateway "), "checkoutgateway");
+assert.equal(parseCheckoutPaymentProvider("LEGACYGATEWAY"), null);
+assert.equal(parseCheckoutPaymentProvider("legacygateway"), null);
 assert.equal(parseCheckoutPaymentProvider(undefined), null);
 assert.equal(parseCheckoutPaymentProvider(""), null);
 assert.equal(parseCheckoutPaymentProvider("stripe"), null);

@@ -3,8 +3,8 @@ import type { MusicProviderId } from "./domain/music-provider-id.js";
 import type { MusicGenerationProvider } from "./domain/music-generation-provider.js";
 import { MusicProviderError } from "./domain/errors/music-provider.error.js";
 import { createMockMusicGenerationProvider } from "./providers/mock/mock-music-generation.provider.js";
-import { createMurekaMusicGenerationProvider } from "./providers/mureka/mureka-music-generation.provider.js";
-import { createSunoMusicGenerationProvider } from "./providers/suno-api/suno-music-generation.provider.js";
+import { createAudioengineMusicGenerationProvider } from "./providers/audioengine/audioengine-music-generation.provider.js";
+import { createLegacyengineMusicGenerationProvider } from "./providers/legacyengine-api/legacyengine-music-generation.provider.js";
 
 /**
  * Resolve MusicGenerationProvider by persisted provider id (not current env).
@@ -18,10 +18,10 @@ export function createMusicGenerationProvider(
   }
 
   switch (providerId) {
-    case "sunoapi":
-      return createSunoMusicGenerationProvider();
-    case "mureka":
-      return createMurekaMusicGenerationProvider();
+    case "legacyengineapi":
+      return createLegacyengineMusicGenerationProvider();
+    case "audioengine":
+      return createAudioengineMusicGenerationProvider();
     default:
       throw new MusicProviderError(
         `Unsupported music generation provider: ${providerId}`,

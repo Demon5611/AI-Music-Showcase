@@ -5,7 +5,7 @@ export interface AlbumCoverResponseDto {
   cached: boolean;
   /**
    * True only when this generation can request provider cover variants
-   * (Suno music task → Suno cover API). False for Mureka and other providers.
+   * (Legacyengine music task → Legacyengine cover API). False for Audioengine and other providers.
    */
   variantsAvailable: boolean;
 }

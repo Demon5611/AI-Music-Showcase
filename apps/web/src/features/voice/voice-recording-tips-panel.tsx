@@ -25,7 +25,7 @@ export function VoiceRecordingTipsPanel() {
   );
 }
 
-export function SunoVoiceVerifyTipsPanel() {
+export function LegacyengineVoiceVerifyTipsPanel() {
   const t = useTranslations("VoiceUpload");
 
   return (

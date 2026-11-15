@@ -16,7 +16,7 @@ function status(
 ): MusicLyricsStatusResponseDto {
   return {
     taskId: partial.taskId ?? "task-1",
-    provider: partial.provider ?? "sunoapi",
+    provider: partial.provider ?? "legacyengineapi",
     status: partial.status,
     lyrics: partial.lyrics,
     errorMessage: partial.errorMessage,

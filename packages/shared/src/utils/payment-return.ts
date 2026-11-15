@@ -1,7 +1,7 @@
-/** Query key we set on Flitt `response_url`. UX only — never payment proof. */
+/** Query key we set on Checkoutgateway `response_url`. UX only — never payment proof. */
 export const PAYMENT_RETURN_PURCHASE_ID_QUERY = "purchaseId";
 
-/** Flitt browser return may include merchant `order_id` (= our purchase id). */
+/** Checkoutgateway browser return may include merchant `order_id` (= our purchase id). */
 export const PAYMENT_RETURN_ORDER_ID_QUERY = "order_id";
 
 export const PAYMENT_RETURN_PAGE_SLUG = "payment-return";
@@ -65,7 +65,7 @@ export function paymentReturnParamsFromRecord(
 }
 
 /**
- * Flitt `response_url` must carry only our purchase id.
+ * Checkoutgateway `response_url` must carry only our purchase id.
  * Drops signature / amount / card fields if they were present on the base URL.
  */
 export function appendPurchaseIdToReturnUrl(
@@ -92,7 +92,7 @@ export function isLocalePaymentReturnPath(pathname: string): boolean {
   return /^\/(en|ru|ka)\/payment-return\/?$/.test(pathname);
 }
 
-/** Previous Flitt env pointed here; POST must not hit Clerk/pricing GET-only. */
+/** Previous Checkoutgateway env pointed here; POST must not hit Clerk/pricing GET-only. */
 export function isLegacyPricingReturnPath(pathname: string): boolean {
   return /^\/(en|ru|ka)\/pricing\/?$/.test(pathname);
 }

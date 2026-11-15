@@ -9,7 +9,7 @@ import {
 import { toVoiceSampleDto, toVoiceSampleDtoWithPersonaCheck } from "./mapper.js";
 import { normalizeVoiceSampleMime, resolveVoiceSampleContentType } from "./resolve-voice-sample-mime.js";
 import { resolvePersonaVoiceId } from "./persona-voice-id.service.js";
-import { syncVoiceSampleListEntry } from "./suno-voice.service.js";
+import { syncVoiceSampleListEntry } from "./legacyengine-voice.service.js";
 
 export interface CreateVoiceSampleInput {
   userId: string;

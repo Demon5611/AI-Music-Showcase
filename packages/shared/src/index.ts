@@ -20,7 +20,7 @@ export * from "./music-provider-affinity/index.js";
 export * from "./storage/keys.js";
 export * from "./content-moderation/index.js";
 export * from "./load-control/index.js";
-export * from "./suno-callback-token.js";
+export * from "./legacyengine-callback-token.js";
 export * from "./music-track-audio-persist.js";
 export * from "./voice-verify-phrase-ttl.js";
 export * from "./transactional-email/index.js";
