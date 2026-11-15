@@ -1,4 +1,4 @@
-# Architecture: keep the creative flow simple, make failure explicit
+# Architecture and consistency boundaries
 
 The system separates interaction, authorization and execution. Web renders the experience; API owns access and domain rules; workers handle long-running work. PostgreSQL records domain truth. Queue delivery is a scheduling mechanism, not proof that an operation finished.
 
