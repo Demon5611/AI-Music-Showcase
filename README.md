@@ -126,80 +126,58 @@ Read the [architecture](docs/architecture.md), [engineering decisions](docs/engi
 
 ## AI-assisted engineering controls
 
-### Audit scope and branch distinction
+### Agent context and implementation workflow
 
-Source-configuration audit dated **2026-11-15**. The private project's `main` branch was inspected at `72083b1a`; `staging` was inspected at `c1d01d01`. These are branch states, not independently verified deployment identities.
+Repository instructions in `AGENTS.md` and domain-specific rules and skills give the agent the module structure, architectural constraints, accounting invariants and verification requirements. Tasks define the affected behavior, acceptance criteria and permitted scope before implementation.
 
-The security and architecture follow-ups were merged into **staging**, which was 14 commits ahead of main at this audit. Their presence in staging must not be described as enforcement in the production branch.
+The workflow connects a concrete requirement to a code change, automated diagnostics and behavioral tests. Findings identify the relevant file, rule and execution path; corrections are checked against the original contract.
 
-### Verified controls in the main branch
+### Automated architecture and security checks
 
-| Area | Repository evidence | Actual scope |
-| --- | --- | --- |
-| Agent context | Root `AGENTS.md`, domain rules and skills under `.cursor/` | Written instructions for agents; not proof of compliance or automatic loading by every agent |
-| Engineering constraints | Rules for scope, dependencies, storage, accounting and review | Most architectural constraints are expressed in prose |
-| ESLint | Shared recommended JS/TS configs; Next.js configs | Web explicitly forbids the top-level integration-adapter import; full service/feature boundary enforcement is not present |
-| TypeScript | Workspace typecheck command in CI | Type and contract checking; not architectural or business-logic verification |
-| Regression contracts | Test scripts and authorization/accounting/recovery test files | Tests are invoked in CI; file presence alone does not establish complete coverage |
-| Code review | Local QUICK/STANDARD/DEEP review policy and skill | Agent-assisted review workflow; no demonstrated automated review gate |
-| Feature branches and PRs | Separate implementation branches and reviewed staging PRs | Branch workflow exists; mandatory branch protection could not be verified |
-| NFRs | Production-readiness rules, release checklist, recovery/security invariants | Requirements are documented in several places; no complete measured NFR/SLO compliance matrix was established |
-| Load testing | Manually triggered fake-service load workflow | Test configuration exists; current performance results and production capacity were not validated |
-| Infrastructure | Local Compose configuration, a test-service Dockerfile and CI workflows | Partial environment automation; not a complete production IaC or drift-validation system |
+The following controls are configured in the main application project. This public showcase retains a reduced verification pipeline and sanitized examples.
 
-The main-branch CI runs dependency installation, database client generation, typecheck, lint, unit/contract tests, build-environment validation and build. Additional workflows cover selected media/database release checks and manually triggered fake-service load tests. A successful CI run was observed for the audited main SHA; no local test suite was rerun during this source audit.
-
-### Controls implemented in staging, not yet in audited main
-
-| Control | Staging evidence | Audited main |
-| --- | --- | --- |
-| Gitleaks | Configuration and commit-range/manual-history workflows | Configuration and scanning workflow absent |
-| Dependabot | Workspace and Actions update configuration | Configuration absent; account-level alerts remain unverified |
-| ESLint boundaries | Expanded web/server/package restrictions and a documented legacy exception | Expanded rules absent |
-| dependency-cruiser | Cycle configuration and known-violation baseline | Dependency, configuration and cycle command absent |
-| Semgrep | Structural security rules, negative/positive fixtures and CI invocation | Rules, fixture runner and CI invocation absent |
-| Download/credential regressions | Additional unit, HTTP integration and Chromium checks | Follow-up implementations/tests not promoted |
-
-These describe completed staging changes, not planned capabilities and not controls installed in this showcase. The public snapshot's CI independently runs its own publication check, typecheck, lint, tests and build.
-
-### Requested tools and methods not established in audited main
-
-| Area | Audit result |
+| Control | How it is organized |
 | --- | --- |
-| eslint-plugin-boundaries / Madge | No direct dependency, dedicated configuration or CI invocation found |
-| SonarQube / SonarCloud / CodeRabbit | No repository-based quality/review integration established; externally installed services were not independently verified |
-| CodeQL / ast-grep / Tree-sitter rule sets | No configured analysis pipeline found |
-| Knip / ts-prune / jscpd | No configured unused-code or duplication gate found |
-| Cyclomatic / cognitive / Halstead metrics | No measurement report or enforced threshold found |
-| Coupling/cohesion metrics | No quantified maintainability gate established |
-| Trivy / OWASP ZAP | No configured container or running-application scan gate found |
-| Formal verification | No CFG/SSA/SMT proof pipeline or formal business-invariant verification found |
-| BMAD / SDD tooling | No installed framework configuration or traceable generated workflow established |
-| Full production IaC | No Terraform/Pulumi/CDK deployment or policy/drift-validation pipeline found in the inspected tree |
+| **Gitleaks** | Scans PR commit ranges and repository history. Known false positives use narrow exceptions; scanner output redacts detected values. A separate manual workflow supports full-history checks. |
+| **Dependabot** | Weekly update configuration covers workspace dependencies and GitHub Actions. Compatible minor/patch updates are grouped and reviewed with bounded open-update counts. |
+| **ESLint boundaries** | Targeted import restrictions keep database, storage and integration implementations out of web code, prevent server packages from depending on web, and restrict cross-feature style imports. Explicit legacy exceptions remain documented. |
+| **dependency-cruiser** | Builds the dependency graph with workspace and alias resolution. CI rejects new cycles; existing exceptions are recorded in a specific baseline. |
+| **Semgrep** | Structural rules flag unsafe raw SQL APIs, process execution outside designated modules, explicit shell execution and selected storage/server-import violations. Fixtures check aliases, namespace imports, module loading, expected findings and clean examples. |
+| **Download and credential regressions** | Unit and HTTP integration tests cover URL validation, DNS pinning, redirects, shared deadlines, response cleanup and address classification. Chromium tests exercise the real authenticated media helper: direct delivery, redirect rejection and refusal to send Bearer credentials to an untrusted origin. |
 
-Task plans and contract-first testing rules provide elements of specification-oriented work. They do not establish adoption of BMAD or a formal Spec-Driven Development framework.
+The selected approach uses explicit import rules for a small layer matrix, graph analysis for cycles, structural rules for unsafe constructs and behavioral tests for runtime contracts. Analyzer fixtures verify that rules detect prohibited examples without flagging permitted ones.
 
-### Enforcement gaps and correction workflow
+### Code review
 
-The agent rules prescribe file/function size limits, but no corresponding executable gate was found. Large modules remain in main. Documentation of a constraint must therefore be separated from demonstrated enforcement.
+A separate agent-assisted review workflow checks the actual diff and affected dependency paths. Review depth increases for changes involving authorization, accounting, external side effects, queues, storage or migrations.
 
-A diagnostic-driven workflow should connect a requirement to an executable rule or behavioral test, apply a scoped correction, and verify the reviewed commit before release. This is the required operating model; the audit does not establish that every change already follows it.
+| Review area | What is checked |
+| --- | --- |
+| Correctness and contracts | Changed behavior, API compatibility, validation, error handling and regression coverage |
+| Authentication and ownership | Server-authoritative identity, resource access, admin boundaries and callback verification |
+| Payments and credits | Verified payment state, idempotent grants/debits/refunds, original-amount compensation and ambiguous outcomes |
+| Asynchronous state | Duplicate delivery, callback/poll races, stale transitions, worker restarts and crash recovery |
+| Integrations and media | Persisted task affinity, repeated external submissions, trusted URLs, credential handling and output readiness |
+| Data and frontend | Transaction boundaries, migration effects, browser/server separation and unintended side effects on mount |
+
+Each finding must describe what breaks, the execution path, code evidence and severity. A validation pass attempts to disprove the finding before it is accepted. Focused tests and applicable checks validate the correction; formatting preferences are kept separate from defect review.
+
+### Refactoring and verification
+
+Maintainability work is scoped around module responsibilities, coupling and behavioral contracts. Extracting functions solely to lower a metric is not an acceptance criterion. Regression expectations must come from the intended contract rather than being changed to fit the implementation.
 
 ```mermaid
 flowchart TD
-    Requirement["Requirement and failure cases"] --> Evidence{"Executable check exists?"}
-    Evidence -->|"yes"| Change["Scoped implementation change"]
-    Evidence -->|"no"| Gap["Record gap and define verification"]
-    Gap --> Change
-    Change --> Verify["Static checks and behavioral tests"]
-    Verify --> Result{"Checks pass?"}
-    Result -->|"no"| Fix["Investigate diagnostic and correct"]
-    Fix --> Verify
-    Result -->|"yes"| Review["Review actual SHA and residual risk"]
-    Review --> Release["Authorized merge and release"]
+    Context["Task and repository constraints"] --> Change["Scoped implementation"]
+    Change --> Checks["Architecture checks and regression tests"]
+    Checks --> Result{"Checks pass?"}
+    Result -->|"no"| Diagnose["Investigate diagnostic and correct"]
+    Diagnose --> Checks
+    Result -->|"yes"| Review["Domain code review"]
+    Review --> Decision{"Behavior and evidence agree?"}
+    Decision -->|"revision"| Diagnose
+    Decision -->|"accepted"| Complete["Verified change and documented limitations"]
 ```
-
-CI success does not prove absence of vulnerabilities. Static rules do not prove business correctness. A lower complexity score does not alone justify refactoring. Branch protection, deployment identity and externally configured scanning remain separate verification tasks.
 
 ## Local setup
 
